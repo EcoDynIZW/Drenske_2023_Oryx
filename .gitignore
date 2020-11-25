@@ -1,3 +1,29 @@
-.Rproj.user
+# History & Session data files
 .Rhistory
 .RData
+
+# RStudio files
+.Rproj.user
+
+# User-specific files
+.Ruserdata
+
+# Specific file formats
+*.doc
+*.html
+*.png
+*.pptx
+
+# Temporary files
+*.utf8.md
+*.knit.md
+*~
+~$*.doc*
+~$*.xls*
+*.xlk
+~$*.ppt*
+
+
+# Folder
+plots/
+docs/
