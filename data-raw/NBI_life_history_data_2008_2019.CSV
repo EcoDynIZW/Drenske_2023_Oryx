@@ -1,0 +1,737 @@
+bird_id;name;sex;generation;hatching_date;raising_type;status;parent_f;parent_f_id;parent_m;parent_m_id;population;breeding_area;missed_since;delivered_or_death_date;mortality_cause;mortality_verified
+5;Mikesch;m;F0;2008-05-20;foster parent;dead;n.a.;n.a.;n.a.;n.a.;wild population;Burghausen;;2014-12-29;other;verified
+6;Gonzo;f;F0;2008-05-17;foster parent;dead;n.a.;n.a.;n.a.;n.a.;wild population;Burghausen;;2014-09-17;electrocution;verified
+7;Julio;m;F0;2009-04-09;foster parent;dead;Henry;99004;Peppone 1;99019;wild population;Burghausen;;2014-09-17;electrocution;unverified
+8;Bima;f;F0;2009-04-23;foster parent;dead;Maja;99017;Ouso;n.a.;wild population;Burghausen;2015-02-23;2015-04-23;unknown;unverified
+9;Pepe;f;F0;2009-04-28;foster parent;dead;Lola;99005;Muck;99018;wild population;Burghausen;;2014-12-26;other;verified
+10;Hella;m;F0;2010-04-25;foster parent;dead;Henry;99004;Ouso;n.a.;wild population;Burghausen;;2014-10-22;shot;verified
+14;Balthasar;m;F0;2011-04-21;foster parent;dead;Camillo 1;99013;Benu;n.a.;wild population;Kuchl;2016-06-30;2016-08-30;unknown;unverified
+15;Tara;m;F0;2011-04-27;foster parent;dead;Jule;n.a.;Goran;n.a.;wild population;Kuchl;;2016-10-08;shot;verified
+16;Greta;m;F0;2011-04-24;foster parent;alive;Momo;99006;Tamri;99011;wild population;Kuchl;;;;
+17;Salem;f;F0;2011-04-20;foster parent;alive;Raki;n.a.;Muck;99018;wild population;Kuchl;;;;
+18;Iris;f;F0;2011-04-20;foster parent;dead;Meldos;n.a.;Lexi;n.a.;wild population;Kuchl;;2016-07-26;electrocution;verified
+19;Senta;f;F0;2011-04-23;foster parent;dead;Camillo 1;99013;Benu;n.a.;wild population;Kuchl;2015-06-19;2015-08-19;unknown;unverified
+20;Jazu;m;F1;2011-05-11;parent;alive;Tintifax;99021;Lilu;1;wild population;Burghausen;;;;
+21;Remus;m;F0;2011-04-17;supplementation;dead;Arion;n.a.;Hombre;n.a.;wild population;Burghausen;;2015-01-08;predation;unverified
+27;Artemide;m;F1;2012-05-18;parent;dead;Goja;99098;Ayla;4;wild population;Burghausen;;2016-04-28;electrocution;verified
+29;Idefix;m;F0;2013-04-21;supplementation;alive;Twister;n.a.;Nero 1;n.a.;wild population;Kuchl;;;;
+30;Amsel;f;F0;2013-04-22;supplementation;dead;Soho;n.a.;Muck;99018;wild population;Kuchl;2015-01-11;2015-03-11;unknown;unverified
+32;Luna;f;F1;2013-06-05;parent;alive;Gonzo;6;Mikesch;5;wild population;Burghausen;;;;
+33;Viola;f;F1;2013-06-11;parent;dead;Gonzo;6;Mikesch;5;wild population;Burghausen;2015-01-06;2015-03-06;unknown;unverified
+34;Francesco;m;F1;2013-06-13;parent;alive;Gonzo;6;Mikesch;5;wild population;Burghausen;;;;
+35;Vitorio;f;F0;2014-04-13;foster parent;alive;Raki;n.a.;Schurli;99010;wild population;Kuchl;;;;
+36;Auron;f;F0;2014-04-13;foster parent;dead;Pebbles;n.a.;Nero 1;n.a.;wild population;Kuchl;;2016-06-26;unknown;verified
+37;Terra;f;F0;2014-04-13;foster parent;dead;Twister;n.a.;Tamri;99011;wild population;Kuchl;2016-05-03;2016-07-03;unknown;unverified
+38;Liethe;m;F0;2014-04-14;foster parent;alive;Raki;n.a.;Schurli;99010;wild population;Kuchl;;;;
+39;Hiemi;m;F0;2014-04-14;foster parent;dead;Pebbles;n.a.;Nero 1;n.a.;wild population;Kuchl;2015-06-23;2015-08-23;unknown;unverified
+40;Pietri;m;F0;2014-04-15;foster parent;dead;Soho;n.a.;Muck;99018;wild population;Kuchl;;2016-05-07;electrocution;verified
+41;Ambra;m;F0;2014-04-15;foster parent;dead;Maja;99017;Lenus;n.a.;wild population;Kuchl;2017-09-10;2017-11-10;unknown;unverified
+43;Tori;m;F0;2014-04-15;foster parent;dead;Twister;n.a.;Tamri;99011;wild population;allocation;2018-05-01;2018-07-01;unknown;unverified
+44;Aris;f;F0;2014-04-17;foster parent;dead;Maja;99017;Lenus;n.a.;wild population;Kuchl;;2016-07-26;electrocution;verified
+45;Ed;f;F0;2014-04-17;foster parent;dead;Pela;n.a.;José;99067;wild population;Kuchl;2015-10-03;2015-12-03;unknown;unverified
+46;Blauge;f;F0;2014-04-18;foster parent;dead;Baluh;n.a.;Lucky;n.a.;wild population;Kuchl;2015-07-09;2015-09-09;unknown;unverified
+47;Peter;f;F0;2014-04-18;foster parent;alive;Amato;99001;Niels;99007;wild population;Kuchl;;;;
+48;Nova ;m;F0;2014-04-19;foster parent;alive;Benny;n.a.;Biene;n.a.;wild population;Kuchl;;;;
+49;Flumisel;f;F0;2014-04-20;foster parent;dead;Baluh;n.a.;Lucky ;n.a.;wild population;Burghausen;2018-05-07;2018-07-07;unknown;unverified
+52;Mario;m;F1;2014-05-15;parent;dead;Jack ;2;Marketa;3;wild population;Burghausen;;2014-09-17;electrocution;unverified
+53;Luigi;f;F1;2014-05-18;parent;alive;Jack ;2;Marketa;3;wild population;Burghausen;;;;
+54;Yoshi;m;F1;2014-05-21;parent;dead;Frodo;12;Ayla;4;wild population;Burghausen;;2014-09-17;electrocution;unverified
+55;Nero;m;F1;2014-05-21;parent;dead;Amore;13;Julio;7;wild population;Burghausen;2015-05-11;2015-07-11;unknown;unverified
+56;Kato;f;F1;2014-05-24;parent;dead;Amore;13;Julio;7;wild population;Burghausen;;2016-09-01;shot;verified
+57;Pernille;f;F1;2014-05-26;parent;dead;Amore;13;Julio;7;wild population;Burghausen;2017-11-14;2018-01-14;unknown;unverified
+58;Como;f;F1;2014-05-28;parent;delivered;Bima;8;Hella;10;wild population;Burghausen;;2015-04-23;;
+59;Lyra;m;F1;2014-05-31;parent;temporary;Bima;8;Hella;10;wild population;Burghausen;;;;
+60;Leopold;f;F1;2014-06-22;parent;alive;Pepe;9;Lilu;1;wild population;Burghausen;;;;
+61;DaVinci;m;F1;2014-06-24;parent;dead;Pepe;9;Lilu;1;wild population;Burghausen;2015-01-08;2015-03-08;unknown;unverified
+66;Ronja;m;F1;2014-06-09;parent;dead;Zeudi;25;Saba;22;wild population;Kuchl;2016-03-14;2016-05-14;unknown;unverified
+67;Ombra;f;F1;2014-06-14;parent;dead;Salem;17;Semir;24;wild population;Kuchl;;2017-05-30;injury/illness;verified
+68;Alpi;m;F0;2014-06-21;supplementation;dead;n.a.;n.a.;n.a.;n.a.;wild population;Kuchl;;2018-05-11;unknown;verified
+69;Muchacho;m;F0;2015-04-08;foster parent;dead;Mulan 1;n.a.;Phoenix;n.a.;wild population;allocation;2015-10-26;2015-12-26;unknown;unverified
+70;Fritz;f;F0;2015-04-09;foster parent;dead;Mulan 1;n.a.;Phoenix;n.a.;wild population;allocation;2016-07-14;2016-09-14;unknown;unverified
+71;Pino;m;F0;2015-04-11;foster parent;alive;Baluh;n.a.;Lucky;n.a.;wild population;Kuchl;;;;
+72;Bosco;m;F0;2015-04-11;foster parent;dead;Maja;99017;Lenus;n.a.;wild population;allocation;;2015-10-28;injury/illness;verified
+74;Donatello;m;F0;2015-04-12;foster parent;dead;Meldos;n.a.;Baerli;n.a.;wild population;Burghausen;;2019-12-14;shot;unverified
+75;Eywa;m;F0;2015-04-12;foster parent;dead;Twister;n.a.;Lexi;n.a.;wild population;allocation;2015-12-31;2016-03-01;unknown;unverified
+76;Bobericio;m;F0;2015-04-12;foster parent;dead;Pebbles;n.a.;Nero 1;n.a.;wild population;allocation;2015-11-22;2016-01-22;unknown;unverified
+77;Yuki;m;F0;2015-04-13;foster parent;dead;Camillo 1;99013;Mundel;n.a.;wild population;allocation;;2018-05-01;electrocution;verified
+78;Tosca;f;F0;2015-04-13;foster parent;dead;Baluh;n.a.;Lucky;n.a.;wild population;allocation;2015-11-25;2016-01-25;unknown;unverified
+79;Leonardo;f;F0;2015-04-13;foster parent;alive;Meldos;n.a.;Baerli;n.a.;wild population;Kuchl;;;;
+80;Raphael;f;F0;2015-04-13;foster parent;dead;Sid;n.a.;Rookie;n.a.;wild population;allocation;2016-07-19;2016-09-19;unknown;unverified
+81;Pandora;m;F0;2015-04-13;foster parent;dead;Benny;n.a.;Biene;n.a.;wild population;allocation;2017-05-09;2017-07-09;unknown;unverified
+82;Pangaea;f;F0;2015-04-14;foster parent;dead;Benny;n.a.;Biene;n.a.;wild population;allocation;2015-12-31;2016-03-01;unknown;unverified
+83;Tinto;m;F0;2015-04-14;foster parent;dead;Thor 1;n.a.;Diesel;n.a.;wild population;allocation;2016-07-30;2016-09-30;unknown;unverified
+84;Gobi;m;F0;2015-04-14;foster parent;dead;Amato;99001;Niels;99007;wild population;allocation;2015-12-31;2016-03-01;unknown;unverified
+85;Beteigeuze;m;F0;2015-04-14;foster parent;dead;Amato;99001;Niels;99007;wild population;allocation;;2015-12-23;unknown;verified
+86;Japo;m;F0;2015-04-14;foster parent;dead;Alibaba;99012;Schurli;99010;wild population;allocation;2018-06-13;2018-08-13;unknown;unverified
+87;Marvin;f;F0;2015-04-15;foster parent;alive;Thor 1;n.a.;Diesel;n.a.;wild population;Kuchl;;;;
+88;Gemini;f;F0;2015-04-15;foster parent;alive;Raki;n.a.;Benu;n.a.;wild population;Burghausen;;;;
+89;Carlito;m;F0;2015-04-15;foster parent;dead;Pebbles;n.a.;Nero 1;n.a.;wild population;allocation;;2015-10-30;injury/illness;verified
+90;Hannibal;f;F0;2015-04-15;foster parent;alive;Sid;n.a.;Rookie;n.a.;wild population;allocation;;;;
+91;Cosimo;m;F0;2015-04-16;foster parent;dead;Camillo 1;99013;Mundel;n.a.;wild population;allocation;2015-10-19;2015-12-19;unknown;unverified
+92;Orion;f;F0;2015-04-16;foster parent;dead;Mulan 1;n.a.;Phoenix;n.a.;wild population;allocation;2015-11-25;2016-01-25;unknown;unverified
+93;Camillo;f;F0;2015-04-16;foster parent;alive;Pela;n.a.;José;99067;wild population;Burghausen;;;;
+94;Pinocchio;f;F0;2015-04-17;foster parent;dead;Thor 1;n.a.;Diesel;n.a.;wild population;allocation;;2018-05-01;electrocution;verified
+95;Peppone;m;F0;2015-04-17;foster parent;dead;Pela;n.a.;José;99067;wild population;allocation;;2017-04-25;electrocution;verified
+96;Magrathea;m;F0;2015-04-17;foster parent;dead;Amato;99001;Niels;99007;wild population;allocation;2015-12-31;2016-03-01;unknown;unverified
+97;Fiore;m;F0;2015-04-17;foster parent;dead;Benny;n.a.;Biene;n.a.;wild population;allocation;2015-11-25;2016-01-25;unknown;unverified
+99;Dante;f;F0;2015-04-18;foster parent;dead;Gimli;n.a.;Nala;n.a.;wild population;Kuchl;;2019-12-19;electrocution;unverified
+100;Sparky;f;F0;2015-04-20;foster parent;dead;Thor 1;n.a.;Diesel;n.a.;wild population;allocation;2017-08-18;2017-10-18;unknown;unverified
+101;Hans;m;F1;2015-05-19;parent;dead;Jack;2;Ayla;4;wild population;Burghausen;2017-08-07;2017-10-07;unknown;unverified
+102;Tonio;m;F1;2015-05-21;parent;dead;Jack;2;Ayla;4;wild population;Burghausen;2015-08-15;2015-10-15;unknown;unverified
+103;Rocco;f;F1;2015-05-23;parent;dead;Jack;2;Ayla;4;wild population;Burghausen;;2017-03-08;during human care;verified
+104;Konrad;m;F1;2015-05-24;parent;dead;Frodo;12;Lilu;1;wild population;Burghausen;2015-11-22;2016-01-22;unknown;unverified
+105;Felipe;f;F1;2015-05-26;parent;dead;Frodo;12;Lilu;1;wild population;Burghausen;2015-12-03;2016-02-03;unknown;unverified
+106;Wolfi;f;F1;2015-05-27;parent;dead;Amore;13;Marketa;3;wild population;Burghausen;;2015-08-25;injury/illness;verified
+107;Coco;f;F1;2015-05-29;parent;dead;Amore;13;Marketa;3;wild population;Burghausen;;2015-12-14;injury/illness;verified
+108;Schrolli;m;F1;2015-05-31;parent;dead;Amore;13;Marketa;3;wild population;Burghausen;;2015-08-29;injury/illness;verified
+109;Kiki;m;F2;2015-06-16;parent;dead;Shorty;28;Jazu;20;wild population;Burghausen;2015-10-29;2015-12-29;unknown;unverified
+110;Rigi;f;F2;2015-06-18;parent;dead;Shorty;28;Jazu ;20;wild population;Burghausen;;2015-09-20;injury/illness;unverified
+111;Fanti;m;F1;2015-05-03;parent;dead;Zeudi;25;Saba;22;wild population;Kuchl;2017-08-22;2017-10-22;unknown;unverified
+112;Fynn;f;F1;2015-05-06;parent;alive;Zeudi;25;Saba;22;wild population;Kuchl;;;;
+113;Felix;f;F1;2015-05-07;parent;dead;Zeudi;25;Saba;22;wild population;Kuchl;;2015-08-07;injury/illness;verified
+114;Frieda;f;F1;2015-05-08;parent;dead;Zeudi;25;Saba;22;wild population;Kuchl;;2018-11-21;shot;verified
+115;Theo;m;F1;2015-05-14;parent;dead;Salem;17;Semir;24;wild population;Kuchl;;2018-11-21;shot;verified
+116;Mika;m;F1;2015-05-17;parent;dead;Salem;17;Semir;24;wild population;Kuchl;;2018-06-13;electrocution;verified
+117;Bianca;f;F1;2015-05-19;parent;alive;Salem;17;Semir;24;wild population;Kuchl;;;;
+118;Lancillotto;m;F0;2016-04-01;foster parent;alive;Don;n.a.;Agadir;n.a.;wild population;Kuchl;;;;
+119;Avventura;m;F0;2016-04-01;foster parent;alive;Don;n.a.;Agadir;n.a.;wild population;allocation;;;;
+120;Fiona;f;F0;2016-04-01;foster parent;alive;Camillo 1;99013;Mundel;n.a.;wild population;Burghausen;;;;
+121;Panzerotto;f;F0;2016-04-01;foster parent;dead;Sid;n.a.;Rookie;n.a.;wild population;allocation;2017-07-01;2017-09-01;unknown;unverified
+122;Artu;f;F0;2016-04-02;foster parent;dead;Sid;n.a.;Rookie;n.a.;wild population;allocation;;2016-08-06;predation;verified
+123;Cannella;m;F0;2016-04-03;foster parent;dead;Pebbles;n.a.;Benu;n.a.;wild population;allocation;2017-07-15;2017-09-15;unknown;unverified
+124;Orfeo;m;F0;2016-04-03;foster parent;dead;Twister;n.a.;Lexi;n.a.;wild population;allocation;;2018-10-26;unknown;verified
+125;Circe;f;F0;2016-04-04;foster parent;dead;Camillo 1;99013;Mundel;n.a.;wild population;allocation;2016-09-28;2016-11-28;unknown;unverified
+126;Ipazia;m;F0;2016-04-04;foster parent;dead;Baluh;n.a.;Diesel;n.a.;wild population;allocation;;2019-11-26;electrocution;verified
+127;Cenerella;m;F0;2016-04-05;foster parent;dead;Baluh;n.a.;Diesel;n.a.;wild population;allocation;;2018-10-13;injury/illness;verified
+129;Dusti;m;F0;2016-04-05;foster parent;dead;Twister;n.a.;Lexi;n.a.;wild population;allocation;;2019-01-07;shot;verified
+130;Altea;f;F0;2016-04-05;foster parent;dead;Nemo;n.a.;Olli;n.a.;wild population;allocation;;2019-07-15;electrocution;verified
+131;Bolti;m;F0;2016-04-06;foster parent;dead;Twister ;n.a.;Lexi;n.a.;wild population;allocation;;2016-11-09;unknown;verified
+132;Apollo;f;F0;2016-04-07;foster parent;dead;Meldos;n.a.;Baerli;n.a.;wild population;allocation;;2016-12-03;unknown;verified
+133;Cassandra;f;F0;2016-04-09;foster parent;alive;Twister;n.a.;Lexi;n.a.;wild population;allocation;;;;
+134;Smeik;m;F0;2016-04-09;foster parent;dead;Gimli;n.a.;Nala;n.a.;wild population;allocation;;2018-07-23;electrocution;verified
+135;Kuzko;f;F0;2016-04-09;foster parent;dead;Raki;n.a.;Tamri;99011;wild population;allocation;;2018-05-03;electrocution;verified
+136;Poncho;f;F0;2016-04-10;foster parent;alive;Meldos;n.a.;Baerli;n.a.;wild population;allocation;2019-12-16;;;
+137;Salvatore;m;F0;2016-04-10;foster parent;alive;Nemo;n.a.;Olli;n.a.;wild population;allocation;;;;
+138;Ciro;f;F0;2016-04-10;foster parent;dead;Pela;n.a.;Nero 1;n.a.;wild population;allocation;;2017-08-11;electrocution;verified
+139;Gennaro;m;F0;2016-04-11;foster parent;alive;Pela;n.a.;Nero 1;n.a.;wild population;allocation;;;;
+140;Imperatore;f;F0;2016-04-11;foster parent;dead;Raki;n.a.;Tamri;99011;wild population;allocation;;2016-10-17;unknown;verified
+141;Rumo;f;F0;2016-04-11;foster parent;dead;Gimli;n.a.;Nala;n.a.;wild population;allocation;;2018-03-25;unknown;verified
+142;Chewbacca;f;F0;2016-04-11;foster parent;dead;Ria;n.a.;Flipp;99014;wild population;allocation;;2017-06-14;electrocution;verified
+143;Jojo;m;F0;2016-04-11;foster parent;alive;Aleppo;n.a.;Othello;n.a.;wild population;Burghausen;;;;
+144;Dali;f;F0;2016-04-12;foster parent;temporary;Alibaba;99012;Schurli;99010;wild population;allocation;;;;
+146;Hanky;m;F0;2016-04-12;foster parent;dead;Ria;n.a.;Flipp;99014;wild population;allocation;;2016-12-06;unknown;verified
+147;Santora;m;F0;2016-04-13;foster parent;dead;Pela;n.a.;Nero 1;n.a.;wild population;allocation;;2017-09-27;shot;verified
+148;Silber;m;F0;2016-04-13;foster parent;dead;Soho;n.a.;Muck;99018;wild population;allocation;2017-07-12;2017-09-12;unknown;unverified
+149;Charlie;f;F0;2016-04-17;foster parent;alive;Shannara;n.a.;Schreckse;n.a.;wild population;Kuchl;;;;
+150;Enno;m;F1;2016-05-10;parent;dead;Jack;2;Ayla;4;wild population;Burghausen;;2016-11-03;shot;verified
+151;Triti;f;F1;2016-05-16;parent;dead;Jack;2;Ayla;4;wild population;Burghausen;;2016-08-04;predation;verified
+152;Heinz;m;F1;2016-05-16;parent;dead;Amore;13;Jazu;20;wild population;Burghausen;;2016-07-26;electrocution;unverified
+153;Quacks;m;F1;2016-05-18;parent;dead;Amore;13;Jazu;20;wild population;Burghausen;;2016-09-28;injury/illness;verified
+154;Lupo;f;F1;2016-05-19;parent;dead;Amore;13;Jazu;20;wild population;Burghausen;2016-08-03;2016-10-03;unknown;unverified
+155;Eragon;f;F1;2016-05-21;parent;dead;Amore;13;Jazu;20;wild population;Burghausen;;2016-12-20;injury/illness;verified
+156;Thor;f;F1;2016-05-08;parent;dead;Zeudi;25;Saba;22;wild population;Kuchl;;2017-04-20;shot;verified
+157;Odin;f;F1;2016-05-13;parent;dead;Zeudi;25;Saba;22;wild population;Kuchl;2016-07-26;2016-09-26;unknown;unverified
+158;Freya;m;F1;2016-05-14;parent;dead;Zeudi;25;Saba;22;wild population;Kuchl;;2016-12-10;predation;unverified
+159;Pax;m;F1;2016-05-29;parent;dead;Salem;17;Semir;24;wild population;Kuchl;;2017-04-29;electrocution;verified
+160;Fides;m;F1;2016-05-31;parent;dead;Salem;17;Semir;24;wild population;Kuchl;;2016-09-05;electrocution;verified
+161;Gea;f;F1;2016-06-02;parent;dead;Salem;17;Semir;24;wild population;Kuchl;;2016-09-05;electrocution;verified
+162;Cronos;f;F1;2016-05-31;parent;dead;Frodo;12;Tara;15;wild population;Kuchl;;2016-11-11;unknown;verified
+163;Einstein;f;F0;2017-04-02;foster parent;delivered;Phoenix;n.a.;Tamri;99011;wild population;Ueberlingen;;2018-05-16;;
+164;Zoppo;m;F0;2017-04-04;foster parent;alive;Sid;n.a.;Rookie;n.a.;wild population;Ueberlingen;;;;
+165;Eduardo;f;F0;2017-04-04;foster parent;alive;Don;n.a.;Agadir;n.a.;wild population;Ueberlingen;;;;
+166;Flux;f;F0;2017-04-04;foster parent;dead;Pebbles;n.a.;Benu;n.a.;wild population;Ueberlingen;;2017-12-16;unknown;verified
+167;Doc Brown;f;F0;2017-04-05;foster parent;dead;Pebbles;n.a.;Benu;n.a.;wild population;Ueberlingen;;2018-06-22;injury/illness;verified
+168;Aldo;f;F0;2017-04-05;foster parent;dead;Meldos;n.a.;Baerli;n.a.;wild population;Ueberlingen;;2018-02-03;unknown;verified
+169;Allegra ;m;F0;2017-04-05;foster parent;dead;Raki;n.a.;Nero 1;n.a.;wild population;Ueberlingen;2017-10-07;2017-12-07;unknown;unverified
+170;Corleone;f;F0;2017-04-06;foster parent;dead;Camillo 1;99013;Nala;n.a.;wild population;Ueberlingen;;2019-06-30;electrocution;verified
+171;Peluki;f;F0;2017-04-06;foster parent;dead;Baluh;n.a.;Diesel;n.a.;wild population;Ueberlingen;2017-10-11;2017-12-11;unknown;unverified
+172;Urmel;m;F0;2017-04-06;foster parent;alive;Baluh;n.a.;Diesel;n.a.;wild population;Ueberlingen;;;;
+173;Kopernikus;m;F0;2017-04-06;foster parent;dead;Nemo;n.a.;Mundel;n.a.;wild population;Ueberlingen;;2017-11-30;predation;verified
+174;Marty Mc Fly;m;F0;2017-04-07;foster parent;dead;Pebbles;n.a.;Benu;n.a.;wild population;Ueberlingen;;2018-08-06;electrocution;verified
+175;Giuliano;m;F0;2017-04-07;foster parent;dead;Meldos;n.a.;Baerli;n.a.;wild population;Ueberlingen;;2018-07-16;unknown;verified
+176;Flaps;f;F0;2017-04-07;foster parent;dead;Baluh;n.a.;Diesel;n.a.;wild population;Ueberlingen;;2018-10-19;shot;unverified
+177;Jakopo;m;F0;2017-04-07;foster parent;dead;Nemo;n.a.;Mundel;n.a.;wild population;Ueberlingen;2018-02-03;2018-04-03;unknown;unverified
+178;Sonic;f;F0;2017-04-09;foster parent;alive;Pela;n.a.;Ollie;n.a.;wild population;Ueberlingen;;;;
+180;Wookiee;m;F0;2017-04-10;foster parent;dead;Soho;n.a.;Muck;99018;wild population;Ueberlingen;;2019-06-03;unknown;unverified
+181;Rafiki;f;F0;2017-04-10;foster parent;dead;Kleopatra;n.a.;Ozzy;n.a.;wild population;Ueberlingen;;2018-03-30;unknown;verified
+182;Giorgia;f;F0;2017-04-11;foster parent;alive;Nemo;n.a.;Mundel;n.a.;wild population;Ueberlingen;;;;
+183;Don Muggele;f;F0;2017-04-11;foster parent;dead;Ria;n.a.;Flipp;99014;wild population;Ueberlingen;;2018-10-03;shot;unverified
+184;Capitano;f;F0;2017-04-11;foster parent;alive;Gismo;n.a.;Triton;n.a.;wild population;Ueberlingen;;;;
+185;Snorre;f;F0;2017-04-12;foster parent;dead;Pela;n.a.;Ollie;n.a.;wild population;Ueberlingen;2017-10-08;2017-12-08;unknown;unverified
+186;Argenta;f;F0;2017-04-12;foster parent;dead;Ariel;n.a.;Giuseppe;n.a.;wild population;Ueberlingen;2017-10-08;2017-12-08;unknown;unverified
+187;Il Barone;m;F0;2017-04-12;foster parent;dead;Gismo;n.a.;Triton;n.a.;wild population;Ueberlingen;2017-10-07;2017-12-07;unknown;unverified
+188;Akela;m;F0;2017-04-12;foster parent;dead;Sequoia;n.a.;Simon;n.a.;wild population;Ueberlingen;;2019-01-31;injury/illness;unverified
+189;Nuria;m;F0;2017-04-13;foster parent;dead;Meldos;n.a.;Baerli;n.a.;wild population;Ueberlingen;;2017-10-10;shot;unverified
+190;Sele;m;F0;2017-04-13;foster parent;dead;Ria;n.a.;Flipp;99014;wild population;Ueberlingen;2017-10-10;2017-12-10;unknown;unverified
+191;Yakari;f;F0;2017-04-13;foster parent;dead;Schreckse;n.a.;Shannara;n.a.;wild population;Ueberlingen;;2017-12-24;injury/illness;verified
+192;Dino;m;F0;2017-04-14;foster parent;dead;Pela;n.a.;Ollie;n.a.;wild population;Ueberlingen;;2018-10-07;electrocution;verified
+193;Arda;f;F0;2017-04-14;foster parent;dead;Gimli;n.a.;José;99067;wild population;Ueberlingen;2017-10-07;2017-12-07;unknown;unverified
+194;Raia;m;F2;2017-05-04;parent;alive;Shorty;28;Lilu;1;wild population;Burghausen;;;;
+195;Speranza;m;F2;2017-05-06;parent;dead;Shorty;28;Lilu;1;wild population;Burghausen;;2018-07-27;electrocution;verified
+196;Cleo;f;F2;2017-05-08;parent;dead;Shorty;28;Lilu;1;wild population;Burghausen;2017-12-23;2018-02-23;unknown;unverified
+197;Karl;f;F1;2017-05-11;parent;alive;Amore;13;Ayla;4;wild population;Burghausen;;;;
+198;Simile;m;F1;2017-05-14;parent;dead;Amore;13;Ayla;4;wild population;Burghausen;;2017-08-28;electrocution;unverified
+199;Brutus;f;F1;2017-05-11;parent;alive;Jack;2;Jazu;20;wild population;Burghausen;;;;
+200;Luciano;m;F1;2017-05-14;parent;dead;Jack;2;Jazu;20;wild population;Burghausen;;2017-09-18;electrocution;unverified
+201;Lula;m;F1;2017-05-16;parent;dead;Jack;2;Jazu;20;wild population;Burghausen;;2017-09-25;electrocution;verified
+202;Smudo;f;F1;2017-05-17;parent;alive;Jack;2;Jazu;20;wild population;Burghausen;;;;
+203;Attila;m;F1;2017-05-28;parent;alive;Salem;17;Semir;24;wild population;allocation;;;;
+204;Samson;f;F1;2017-05-30;parent;dead;Salem;17;Semir;24;wild population;Burghausen;;2019-06-20;electrocution;verified
+205;Albinia;f;F1;2017-06-01;parent;dead;Salem;17;Semir;24;wild population;Burghausen;2019-10-07;2019-12-07;unknown;unverified
+206;Ikarus;m;F1;2017-06-01;parent;dead;Zeudi;25;Saba;22;wild population;Kuchl;2018-02-27;2018-04-27;unknown;unverified
+207;Waldemar;f;F1;2017-06-03;parent;alive;Zeudi;25;Saba;22;wild population;allocation;;;;
+208;Tiffi;m;F1;2017-06-05;parent;alive;Zeudi;25;Saba;22;wild population;allocation;;;;
+209;Silie;m;F1;2017-06-07;parent;dead;Peter;47;Liethe;38;wild population;Burghausen;2017-08-04;2017-10-04;unknown;unverified
+210;Findus;f;F1;2017-06-08;parent;dead;Peter;47;Liethe;38;wild population;Burghausen;;2017-09-17;electrocution;verified
+211;Rowdie;m;F0;2018-04-15;foster parent;dead;Ariel;n.a.;José;99067;wild population;Ueberlingen;;2019-01-06;unknown;verified
+212;Sensai;m;F0;2018-04-15;foster parent;alive;Nemo;n.a.;Mundel;n.a.;wild population;Ueberlingen;;;;
+213;Gipsy;f;F0;2018-04-15;foster parent;alive;Baluh;n.a.;Lucky;n.a.;wild population;Ueberlingen;;;;
+215;Cip;f;F0;2018-04-16;foster parent;dead;Phoenix;n.a.;Diesel;n.a.;wild population;Ueberlingen;;2019-01-24;unknown;verified
+216;Coranne;m;F0;2018-04-16;foster parent;dead;Don;n.a.;Agadir;n.a.;wild population;Ueberlingen;;2019-01-22;unknown;verified
+217;Akuma;m;F0;2018-04-16;foster parent;alive;Meldos;n.a.;Baerli;n.a.;wild population;Ueberlingen;;;;
+218;Ciop;m;F0;2018-04-16;foster parent;alive;Pela;n.a.;Ollie;n.a.;wild population;Ueberlingen;;;;
+219;Drogo;f;F0;2018-04-19;foster parent;dead;Twister;n.a.;Nero 1;n.a.;wild population;Ueberlingen;;2019-01-18;unknown;verified
+220;Rambo;f;F0;2018-04-17;foster parent;dead;Ariel;n.a.;José;99067;wild population;Ueberlingen;;2019-01-24;unknown;verified
+221;Poggi;f;F0;2018-04-17;foster parent;dead;Nemo;n.a.;Mundel;n.a.;wild population;Ueberlingen;;2019-01-24;unknown;verified
+222;Gringo;f;F0;2018-04-17;foster parent;alive;Don;n.a.;Agadir;n.a.;wild population;Ueberlingen;;;;
+223;Grobi;m;F0;2018-04-17;foster parent;dead;Pebbles;n.a.;Benu;n.a.;wild population;Ueberlingen;;2019-01-24;unknown;verified
+224;Draghetto;m;F0;2018-04-18;foster parent;dead;Phoenix;n.a.;Diesel;n.a.;wild population;Ueberlingen;;2019-02-20;injury/illness;verified
+225;Bernardo;m;F0;2018-04-18;foster parent;alive;Raki;n.a.;Lenus;n.a.;wild population;Ueberlingen;;;;
+227;Afra;f;F0;2018-04-18;foster parent;alive;Twister;n.a.;Nero 1;n.a.;wild population;Ueberlingen;;;;
+228;Bonsi;f;F0;2018-04-20;foster parent;alive;Meldos;n.a.;Baerli;n.a.;wild population;Ueberlingen;;;;
+229;Grisu;f;F0;2018-04-20;foster parent;dead;Pela;n.a.;Ollie;n.a.;wild population;Ueberlingen;;2019-01-24;unknown;verified
+230;Oskar;m;F0;2018-04-20;foster parent;alive;Hazel;n.a.;Rusty;n.a.;wild population;Ueberlingen;;;;
+231;Arya;m;F0;2018-04-20;foster parent;dead;Ria;n.a.;Triton;n.a.;wild population;Ueberlingen;;2019-01-22;unknown;verified
+232;Sky;f;F0;2018-04-23;foster parent;alive;Hazel;n.a.;Rusty;n.a.;wild population;Ueberlingen;;;;
+233;Enea;m;F0;2018-04-23;foster parent;alive;Ria;n.a.;Triton;n.a.;wild population;Ueberlingen;;;;
+234;Fuchur;m;F0;2018-04-23;foster parent;dead;Raider;n.a.;Guiseppe;n.a.;wild population;Ueberlingen;;2019-01-12;unknown;verified
+235;Mowgli;m;F0;2018-04-23;foster parent;alive;Sequioia;n.a.;Simon;n.a.;wild population;Ueberlingen;;;;
+236;Alfredo;m;F0;2018-04-24;foster parent;alive;Gismo;n.a.;Zaza;n.a.;wild population;Ueberlingen;;;;
+238;Mulan;f;F0;2018-04-25;foster parent;dead;Sequioia;n.a.;Simon;n.a.;wild population;Ueberlingen;;2019-09-22;unknown;verified
+240;Fridolin;m;F0;2018-04-26;foster parent;dead;Ria;n.a.;Triton;n.a.;wild population;Ueberlingen;;2019-01-09;unknown;verified
+241;Paride;m;F0;2018-04-26;foster parent;alive;Gimli;n.a.;Flipp;99014;wild population;Ueberlingen;;;;
+242;Smaug;m;F0;2018-04-26;foster parent;alive;Sherlock 1;n.a.;Schurli;99010;wild population;Ueberlingen;;;;
+243;Montalcino;f;F0;2018-04-26;foster parent;alive;Mokka;n.a.;Ozzy;n.a.;wild population;Ueberlingen;;;;
+244;Lorenz;m;F2;2018-05-11;parent;dead;Luna;32;Jazu;20;wild population;Burghausen;;2018-07-21;electrocution;verified
+245;Adele;f;F2;2018-05-12;parent;alive;Luna;32;Jazu;20;wild population;Burghausen;;;;
+246;Fidelio;f;F2;2018-05-14;parent;dead ;Luna;32;Jazu;20;wild population;Burghausen;;2018-11-18;shot;unverified
+247;Lucius;m;F1;2018-05-11;parent;alive;Jack;2;Ayla;4;wild population;Burghausen;;;;
+248;Atair;m;F1;2018-05-12;parent;dead;Jack;2;Ayla;4;wild population;Burghausen;;2018-07-21;electrocution;verified
+249;Carlo;m;F1;2018-05-14;parent;alive;Jack;2;Ayla;4;wild population;Burghausen;;;;
+250;Verus;f;F1;2018-05-12;parent;dead;Frodo;12;Lilu;1;wild population;Kuchl;;2019-03-12;unknown;verified
+251;Juno;m;F1;2018-05-14;parent;alive;Frodo;12;Lilu;1;wild population;Burghausen;;;;
+252;Laura;f;F1;2018-05-16;parent;alive;Frodo;12;Lilu;1;wild population;Burghausen;;;;
+253;Moritz;f;F1;2018-06-01;parent;alive;Camillo;93;Francesco;34;wild population;Burghausen;;;;
+254;Mea;f;F1;2018-06-04;parent;dead;Camillo;93;Francesco;34;wild population;Burghausen;;2018-08-08;injury/illness;verified
+255;Silvretta;f;F0;2018-05-07;supplementation;alive;51286/r/white/l;n.a.;51829/l/blue/l;n.a.;wild population;allocation;;;;
+256;Selun;m;F0;2018-05-14;supplementation;dead;51286/r/white/l;n.a.;51829/l/blue/l;n.a.;wild population;allocation;;2018-12-08;unknown;verified
+257;Strela;f;F0;2018-05-14;supplementation;dead;51824/r/red/l;n.a.;51820/l/black/r;n.a.;wild population;allocation;;2018-08-27;electrocution;verified
+258;Saentis;m;F0;2018-05-14;supplementation;dead;51206;n.a.;51207;n.a.;wild population;allocation;;2018-12-19;unknown;verified
+259;namenlos26;n.a.;F1;2018-06-02;parent;dead;Camillo;93;Francesco;34;wild population;Burghausen;;2018-07-22;electrocution;verified
+260;Smokie;m;F1;2018-05-16;parent;dead;Zeudi;25;Filou;23;wild population;Kuchl;;2019-01-31;unknown;verified
+261;Sissi;f;F1;2018-05-18;parent;dead;Zeudi;25;Filou;23;wild population;Kuchl;;2018-12-17;unknown;verified
+262;Nessi;m;F1;2018-05-20;parent;dead;Zeudi;25;Filou;23;wild population;Kuchl;;2018-12-12;unknown;verified
+263;Clyde;m;F1;2018-05-25;parent;alive;Vitorio;35;Saba;22;wild population;Kuchl;;;;
+264;Bonnie;f;F1;2018-05-27;parent;dead;Vitorio;35;Saba;22;wild population;Kuchl;;2018-11-27;unknown;verified
+265;Janus;m;F1;2018-05-25;parent;dead;Peter;47;Nova;48;wild population;Kuchl;;2019-01-20;unknown;verified
+266;Eos;f;F1;2018-05-27;parent;dead;Peter;47;Nova;48;wild population;Kuchl;;2019-01-30;unknown;verified
+267;Persephone;f;F1;2018-05-29;parent;dead;Peter;47;Nova;48;wild population;Kuchl;;2019-06-22;electrocution;verified
+268;Elliot;m;F1;2018-05-29;parent;alive;Salem;17;Greta;16;wild population;Kuchl;;;;
+269;Wila;f;F1;2018-06-01;parent;dead;Salem;17;Greta;16;wild population;Kuchl;;2018-08-17;predation;verified
+270;Caspar;m;F1;2018-06-03;parent;dead;Marvin;87;Pino;71;wild population;Kuchl;;2018-08-18;predation;verified
+271;Melchior;f;F1;2018-06-05;parent;dead;Marvin;87;Pino;71;wild population;Kuchl;;2018-10-22;predation;verified
+272;Nepomuk;m;F1;2018-06-09;parent;alive;Leonardo;79;Liethe;38;wild population;Kuchl;;;;
+273;Marla;m;F1;2018-06-11;parent;dead;Leonardo;79;Liethe;38;wild population;Kuchl;;2018-07-31;electrocution;verified
+274;Gandolf;f;F0;2018-04-19;parent;alive;Don;n.a.;Agadir;n.a.;wild population;Rosegg;;;;
+275;Mozart;f;F0;2018-04-26;parent;dead;Gismo;n.a.;Zaza;n.a.;wild population;Rosegg;;2019-01-23;predation;verified
+276;Phebe;m;F0;2018-04-13;parent;alive;Phoenix;n.a.;Diesel;n.a.;wild population;Rosegg;;;;
+277;Bart;m;F0;2018-04-20;parent;dead;Matrix;n.a.;Homer;n.a.;wild population;Rosegg;;2019-01-29;unknown;verified
+278;Rudini;f;F0;2019-04-04;foster parent;alive;Phoenix ;n.a.;Diesel ;n.a.;wild population;Ueberlingen;;;;
+279;Atreju;m;F0;2019-04-05;foster parent;alive;Meldos;n.a.;Lucky;n.a.;wild population;Ueberlingen;;;;
+280;Hansi;f;F0;2019-04-05;foster parent;alive;Baluh ;n.a.;Mundel;n.a.;wild population;Ueberlingen;;;;
+281;Hitschi;f;F0;2019-04-05;foster parent;alive;Pebbles;n.a.;Benu;n.a.;wild population;Ueberlingen;;;;
+282;Calimero;f;F0;2019-04-07;foster parent;alive;Sid ;n.a.;Rookie ;n.a.;wild population;Ueberlingen;;;;
+283;Ohnezahn;m;F0;2019-04-07;foster parent;alive;Pebbles;n.a.;Benu;n.a.;wild population;Ueberlingen;;;;
+284;Cupi;f;F0;2019-04-09;foster parent;alive;Meldos;n.a.;Lucky;n.a.;wild population;Ueberlingen;;;;
+285;Hicks;f;F0;2019-04-09;foster parent;alive;Pela;n.a.;Ollie;n.a.;wild population;Ueberlingen;;;;
+286;Vincino;f;F0;2019-04-09;foster parent;alive;Raider;n.a.;Guiseppe;n.a.;wild population;Ueberlingen;;;;
+287;Alfonso;f;F0;2019-04-10;foster parent;alive;Pela;n.a.;Ollie;n.a.;wild population;Ueberlingen;;;;
+288;Hedwig;m;F0;2019-04-10;foster parent;alive;Ariel ;n.a.;Lexi;n.a.;wild population;Ueberlingen;;;;
+289;Gero;f;F0;2019-04-10;foster parent;alive;Twister;n.a.;Nero 1;n.a.;wild population;Ueberlingen;;;;
+291;Ginny;m;F0;2019-04-11;foster parent;dead;Ariel ;n.a.;Lexi;n.a.;wild population;Ueberlingen;;2019-12-23;injury/illness;verified
+292;Paolo;f;F0;2019-04-12;foster parent;alive;Pela;n.a.;Ollie;n.a.;wild population;Ueberlingen;;;;
+293;Bernadette;m;F0;2019-04-12;foster parent;alive;Matrix;n.a.;Homer;n.a.;wild population;Ueberlingen;;;;
+294;El Comandante;f;F0;2019-04-12;foster parent;alive;Twister;n.a.;Nero 1;n.a.;wild population;Ueberlingen;;;;
+295;Albus;m;F0;2019-04-12;foster parent;alive;Nemo;n.a.;Zaza;n.a.;wild population;Ueberlingen;;;;
+296;Luise;m;F0;2019-04-13;foster parent;alive;Ria ;n.a.;Triton;n.a.;wild population;Ueberlingen;;;;
+297;Rupert;f;F0;2019-04-14;foster parent;alive;Ria ;n.a.;Triton;n.a.;wild population;Ueberlingen;;;;
+298;Shaun;m;F0;2019-04-14;foster parent;alive;Gismo ;n.a.;José;99067;wild population;Ueberlingen;;;;
+299;Linus;m;F0;2019-04-15;foster parent;alive;Ria ;n.a.;Triton;n.a.;wild population;Ueberlingen;;;;
+300;Marcello;f;F0;2019-05-14;foster parent;alive;Twister;n.a.;Nero 1;n.a.;wild population;Ueberlingen;;;;
+301;Sir Angus;m;F0;2019-04-15;foster parent;alive;Nemo;n.a.;Zaza;n.a.;wild population;Ueberlingen;;;;
+302;Obelix;m;F0;2019-04-15;foster parent;alive;Matrix;n.a.;Homer;n.a.;wild population;Ueberlingen;;;;
+303;Scotty;f;F0;2019-04-16;foster parent;alive;Faraya;n.a.;Abasi;n.a.;wild population;Ueberlingen;;;;
+304;Cesare;m;F0;2019-04-16;foster parent;alive;Twister;n.a.;Nero 1;n.a.;wild population;Ueberlingen;;;;
+306;Spock;f;F0;2019-04-17;foster parent;alive;Ria ;n.a.;Triton;n.a.;wild population;Ueberlingen;;;;
+307;Asterix;f;F0;2019-04-19;foster parent;alive;Sherlock 1;n.a.;Baerli;n.a.;wild population;Ueberlingen;;;;
+308;Yoda;f;F0;2019-04-19;foster parent;alive;Jamala ;n.a.;Zahir;n.a.;wild population;Ueberlingen;;;;
+309;Kazoo;f;F0;2019-04-20;foster parent;alive;Jamala ;n.a.;Zahir;n.a.;wild population;Ueberlingen;;;;
+314;Amenophis;m;F2;2019-05-08;parent;alive;Luna;32;Jazu;20;wild population;Burghausen;;;;
+315;Hapu;f;F2;2019-05-09;parent;alive;Luna;32;Jazu;20;wild population;Burghausen;;;;
+316;Chimo;m;F2;2019-05-10;parent;dead;Luna;32;Jazu;20;wild population;Burghausen;;2019-12-13;predation;unverified
+317;Akkon;f;F2;2019-05-12;parent;alive;Luna;32;Jazu;20;wild population;Burghausen;;;;
+318;Jola;m;F1;2019-05-08;parent;alive;Frodo;12;Marketa;3;wild population;Burghausen;;;;
+319;Keno;m;F1;2019-05-10;parent;alive;Frodo;12;Marketa;3;wild population;Burghausen;;;;
+320;Tamina;m;F1;2019-05-12;parent;alive;Frodo;12;Marketa;3;wild population;Burghausen;;;;
+321;Lilly;f;F1;2019-05-14;parent;delivered;Frodo;12;Marketa;3;wild population;Burghausen;;2019-11-26;;
+322;Drako;f;F1;2019-05-13;parent;alive;Sommo;42;Francesco;34;wild population;Burghausen;;;;
+323;Cuculo;f;F2;2019-05-17;parent;alive;Luna;32;Jazu;20;wild population;Burghausen;;;;
+324;Xaverl;m;F1;2019-05-25;parent;alive;Camillo;93;Alpha;11;wild population;Burghausen;;;;
+325;Richie;f;F1;2019-05-26;parent;dead;Camillo;93;Alpha;11;wild population;Burghausen;;2019-12-16;electrocution;unverified
+326;Ilex;f;F1;2019-05-28;parent;alive;Camillo;93;Alpha;11;wild population;Burghausen;;;;
+327;Caradis;f;F1;2019-05-30;parent;alive;Camillo;93;Alpha;11;wild population;Burghausen;;;;
+328;Gorgo;m;F1;2019-05-29;parent;alive;Gemini;88;Jojo;143;wild population;Burghausen;;;;
+329;Tilda;f;F1;2019-05-30;parent;alive;Gemini;88;Jojo;143;wild population;Burghausen;;;;
+330;Kelaynak;m;F1;2019-05-13;parent;dead;Zeudi;25;Filou;23;wild population;Kuchl;;2019-12-11;electrocution;verified
+331;Hala;m;F1;2019-05-14;parent;alive;Zeudi;25;Filou;23;wild population;Kuchl;;;;
+332;Agada;m;F1;2019-05-16;parent;alive;Zeudi;25;Filou;23;wild population;Kuchl;;;;
+333;Mara;f;F1;2019-05-18;parent;alive;Zeudi;25;Filou;23;wild population;Kuchl;;;;
+334;Chlodwig;f;F1;2019-05-26;parent;alive;Peter;47;Nova;48;wild population;Kuchl;;;;
+335;Adalberto;m;F1;2019-05-28;parent;alive;Peter;47;Nova;48;wild population;Kuchl;;;;
+336;Wes;m;F1;2019-05-28;parent;alive;Dante;99;Quasimodo;351;wild population;Kuchl;;;;
+337;Robin;f;F1;2019-05-30;parent;alive;Dante;99;Quasimodo;351;wild population;Kuchl;;;;
+338;Marlene;f;F1;2019-06-01;parent;dead;Dante;99;Quasimodo;351;wild population;Kuchl;;2019-08-27;unknown;verified
+339;Jonte;m;F1;2019-05-28;parent;alive;Salem;17;Liethe;38;wild population;Kuchl;;;;
+340;Pauli;m;F1;2019-06-01;parent;alive;Salem;17;Liethe;38;wild population;Kuchl;;;;
+341;Isabella;f;F1;2019-06-03;parent;alive;Salem;17;Liethe;38;wild population;Kuchl;;;;
+342;Junia;m;F1;2019-05-29;parent;dead;Leonardo;79;Saba;22;wild population;Kuchl;;2019-12-31;unknown;verified
+343;Abbondio;m;F1;2019-05-31;parent;alive;Leonardo;79;Saba;22;wild population;Kuchl;;;;
+344;Grignolino;f;F1;2019-06-02;parent;alive;Leonardo;79;Saba;22;wild population;Kuchl;;;;
+345;Goliath;m;F1;2019-06-09;parent;dead;Marvin;87;Pino;71;wild population;Kuchl;;2019-10-21;predation;verified
+346;Zerberus;m;F1;2019-06-10;parent;alive;Marvin;87;Pino;71;wild population;Kuchl;2019-11-01;;;
+347;Prometheus;f;F1;2019-06-12;parent;alive;Marvin;87;Pino;71;wild population;Kuchl;;;;
+348;Wilma;m;F1;2019-06-10;parent;temporary;Vitorio;35;Greta;16;wild population;Kuchl;;;;
+349;Cyrus;f;F1;2019-06-11;parent;alive;Vitorio;35;Greta;16;wild population;Kuchl;;;;
+350;Deedee;m;F1;2019-06-13;parent;dead;Vitorio;35;Greta;16;wild population;Kuchl;;2019-10-20;predation;verified
+352;Bubona;m;F0;2019-04-21;parent;alive;Sherlock 1;n.a.;Baerli;n.a.;wild population;Rosegg;2019-12-19;;;
+353;Strenia;f;F0;2019-04-15;parent;alive;Soho;n.a.;Muck;99018;wild population;Rosegg;2019-11-25;;;
+354;Bacchus;m;F0;2019-04-07;parent;alive;Baluh ;n.a.;Mundel;n.a.;wild population;Rosegg;;;;
+355;Vesta;m;F0;2019-04-09;parent;alive;Hazel;n.a.;Rusty;n.a.;wild population;Rosegg;;;;
+356;Aurora;m;F0;2019-04-15;parent;dead;Ariel ;n.a.;Lexi;n.a.;wild population;Rosegg;;2019-12-16;predation;verified
+357;Salus;f;F0;2019-04-03;parent;alive;Sid ;n.a.;Rookie ;n.a.;wild population;Rosegg;;;;
+358;Pemona;m;F0;2019-03-30;parent;alive;Phoenix ;n.a.;Diesel ;n.a.;wild population;Rosegg;2019-11-14;;;
+359;Piccus;m;F0;2019-04-10;parent;delivered;Pebbles;n.a.;Benu;n.a.;wild population;Rosegg;;2019-12-17;;
+360;Epona;m;F0;2019-04-04;parent;alive;Phoenix ;n.a.;Diesel ;n.a.;wild population;Rosegg;2019-12-14;;;
+361;Pietas;f;F0;2019-05-02;parent;alive;Houdini;n.a.;Jojo1;n.a.;wild population;Rosegg;;;;
+362;Cyela;m;F0;2019-04-01;parent;alive;Camillo 1;99013;Nala;n.a.;wild population;Rosegg;;;;
+363;Robigus;f;F0;2019-04-10;parent;alive;Raider;n.a.;Guiseppe;n.a.;wild population;Rosegg;;;;
+364;Virtus;m;F0;2019-04-22;parent;delivered;Jamala ;n.a.;Zahir;n.a.;wild population;Rosegg;;2019-12-17;;
+365;Jupiter;m;F0;2019-04-17;parent;alive;Gismo ;n.a.;José;99067;wild population;Rosegg;;;;
+366;Terras;m;F0;2019-06-07;parent;dead;Twister;n.a.;Nero 1;n.a.;wild population;Rosegg;;2019-12-14;shot;unverified
+367;Levanna;m;F0;2019-04-11;parent;alive;Meldos;n.a.;Lucky;n.a.;wild population;Rosegg;;;;
+368;Fortuna;f;F0;2019-06-05;parent;dead;Twister;n.a.;Nero 1;n.a.;wild population;Rosegg;;2019-12-15;predation;verified
+369;Fidessa;f;F0;2019-05-13;parent;alive;Romeo;n.a.;Tamri;99011;wild population;Rosegg;2019-12-14;;;
+99078;Sorli;m;F0;2007-04-16;foster parent;dead;Sindbad;n.a.;Alibaba;99012;wild population;Burghausen;2008-08-08;2008-10-08;unknown;unverified
+99084;Isi;f;F0;2008-05-26;foster parent;dead;n.a.;n.a.;n.a.;n.a.;wild population;Burghausen;2008-10-09;2008-12-09;unknown;unverified
+99086;Mari;f;F0;2008-05-22;foster parent;dead;n.a.;n.a.;n.a.;n.a.;wild population;Burghausen;2008-10-09;2008-12-09;unknown;unverified
+99087;Maxi;f;F0;2008-05-14;foster parent;dead;n.a.;n.a.;n.a.;n.a.;wild population;Burghausen;2008-10-09;2008-12-09;unknown;unverified
+99088;Alex;m;F0;2008-05-23;foster parent;dead;n.a.;n.a.;n.a.;n.a.;wild population;Burghausen;2009-01-13;2009-03-13;unknown;unverified
+99092;Hanni;f;F0;2008-05-21;foster parent;dead;n.a.;n.a.;n.a.;n.a.;wild population;Burghausen;;2010-10-23;injury/illness;verified
+99093;Luca;f;F0;2008-05-18;foster parent;dead;n.a.;n.a.;n.a.;n.a.;wild population;Burghausen;2010-05-25;2010-07-25;unknown;unverified
+99094;Mia;f;F0;2008-05-21;foster parent;dead;n.a.;n.a.;n.a.;n.a.;wild population;Burghausen;;2009-06-23;electrocution;unverified
+99097;Zora;m;F0;2008-05-23;foster parent;dead;n.a.;n.a.;n.a.;n.a.;wild population;Burghausen;2008-10-09;2008-12-09;unknown;unverified
+99098;Goja;f;F0;2009-04-30;foster parent;dead;Hombre;n.a.;Arion;n.a.;wild population;Burghausen;;2012-10-13;shot;verified
+99101;Manu;f;F0;2009-04-27;foster parent;dead;Hombre;n.a.;Arion;n.a.;wild population;Burghausen;2011-07-29;2011-09-29;unknown;unverified
+99103;Chiari;m;F0;2009-04-21;foster parent;dead;Maja;99017;Ouso;n.a.;wild population;Burghausen;2011-08-21;2011-10-21;unknown;unverified
+99104;Fria;f;F0;2009-04-24;foster parent;dead;Lola;99005;Muck;99018;wild population;Burghausen;2011-08-21;2011-10-21;unknown;unverified
+99105;Irka;f;F0;2009-04-27;foster parent;dead;Esra;99003;Niels;99007;wild population;Burghausen;2011-08-07;2011-10-07;unknown;unverified
+99106;JoDi;m;F0;2009-04-21;foster parent;dead;Raki;n.a.;Toni 1;n.a.;wild population;Burghausen;2011-07-15;2011-09-15;unknown;unverified
+99110;Toni;f;F0;2009-04-26;foster parent;dead;Soho;n.a.;Tamri;99011;wild population;Burghausen;2009-11-02;2010-01-02;unknown;unverified
+99111;Wiedsche;m;F0;2009-04-09;foster parent;dead;Raki;n.a.;Toni 1;n.a.;wild population;Burghausen;;2012-05-22;electrocution;verified
+99113;Alberich;f;F0;2010-04-25;foster parent;dead;Soho;n.a.;Muck;99018;wild population;Burghausen;;2013-05-07;injury/illness;verified
+99114;Domino;m;F0;2010-04-23;foster parent;dead;Stanley;99020;Tamri;99011;wild population;Burghausen;;2013-11-06;during human care;verified
+99115;Gabriel;m;F0;2010-04-30;foster parent;dead;Arion;n.a.;Hombre;n.a.;wild population;Burghausen;2011-11-02;2012-01-02;unknown;unverified
+99116;Gwendolin;m;F0;2010-04-25;foster parent;dead;Raki;n.a.;Toni 1;n.a.;wild population;Burghausen;2011-06-28;2011-08-28;unknown;unverified
+99117;Cat;m;F0;2010-04-26;foster parent;dead;Aleppo;n.a.;Othello;n.a.;wild population;Burghausen;2012-04-29;2012-06-29;unknown;unverified
+99118;Igor;m;F0;2010-04-23;foster parent;dead;Camillo 1;99013;Benu;n.a.;wild population;Burghausen;;2012-11-06;injury/illness;verified
+99119;Jurix;m;F0;2010-04-25;foster parent;dead;Momo;99006;Amun;n.a.;wild population;Burghausen;2012-05-26;2012-07-26;unknown;unverified
+99120;Lisbeth;f;F0;2010-04-27;foster parent;dead;Momo;99006;Amun;n.a.;wild population;Burghausen;;2012-08-31;during human care;verified
+99121;Molino;m;F0;2010-04-28;foster parent;dead;Soho;n.a.;Muck;99018;wild population;Burghausen;2011-10-10;2011-12-10;unknown;unverified
+99122;Rasputin;f;F0;2010-04-22;foster parent;dead;Stanley;99020;Tamri;99011;wild population;Burghausen;2011-10-18;2011-12-18;unknown;unverified
+99124;Sputnik;f;F0;2010-04-24;foster parent;dead;Camillo 1;99013;Benu;n.a.;wild population;Burghausen;2011-09-06;2011-11-06;unknown;unverified
+99125;Teja;m;F0;2010-04-24;foster parent;dead;Raki;n.a.;Toni 1;n.a.;wild population;Burghausen;2011-03-28;2011-05-28;unknown;unverified
+99126;Thaddaea;m;F0;2010-04-27;foster parent;dead;Lola;99005;Peppone 1;99019;wild population;Burghausen;;2011-02-10;during human care;verified
+99127;Abraxas;m;F1;2011-05-09;parent;delivered;Tintifax;99021;Lilu;1;wild population;Burghausen;;2011-08-13;;
+99128;Burgi;f;F1;2011-05-07;parent;dead;Tintifax;99021;Lilu;1;wild population;Burghausen;;2011-09-30;electrocution;verified
+99129;Amadeus;m;F0;2011-04-25;foster parent;dead;Allbright;n.a.;Steppenwolf;n.a.;wild population;Kuchl;2012-08-10;2012-10-10;unknown;unverified
+99130;Archimedes;m;F0;2011-04-22;foster parent;dead;Pebbles;n.a.;Nero 1;n.a.;wild population;Kuchl;;2013-06-08;shot;verified
+99131;Area;f;F0;2011-04-23;foster parent;dead;Momo;99006;Tamri;99011;wild population;Kuchl;;2012-07-22;electrocution;unverified
+99132;Casimir;m;F0;2011-04-23;foster parent;dead;Soho;n.a.;Peppone  1;99019;wild population;Kuchl;2013-07-23;2013-09-23;unknown;unverified
+99134;Emil;m;F0;2011-04-25;foster parent;dead;Soho;n.a.;Peppone 1;99019;wild population;Kuchl;2012-07-21;2012-09-21;unknown;unverified
+99135;Emma;m;F0;2011-04-22;foster parent;dead;Twister;n.a.;Amun;n.a.;wild population;Kuchl;;2012-07-20;injury/illness;verified
+99138;Luzie;m;F0;2011-04-23;foster parent;dead;Aleppo;n.a.;Othello;n.a.;wild population;Kuchl;2012-07-21;2012-09-21;unknown;unverified
+99140;Pollux;f;F0;2011-04-26;foster parent;dead;Winnetouch;n.a.;Jarmusch;n.a.;wild population;Kuchl;2012-07-21;2012-09-21;unknown;unverified
+99141;Soraya;m;F0;2011-04-24;foster parent;dead;Aleppo;n.a.;Othello;n.a.;wild population;Kuchl;2012-07-19;2012-09-19;unknown;unverified
+99145;Vicky;f;F0;2011-04-27;supplementation;dead;Allbright;n.a.;Steppenwolf;n.a.;wild population;Burghausen;;2012-08-15;injury/illness;verified
+99146;Antares;f;F1;2012-05-18;parent;dead;Goja;99098;Ayla;4;wild population;Burghausen;;2012-09-17;electrocution;verified
+99147;Turgay;f;F1;2012-05-23;parent;dead;Jack;2;Marketa;3;wild population;Burghausen;2013-09-25;2013-11-25;unknown;unverified
+99148;Jedi;f;F1;2012-05-23;parent;dead;Jack;2;Marketa;3;wild population;Burghausen;;2012-10-17;shot;verified
+99149;Knox;n.a.;F1;2012-05-23;parent;dead;Jack;2;Marketa;3;wild population;Burghausen;;2012-08-02;electrocution;verified
+99150;Shaki;m;F1;2012-07-09;parent;delivered;Pepe;9;Mikesch;5;wild population;Burghausen;;2012-08-19;;
+99151;Chrissi;f;F1;2012-07-16;parent;delivered;Gonzo;6;Lilu;1;wild population;Burghausen;;2012-08-19;;
+99152;Gustl;m;F1;2013-05-22;parent;dead;Jack;2;Marketa;3;wild population;Burghausen;;2014-07-17;injury/illness;unverified
+99153;Gino;n.a.;F1;2013-06-12;parent;dead;Bima;8;Alpha;11;wild population;Burghausen;2013-09-21;2013-11-21;unknown;unverified
+99154;Livio;n.a.;F1;2013-06-15;parent;dead;Bima;8;Alpha;11;wild population;Burghausen;;2013-09-24;predation;verified
+99156;namenlos15;n.a.;F1;2014-07-21;parent;dead;Gonzo;6;Mikesch;5;wild population;Burghausen;;2014-08-25;pre_fledgling;verified
+99157;GoMi2;n.a.;F1;2014-07-24;parent;delivered;Gonzo;6;Mikesch;5;wild population;Burghausen;;2014-08-26;;
+99158;namenlos14;n.a.;F1;2014-06-11;parent;dead;Zeudi;25;Saba;22;wild population;Kuchl;;2014-06-30;pre_fledgling;verified
+99162;Luciano No1;m;F2;2017-05-01;parent;dead;Shorty;28;Lilu;1;wild population;Burghausen;2017-06-13;2017-08-13;unknown;unverified
+99163;Benefattore;n.a.;F1;2019-06-03;parent;dead;Salem;17;Liethe;38;wild population;Kuchl;;2019-07-03;pre_fledgling;verified
+99169;namenlos10;n.a.;F1;2012-05-16;parent;dead;Tintifax;99021;Lilu;1;wild population;Burghausen;;2012-05-16;pre_fledgling;verified
+99170;namenlos11;n.a.;F1;2013-05-22;parent;dead;Tintifax;99021;Ayla;4;wild population;Burghausen;;2013-05-24;pre_fledgling;verified
+99171;namenlos12;n.a.;F1;2013-05-23;parent;dead;Tintifax;99021;Ayla;4;wild population;Burghausen;;2013-05-25;pre_fledgling;verified
+99172;namenlos13;n.a.;F1;2013-05-26;parent;dead;Jack;2;Marketa;3;wild population;Burghausen;;2013-05-29;pre_fledgling;verified
+99173;namenlos16;n.a.;F1;2015-05-21;parent;dead;Salem;17;Semir;24;wild population;Kuchl;;2015-05-21;pre_fledgling;verified
+99174;namenlos17;n.a.;F1;2015-05-26;parent;dead;Frodo;12;Lilu;1;wild population;Burghausen;;2015-05-27;pre_fledgling;verified
+99175;namenlos18;n.a.;F1;2016-05-12;parent;dead;Jack;2;Ayla;4;wild population;Burghausen;;2016-05-12;pre_fledgling;verified
+99176;namenlos19;n.a.;F1;2016-05-13;parent;dead;Jack;2;Ayla;4;wild population;Burghausen;;2016-05-13;pre_fledgling;verified
+99177;namenlos20;n.a.;F1;2017-05-16;parent;dead;Amore;13;Ayla;4;wild population;Burghausen;;2017-05-16;pre_fledgling;verified
+99178;namenlos21;n.a.;F1;2017-06-07;parent;dead;Zeudi;25;Saba;22;wild population;Kuchl;;2017-06-07;pre_fledgling;verified
+99179;namenlos22;n.a.;F1;2017-06-09;parent;dead;Peter;47;Liethe;38;wild population;Kuchl;;2017-06-07;pre_fledgling;verified
+99180;namenlos23;n.a.;F1;2017-06-07;parent;dead;Frodo;12;Greta;16;wild population;Kuchl;;2017-06-09;pre_fledgling;verified
+99181;namenlos24;n.a.;F1;2017-06-12;parent;dead;Peter;47;Liethe;38;wild population;Kuchl;;2017-06-12;pre_fledgling;verified
+99182;namenlos25;n.a.;F1;2017-06-13;parent;dead;Peter;47;Liethe;38;wild population;Kuchl;;2017-06-13;pre_fledgling;verified
+99183;namenlos27;n.a.;F1;2018-05-31;parent;dead;Peter;47;Nova;48;wild population;Kuchl;;2018-05-31;pre_fledgling;verified
+99184;namenlos28;n.a.;F1;2018-06-03;parent;dead;Salem;17;Greta;16;wild population;Kuchl;;2018-06-03;pre_fledgling;verified
+99185;namenlos29;n.a.;F1;2018-06-05;parent;dead;Salem;17;Greta;16;wild population;Kuchl;;2018-06-05;pre_fledgling;verified
+99186;namenlos30;n.a.;F1;2018-06-07;parent;dead;Marvin;87;Pino;71;wild population;Kuchl;;2018-06-07;pre_fledgling;verified
+99187;namenlos31;n.a.;F1;2019-05-30;parent;dead;Peter;47;Nova;48;wild population;Kuchl;;2019-05-30;pre_fledgling;verified
+99188;namenlos32;n.a.;F1;2019-06-01;parent;dead;Peter;47;Nova;48;wild population;Kuchl;;2019-06-01;pre_fledgling;verified
+99189;namenlos33;n.a.;F1;2019-06-03;parent;dead;Dante;99;Quasimodo;351;wild population;Kuchl;;2019-06-03;pre_fledgling;verified
+99190;namenlos34;n.a.;F1;2019-06-04;parent;dead;Leonardo;79;Saba;22;wild population;Kuchl;;2019-06-04;pre_fledgling;verified
+99191;namenlos35;n.a.;F1;2019-06-15;parent;dead;Vitorio;35;Greta;16;wild population;Kuchl;;2019-06-15;pre_fledgling;verified
+;;;;;;;;;;;;;;;;
+;;;;;;;;;;;;;;;;
+;;;;;;;;;;;;;;;;
+;;;;;;;;;;;;;;;;
+;;;;;;;;;;;;;;;;
+;;;;;;;;;;;;;;;;
+;;;;;;;;;;;;;;;;
+;;;;;;;;;;;;;;;;
+;;;;;;;;;;;;;;;;
+;;;;;;;;;;;;;;;;
+;;;;;;;;;;;;;;;;
+;;;;;;;;;;;;;;;;
+;;;;;;;;;;;;;;;;
+;;;;;;;;;;;;;;;;
+;;;;;;;;;;;;;;;;
+;;;;;;;;;;;;;;;;
+;;;;;;;;;;;;;;;;
+;;;;;;;;;;;;;;;;
+;;;;;;;;;;;;;;;;
+;;;;;;;;;;;;;;;;
+;;;;;;;;;;;;;;;;
+;;;;;;;;;;;;;;;;
+;;;;;;;;;;;;;;;;
+;;;;;;;;;;;;;;;;
+;;;;;;;;;;;;;;;;
+;;;;;;;;;;;;;;;;
+;;;;;;;;;;;;;;;;
+;;;;;;;;;;;;;;;;
+;;;;;;;;;;;;;;;;
+;;;;;;;;;;;;;;;;
+;;;;;;;;;;;;;;;;
+;;;;;;;;;;;;;;;;
+;;;;;;;;;;;;;;;;
+;;;;;;;;;;;;;;;;
+;;;;;;;;;;;;;;;;
+;;;;;;;;;;;;;;;;
+;;;;;;;;;;;;;;;;
+;;;;;;;;;;;;;;;;
+;;;;;;;;;;;;;;;;
+;;;;;;;;;;;;;;;;
+;;;;;;;;;;;;;;;;
+;;;;;;;;;;;;;;;;
+;;;;;;;;;;;;;;;;
+;;;;;;;;;;;;;;;;
+;;;;;;;;;;;;;;;;
+;;;;;;;;;;;;;;;;
+;;;;;;;;;;;;;;;;
+;;;;;;;;;;;;;;;;
+;;;;;;;;;;;;;;;;
+;;;;;;;;;;;;;;;;
+;;;;;;;;;;;;;;;;
+;;;;;;;;;;;;;;;;
+;;;;;;;;;;;;;;;;
+;;;;;;;;;;;;;;;;
+;;;;;;;;;;;;;;;;
+;;;;;;;;;;;;;;;;
+;;;;;;;;;;;;;;;;
+;;;;;;;;;;;;;;;;
+;;;;;;;;;;;;;;;;
+;;;;;;;;;;;;;;;;
+;;;;;;;;;;;;;;;;
+;;;;;;;;;;;;;;;;
+;;;;;;;;;;;;;;;;
+;;;;;;;;;;;;;;;;
+;;;;;;;;;;;;;;;;
+;;;;;;;;;;;;;;;;
+;;;;;;;;;;;;;;;;
+;;;;;;;;;;;;;;;;
+;;;;;;;;;;;;;;;;
+;;;;;;;;;;;;;;;;
+;;;;;;;;;;;;;;;;
+;;;;;;;;;;;;;;;;
+;;;;;;;;;;;;;;;;
+;;;;;;;;;;;;;;;;
+;;;;;;;;;;;;;;;;
+;;;;;;;;;;;;;;;;
+;;;;;;;;;;;;;;;;
+;;;;;;;;;;;;;;;;
+;;;;;;;;;;;;;;;;
+;;;;;;;;;;;;;;;;
+;;;;;;;;;;;;;;;;
+;;;;;;;;;;;;;;;;
+;;;;;;;;;;;;;;;;
+;;;;;;;;;;;;;;;;
+;;;;;;;;;;;;;;;;
+;;;;;;;;;;;;;;;;
+;;;;;;;;;;;;;;;;
+;;;;;;;;;;;;;;;;
+;;;;;;;;;;;;;;;;
+;;;;;;;;;;;;;;;;
+;;;;;;;;;;;;;;;;
+;;;;;;;;;;;;;;;;
+;;;;;;;;;;;;;;;;
+;;;;;;;;;;;;;;;;
+;;;;;;;;;;;;;;;;
+;;;;;;;;;;;;;;;;
+;;;;;;;;;;;;;;;;
+;;;;;;;;;;;;;;;;
+;;;;;;;;;;;;;;;;
+;;;;;;;;;;;;;;;;
+;;;;;;;;;;;;;;;;
+;;;;;;;;;;;;;;;;
+;;;;;;;;;;;;;;;;
+;;;;;;;;;;;;;;;;
+;;;;;;;;;;;;;;;;
+;;;;;;;;;;;;;;;;
+;;;;;;;;;;;;;;;;
+;;;;;;;;;;;;;;;;
+;;;;;;;;;;;;;;;;
+;;;;;;;;;;;;;;;;
+;;;;;;;;;;;;;;;;
+;;;;;;;;;;;;;;;;
+;;;;;;;;;;;;;;;;
+;;;;;;;;;;;;;;;;
+;;;;;;;;;;;;;;;;
+;;;;;;;;;;;;;;;;
+;;;;;;;;;;;;;;;;
+;;;;;;;;;;;;;;;;
+;;;;;;;;;;;;;;;;
+;;;;;;;;;;;;;;;;
+;;;;;;;;;;;;;;;;
+;;;;;;;;;;;;;;;;
+;;;;;;;;;;;;;;;;
+;;;;;;;;;;;;;;;;
+;;;;;;;;;;;;;;;;
+;;;;;;;;;;;;;;;;
+;;;;;;;;;;;;;;;;
+;;;;;;;;;;;;;;;;
+;;;;;;;;;;;;;;;;
+;;;;;;;;;;;;;;;;
+;;;;;;;;;;;;;;;;
+;;;;;;;;;;;;;;;;
+;;;;;;;;;;;;;;;;
+;;;;;;;;;;;;;;;;
+;;;;;;;;;;;;;;;;
+;;;;;;;;;;;;;;;;
+;;;;;;;;;;;;;;;;
+;;;;;;;;;;;;;;;;
+;;;;;;;;;;;;;;;;
+;;;;;;;;;;;;;;;;
+;;;;;;;;;;;;;;;;
+;;;;;;;;;;;;;;;;
+;;;;;;;;;;;;;;;;
+;;;;;;;;;;;;;;;;
+;;;;;;;;;;;;;;;;
+;;;;;;;;;;;;;;;;
+;;;;;;;;;;;;;;;;
+;;;;;;;;;;;;;;;;
+;;;;;;;;;;;;;;;;
+;;;;;;;;;;;;;;;;
+;;;;;;;;;;;;;;;;
+;;;;;;;;;;;;;;;;
+;;;;;;;;;;;;;;;;
+;;;;;;;;;;;;;;;;
+;;;;;;;;;;;;;;;;
+;;;;;;;;;;;;;;;;
+;;;;;;;;;;;;;;;;
+;;;;;;;;;;;;;;;;
+;;;;;;;;;;;;;;;;
+;;;;;;;;;;;;;;;;
+;;;;;;;;;;;;;;;;
+;;;;;;;;;;;;;;;;
+;;;;;;;;;;;;;;;;
+;;;;;;;;;;;;;;;;
+;;;;;;;;;;;;;;;;
+;;;;;;;;;;;;;;;;
+;;;;;;;;;;;;;;;;
+;;;;;;;;;;;;;;;;
+;;;;;;;;;;;;;;;;
+;;;;;;;;;;;;;;;;
+;;;;;;;;;;;;;;;;
+;;;;;;;;;;;;;;;;
+;;;;;;;;;;;;;;;;
+;;;;;;;;;;;;;;;;
+;;;;;;;;;;;;;;;;
+;;;;;;;;;;;;;;;;
+;;;;;;;;;;;;;;;;
+;;;;;;;;;;;;;;;;
+;;;;;;;;;;;;;;;;
+;;;;;;;;;;;;;;;;
+;;;;;;;;;;;;;;;;
+;;;;;;;;;;;;;;;;
+;;;;;;;;;;;;;;;;
+;;;;;;;;;;;;;;;;
+;;;;;;;;;;;;;;;;
+;;;;;;;;;;;;;;;;
+;;;;;;;;;;;;;;;;
+;;;;;;;;;;;;;;;;
+;;;;;;;;;;;;;;;;
+;;;;;;;;;;;;;;;;
+;;;;;;;;;;;;;;;;
+;;;;;;;;;;;;;;;;
+;;;;;;;;;;;;;;;;
+;;;;;;;;;;;;;;;;
+;;;;;;;;;;;;;;;;
+;;;;;;;;;;;;;;;;
+;;;;;;;;;;;;;;;;
+;;;;;;;;;;;;;;;;
+;;;;;;;;;;;;;;;;
+;;;;;;;;;;;;;;;;
+;;;;;;;;;;;;;;;;
+;;;;;;;;;;;;;;;;
+;;;;;;;;;;;;;;;;
+;;;;;;;;;;;;;;;;
+;;;;;;;;;;;;;;;;
+;;;;;;;;;;;;;;;;
+;;;;;;;;;;;;;;;;
+;;;;;;;;;;;;;;;;
+;;;;;;;;;;;;;;;;
+;;;;;;;;;;;;;;;;
+;;;;;;;;;;;;;;;;
+;;;;;;;;;;;;;;;;
+;;;;;;;;;;;;;;;;
+;;;;;;;;;;;;;;;;
+;;;;;;;;;;;;;;;;
+;;;;;;;;;;;;;;;;
+;;;;;;;;;;;;;;;;
+;;;;;;;;;;;;;;;;
+;;;;;;;;;;;;;;;;
+;;;;;;;;;;;;;;;;
+;;;;;;;;;;;;;;;;
+;;;;;;;;;;;;;;;;
+;;;;;;;;;;;;;;;;
+;;;;;;;;;;;;;;;;
+;;;;;;;;;;;;;;;;
+;;;;;;;;;;;;;;;;
+;;;;;;;;;;;;;;;;
+;;;;;;;;;;;;;;;;
+;;;;;;;;;;;;;;;;
+;;;;;;;;;;;;;;;;
+;;;;;;;;;;;;;;;;
+;;;;;;;;;;;;;;;;
+;;;;;;;;;;;;;;;;
+;;;;;;;;;;;;;;;;
+;;;;;;;;;;;;;;;;
+;;;;;;;;;;;;;;;;
+;;;;;;;;;;;;;;;;
+;;;;;;;;;;;;;;;;
+;;;;;;;;;;;;;;;;
+;;;;;;;;;;;;;;;;
+;;;;;;;;;;;;;;;;
+;;;;;;;;;;;;;;;;
+;;;;;;;;;;;;;;;;
+;;;;;;;;;;;;;;;;
+;;;;;;;;;;;;;;;;
+;;;;;;;;;;;;;;;;
+;;;;;;;;;;;;;;;;
+;;;;;;;;;;;;;;;;
+;;;;;;;;;;;;;;;;
+;;;;;;;;;;;;;;;;
+;;;;;;;;;;;;;;;;
+;;;;;;;;;;;;;;;;
+;;;;;;;;;;;;;;;;
+;;;;;;;;;;;;;;;;
+;;;;;;;;;;;;;;;;
+;;;;;;;;;;;;;;;;
+;;;;;;;;;;;;;;;;
+;;;;;;;;;;;;;;;;
+;;;;;;;;;;;;;;;;
+;;;;;;;;;;;;;;;;
+;;;;;;;;;;;;;;;;
+;;;;;;;;;;;;;;;;
+;;;;;;;;;;;;;;;;
+;;;;;;;;;;;;;;;;
+;;;;;;;;;;;;;;;;
+;;;;;;;;;;;;;;;;
+;;;;;;;;;;;;;;;;
+;;;;;;;;;;;;;;;;
+;;;;;;;;;;;;;;;;
+;;;;;;;;;;;;;;;;
+;;;;;;;;;;;;;;;;
+;;;;;;;;;;;;;;;;
+;;;;;;;;;;;;;;;;
+;;;;;;;;;;;;;;;;
+;;;;;;;;;;;;;;;;
+;;;;;;;;;;;;;;;;
+;;;;;;;;;;;;;;;;
+;;;;;;;;;;;;;;;;
+;;;;;;;;;;;;;;;;
+;;;;;;;;;;;;;;;;
+;;;;;;;;;;;;;;;;
+;;;;;;;;;;;;;;;;
+;;;;;;;;;;;;;;;;
+;;;;;;;;;;;;;;;;
+;;;;;;;;;;;;;;;;
+;;;;;;;;;;;;;;;;
+;;;;;;;;;;;;;;;;
+;;;;;;;;;;;;;;;;
+;;;;;;;;;;;;;;;;
+;;;;;;;;;;;;;;;;
+;;;;;;;;;;;;;;;;
+;;;;;;;;;;;;;;;;
+;;;;;;;;;;;;;;;;
+;;;;;;;;;;;;;;;;
+;;;;;;;;;;;;;;;;
+;;;;;;;;;;;;;;;;
+;;;;;;;;;;;;;;;;
+;;;;;;;;;;;;;;;;
+;;;;;;;;;;;;;;;;
+;;;;;;;;;;;;;;;;
+;;;;;;;;;;;;;;;;
+;;;;;;;;;;;;;;;;
+;;;;;;;;;;;;;;;;
+;;;;;;;;;;;;;;;;
+;;;;;;;;;;;;;;;;
+;;;;;;;;;;;;;;;;
+;;;;;;;;;;;;;;;;
+;;;;;;;;;;;;;;;;
+;;;;;;;;;;;;;;;;
+;;;;;;;;;;;;;;;;
+;;;;;;;;;;;;;;;;
+;;;;;;;;;;;;;;;;
+;;;;;;;;;;;;;;;;
+;;;;;;;;;;;;;;;;
+;;;;;;;;;;;;;;;;
+;;;;;;;;;;;;;;;;
+;;;;;;;;;;;;;;;;
+;;;;;;;;;;;;;;;;
+;;;;;;;;;;;;;;;;
+;;;;;;;;;;;;;;;;
+;;;;;;;;;;;;;;;;
+;;;;;;;;;;;;;;;;
+;;;;;;;;;;;;;;;;
+;;;;;;;;;;;;;;;;
+;;;;;;;;;;;;;;;;
