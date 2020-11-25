@@ -13,6 +13,7 @@
 *.html
 *.png
 *.pptx
+*.xls*
 
 # Temporary files
 *.utf8.md
