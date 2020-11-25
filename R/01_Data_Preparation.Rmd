@@ -1,5 +1,5 @@
 ---
-title: "PVA NBI: Data Preparation" ## name of your project
+title: "PVA of the NBI: Data Preparation" ## name of your project
 author: "Sinah Drenske"                     ## your name(s)
 date: "`r Sys.Date()`"                  ## current date
 output:
@@ -17,9 +17,9 @@ knitr::opts_chunk$set(echo = TRUE, warning = TRUE, message = TRUE,
                       retina = 1, fig.showtext = TRUE)
 ```
 
-* **Research question:**
-* **Study area:**
-* **Data:** 
+* **Research question:** (Q1) How will the NBI population develop in the next 50 years and what will be the extinction risk, given that the colonies will be either managed or left to themselves? (Q2) Will the developments in the two already established colonies Burghausen & Kuchl be different? 
+* **Study area:** Austria and Germany
+* **Data:** Life History data of the NBI
 
 
 # Setup
@@ -31,17 +31,120 @@ knitr::opts_chunk$set(echo = TRUE, warning = TRUE, message = TRUE,
 
 ## libraries used in this script
 ## please add ALL LIBRARIES NEEDED HERE
-## please remove libraries from the list that are not needed anymore 
+## please remove libraries from the list that are not needed anymore
 ## at a later stage
-library()
+library("here")
+library("tidyverse")
+library("eeptools")
 ```
 
 
 # Data
-
+## Load data
 ```{r data}
-#df <- readr::read_csv("your-data.csv")
-#sf <- sf::read_sf("your-geo-data.shp")
+NBI <- read_csv2(file = here::here("data-raw/NBI_life_history_data_2008_2019.csv"), 
+                 col_names = T, # first row as column headers
+                 col_types = "dcffDffccccffDDff", # specify column types
+                 n_max = 411) # There are 411 NBI
+```
+## Prepare data
+### Create additional variables
+Create columns for hatch year, death month and death year
+```{r}
+# Hatch year, death month and death year with substring from the hatching or death date
+NBI$hatch_year <- substring(NBI$hatching_date, 1,4)
+NBI$death_month <- substring(NBI$delivered_or_death_date, 6,7)
+NBI$death_year <- substring(NBI$delivered_or_death_date, 1,4)
+
+# If an individual is alive put a zero as death year 
+NBI$death_year[is.na(NBI$death_year)] <- 0
+
+# Create a variable for the date
+# The data are from 2008 to 2019. In order to avoid miscalculating the survival probabilities, all NBI that were alive at the end of 2019 receive the date of death 01.01.2020
+day <- as.Date("2020-01-01")
+NBI[is.na(NBI$delivered_or_death_date), "delivered_or_death_date"] <- as.Date(day)
+
+# Change one date of death, because there was a mistake (the death date was before the hatching date). We set the death date to the same date as the hatching date
+# row 399 
+NBI$delivered_or_death_date[399] <- as.Date("2017-06-09")
+
+# remove the variable day
+rm(day)
+```
+
+Calculate the age of the NBI: days of life (dof) and years of life (yof)
+Pay attention! First year of life = Age 0. Second year of life = Age 1, ...
+```{r}
+# Use the function age_calc from the eeptools package
+# dob = date of birth/start date, enddate = date when the observation's age is of interest, 
+# units = days, months or years; precise = include leap years or not/ only full years or not
+NBI$dof <- as.numeric(age_calc(dob = NBI$hatching_date, enddate = NBI$delivered_or_death_date, units = "days", precise = F))
+# +1 for the years of life because we want the years of life NOT the age
+NBI$yof <- (age_calc(dob = NBI$hatching_date, enddate = NBI$delivered_or_death_date, units = "years", precise = F) +1)
+```
+
+Add a column for the stage (age class) 
+```{r}
+# reached_stage
+NBI$reached_stage <- ifelse(
+                       test = NBI$yof == 1, 
+                       yes = 1, 
+                       no = ifelse(
+                              test = NBI$yof == 2, 
+                              yes = 2, 
+                              no = ifelse(
+                                     test = NBI$yof == 3, 
+                                     yes = 3, 
+                                     no = ifelse(
+                                            test = NBI$yof  > 3, 
+                                            yes = 4, 
+                                            no = 0))))
+
+NBI$reached_stage <- as.factor(NBI$reached_stage)
+```
+
+
+Add one column for the status: 
+Was the individual at the time of the death date alive or dead? This will be a numeric variable. Some NBI were removed from the project although they were still alive. For example, they were too seriously injured. 
+0 = alive (status = alive, temporary or delivered), 1 = dead
+```{r}
+# life_status
+NBI$life_status <- ifelse(test = NBI$status == "dead", 
+                          yes = 1, 
+                          no = 0)
+NBI$life_status <- as.factor(NBI$life_status)
+
+# Testing
+table(NBI$status)
+table(NBI$life_status)
+```
+
+
+Add one column for the project status: 
+Is the individual alive and part of the project or not (dead or no longer part of the project). This will be a numeric variable.
+0 = alive and part of the project (status = alive or temporary), 1 = not part of the project anymore (delivered or dead)
+```{r}
+# project_status
+NBI$project_status <- ifelse(test = NBI$status == "alive" | NBI$status == "temporary", 
+                             yes = 0, 
+                             no = 1)
+NBI$project_status <- as.factor(NBI$project_status)
+
+# Testing
+table(NBI$status)
+table(NBI$project_status)
+```
+
+
+
+
+
+Welche Individuen sollten für die Analyse entfernt werden? (Z.B. alle die pre fledgling gestorben sind, sind temporarily added individuals drin?)
+Für survival analysis: Die Vögel die nur abgegeben wurden, sollten eigentlich nicht als tot berechnet werden oder? Gibt es da Möglichkeiten für die survival analysis? Vielleicht bei survsplit wenn man alle argumente berücksichtigt
+
+## Save data
+```{r}
+saveRDS(object = NBI, file = here::here("output/data-proc/NBI_data.rds"))
 ```
 
 
