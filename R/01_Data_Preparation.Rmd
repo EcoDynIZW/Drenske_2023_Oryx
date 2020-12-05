@@ -18,7 +18,7 @@ knitr::opts_chunk$set(echo = TRUE, warning = TRUE, message = TRUE,
 ```
 
 * **Research question:** (Q1) How will the NBI population develop in the next 50 years and what will be the extinction risk, given that the colonies will be either managed or left to themselves? (Q2) Will the developments in the two already established colonies Burghausen & Kuchl be different? 
-* **Study area:** Austria and Germany
+* **Study area:** Austria, Germany and Italy
 * **Data:** Life History data of the NBI
 
 
@@ -42,12 +42,31 @@ library("eeptools")
 # Data
 ## Load data
 ```{r data}
-NBI <- read_csv2(file = here::here("data-raw/NBI_life_history_data_2008_2019.csv"), 
+NBI <- read_csv2(file = here::here("data-raw", "NBI_life_history_data_2008_2019.csv"), 
                  col_names = T, # first row as column headers
                  col_types = "dcffDffccccffDDff", # specify column types
                  n_max = 411) # There are 411 NBI
+
+NBI_breeding <- read_csv2(file = here::here("data-raw", "NBI_breeding_data_2008_2019.csv"), 
+                 col_names = T, # first row as column headers
+                 col_types = "Dcncnfnnn", # specify column types
+                 n_max = 411) 
 ```
+# NBI
 ## Prepare data
+### Format columns
+We have to format the column "sex". Individuals where the sex is unknown receive the letter "u" instead of "n.a."
+
+```{r}
+table(NBI$sex)
+
+NBI$sex <- ifelse(test = NBI$sex == "n.a.", yes = "u", no = paste(NBI$sex))
+
+table(NBI$sex)
+NBI$sex <- as.factor(NBI$sex)
+levels(NBI$sex)
+```
+
 ### Create additional variables
 Create columns for hatch year, death month and death year
 ```{r}
@@ -56,7 +75,7 @@ NBI$hatch_year <- substring(NBI$hatching_date, 1,4)
 NBI$death_month <- substring(NBI$delivered_or_death_date, 6,7)
 NBI$death_year <- substring(NBI$delivered_or_death_date, 1,4)
 
-# If an individual is alive put a zero as death year 
+# If an individual is alive and part of the project put a zero as death year 
 NBI$death_year[is.na(NBI$death_year)] <- 0
 
 # Create a variable for the date
@@ -134,17 +153,66 @@ NBI$project_status <- as.factor(NBI$project_status)
 table(NBI$status)
 table(NBI$project_status)
 ```
-
-
-
-
-
-Welche Individuen sollten für die Analyse entfernt werden? (Z.B. alle die pre fledgling gestorben sind, sind temporarily added individuals drin?)
-Für survival analysis: Die Vögel die nur abgegeben wurden, sollten eigentlich nicht als tot berechnet werden oder? Gibt es da Möglichkeiten für die survival analysis? Vielleicht bei survsplit wenn man alle argumente berücksichtigt
-
-## Save data
+Insert "alive" in the mortality type (mortality cause) for individuals which are still alive and insert "delivered" in the mortality type for individuals that are alive but are not part of the project anymore
 ```{r}
-saveRDS(object = NBI, file = here::here("output/data-proc/NBI_data.rds"))
+levels(NBI$mortality_cause)
+NBI$mortality_cause <- ifelse(test = NBI$status == "alive" | NBI$status == "temporary", 
+                              yes = "alive", 
+                              no = ifelse(test = NBI$status == "delivered", 
+                                          yes = "delivered", 
+                                          no = paste(NBI$mortality_cause))) 
+
+NBI$mortality_cause <- as.factor(NBI$mortality_cause)
+NBI$mortality_cause <- droplevels(NBI$mortality_cause)
+levels(NBI$mortality_cause)
+```
+## Sort table
+Reorder the rows and columns
+
+```{r}
+names(NBI)
+```
+
+```{r}
+# reorder rows
+NBI %<>%
+  arrange(hatching_date) %>%
+  as_tibble()
+```
+
+
+```{r}
+#reorder columns
+NBI %<>% 
+  select(bird_id, name, hatching_date, hatch_year, 
+         generation, sex, raising_type, breeding_area, mortality_cause, mortality_verified, 
+         missed_since, delivered_or_death_date, death_month, death_year, dof, yof, reached_stage, 
+         status, life_status, project_status, 
+         parent_f, parent_f_id, parent_m, parent_m_id, population) %>%
+  as_tibble()
+```
+
+
+## Filter data
+Some NBI have to be removed from the dataset for the analysis:
+We consider only fledged individuals in our analysis because there is not data about all individuals that died before fledging. But in the table are some individuals that died before fledging. We remove them from the table. These individuals have the mortality cause "pre_fledgling".
+And there is one individual that was born in 2007 but we want to consider only individuals that were born in 2008 or later.
+
+```{r}
+NBI_all <- NBI
+
+NBI <- subset(x = NBI_all, subset = !hatch_year == "2007" & !mortality_cause == "pre_fledgling")
+NBI$mortality_cause <- droplevels(NBI$mortality_cause)
+```
+k
+
+
+# Save data
+```{r}
+saveRDS(object = NBI_all, file = here::here("output", "data-proc", "NBI_all_data.rds"))
+saveRDS(object = NBI, file = here::here("output", "data-proc", "NBI_data.rds"))
+
+saveRDS(object = NBI_breeding, file = here::here("output", "data-proc", "NBI_breeding.rds"))
 ```
 
 
@@ -157,7 +225,7 @@ saveRDS(object = NBI, file = here::here("output/data-proc/NBI_data.rds"))
 ## We store the settings of your computer and the current versions of the
 ## packages used to allow for reproducibility
 Sys.time()
-#git2r::repository() ## uncomment if you are using GitHub
+git2r::repository() ## uncomment if you are using GitHub
 sessionInfo()
 ```
 
