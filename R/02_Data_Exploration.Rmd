@@ -13,13 +13,15 @@ output:
 ## If you want to modify chunk options, you can do it here for all chunks or
 ## add the options in the repsective chunk header, e.g. `{r, message = FALSE}`
 knitr::opts_chunk$set(echo = TRUE, warning = TRUE, message = TRUE,
-                      fig.width = 9, fig.height = 6, dpi = 500, 
+                      fig.width = 12, fig.height = 8, dpi = 500, 
                       retina = 1, fig.showtext = TRUE)
 ```
 
-* **Research question:**
-* **Study area:**
-* **Data:** 
+* **Research question:** (Q1) How will the NBI population develop in the next 50 years and what will be the extinction risk, given that the colonies will be either managed or left to themselves? (Q2) Will the developments in the two already established colonies Burghausen & Kuchl be different? 
+* **Study area:** Austria, Germany and Italy
+* **Data:** Life History data of the NBI
+
+In this script we created different plots for the description of the NBI population. We created Timelines, Population size per year and Barplots for all individuals and the alive females to show the distribution between the sexes, stages, colonies, raising types and the mortality types.
 
 
 # Setup
@@ -33,17 +35,335 @@ knitr::opts_chunk$set(echo = TRUE, warning = TRUE, message = TRUE,
 ## please add ALL LIBRARIES NEEDED HERE
 ## please remove libraries from the list that are not needed anymore 
 ## at a later stage
-library()
+library("here")
+#library("knitr")
+library("viridisLite")
 ```
 
 
 # Data
 
 ```{r data}
-#df <- readr::read_csv("your-data.csv")
-#sf <- sf::read_sf("your-geo-data.shp")
+NBI <- readRDS(file = here::here("output", "data-proc", "NBI_data.rds"))
 ```
 
+Save some standard variables
+```{r}
+mar_default <- c(5, 4, 4, 2) + 0.1
+mar_small <- c(0,0,0,0)
+zero_line <- rep(0, 12)
+```
+
+
+# Population size per year
+Plot the whole Population size and the number of individuals per sex, per raising type and per colony per year.
+```{r}
+# Calculate the number of living individuals per year
+popsize_NBI <- tibble(
+  "2008" = ifelse(test = NBI$hatch_year <= 2008 & (NBI$death_year >= 2008 | NBI$death_year == 0), 
+                 yes = 1, 
+                 no = 0) %>% 
+          sum(), 
+  "2009" = ifelse(test = NBI$hatch_year <= 2009 & (NBI$death_year >= 2009 | NBI$death_year == 0), 
+                 yes = 1, 
+                 no = 0) %>% 
+          sum(),
+  "2010" = ifelse(test = NBI$hatch_year <= 2010 & (NBI$death_year >= 2010 | NBI$death_year == 0), 
+                 yes = 1, 
+                 no = 0) %>% 
+          sum(),
+  "2011" = ifelse(test = NBI$hatch_year <= 2011 & (NBI$death_year >= 2011 | NBI$death_year == 0), 
+                 yes = 1, 
+                 no = 0) %>% 
+          sum(),
+  "2012" = ifelse(test = NBI$hatch_year <= 2012 & (NBI$death_year >= 2012 | NBI$death_year == 0), 
+                 yes = 1, 
+                 no = 0) %>% 
+          sum(),
+  "2013" = ifelse(test = NBI$hatch_year <= 2013 & (NBI$death_year >= 2013 | NBI$death_year == 0), 
+                 yes = 1, 
+                 no = 0) %>% 
+          sum(),
+  "2014" = ifelse(test = NBI$hatch_year <= 2014 & (NBI$death_year >= 2014 | NBI$death_year == 0), 
+                 yes = 1, 
+                 no = 0) %>% 
+          sum(),
+  "2015" = ifelse(test = NBI$hatch_year <= 2015 & (NBI$death_year >= 2015 | NBI$death_year == 0), 
+                 yes = 1, 
+                 no = 0) %>% 
+          sum(),
+  "2016" = ifelse(test = NBI$hatch_year <= 2016 & (NBI$death_year >= 2016 | NBI$death_year == 0), 
+                 yes = 1, 
+                 no = 0) %>% 
+          sum(),
+  "2017" = ifelse(test = NBI$hatch_year <= 2017 & (NBI$death_year >= 2017 | NBI$death_year == 0), 
+                 yes = 1, 
+                 no = 0) %>% 
+          sum(),
+  "2018" = ifelse(test = NBI$hatch_year <= 2018 & (NBI$death_year >= 2018 | NBI$death_year == 0), 
+                 yes = 1, 
+                 no = 0) %>% 
+          sum(),
+  "2019" = ifelse(test = NBI$hatch_year <= 2019 & (NBI$death_year >= 2019 | NBI$death_year == 0), 
+                 yes = 1, 
+                 no = 0) %>% 
+          sum())
+
+# Calculate the change per year
+for (i in 2:ncol(popsize_NBI)) {
+  
+  popsize_NBI[2,i] <- popsize_NBI[1,i] - popsize_NBI[1,i-1]
+
+}
+```
+
+
+```{r, fig.height=7, fig.width=10}
+# only numbers
+pop_num <- as.numeric(popsize_NBI[1,])
+
+# plot it
+par(mar = (c(5, 4.5, 1, 2) + 0.1))
+
+plot(pop_num, type = "n", xaxt = "n", yaxt = "n", xlab = "Year", ylab = "Number of individuals", cex.lab = 2, ylim = c(0,200))
+axis(1, at = 1:12, labels = 2008:2019, cex.axis = 2)
+axis(2, cex.axis = 2)
+
+lines(zero_line, col = "grey85")
+polygon(c(1:12, rev(1:12)), c(pop_num, rev(zero_line)), col = "grey85", border= NA)
+
+lines(pop_num, lwd = 3)
+points(pop_num, pch = 16, cex = 1.5)
+
+box()
+par(mar = mar_default)
+```
+
+Save the plot
+```{r}
+png(filename = here("plots", "01_description", "Popsize_per_year.png"))
+par(mar = (c(5, 4.5, 1, 2) + 0.1))
+
+plot(pop_num, type = "n", xaxt = "n", yaxt = "n", xlab = "Year", ylab = "Number of individuals", cex.lab = 2, ylim = c(0,200))
+axis(1, at = 1:12, labels = 2008:2019, cex.axis = 2)
+axis(2, cex.axis = 2)
+
+lines(zero_line, col = "grey85")
+polygon(c(1:12, rev(1:12)), c(pop_num, rev(zero_line)), col = "grey85", border= NA)
+
+lines(pop_num, lwd = 3)
+points(pop_num, pch = 16, cex = 1.5)
+
+box()
+par(mar = mar_default)
+
+dev.off()
+```
+# Customized barplots
+## Overall population
+Show the values for each category
+Build a matrix with them. The NAs between some values are there for some space between the categories 
+
+```{r}
+table(NBI$reached_stage)
+table(NBI$sex)
+table(NBI$breeding_area)
+table(NBI$raising_type)
+table(NBI$mortality_cause)
+```
+
+```{r}
+NBI_mat <- matrix(data = c(
+             202, 74,46,62,NA,           # Stage
+             184,195, 5,NA,              # Sex
+             127, 89,89,22,57,NA,        # Colony (B, K, Ue, R, Allo)
+             213, 162,9, NA,             # Raising type
+             4,46,23,15,18,2,124,9,143)) # Mortality  type (d h c, elec, inj, pred, shot. other, unk, del, alive)
+```
+
+Plot
+```{r}
+par(mar = c(5,5,2,0))
+barplot(NBI_mat, beside = T, ylim = c(0,220), ylab = "Number of Individuals", border = NA, 
+        cex.axis = 3, cex.lab = 3,
+        col = c(
+                magma(4, begin = 0.25, end = 0.6), "white", # Stage
+                
+                plasma(1, direction = -1, begin = 0.0, end = 0.6), viridis(1, begin = 0.2, alpha = 0.9), # Sex
+                  magma(1, begin = 0.1, alpha = 0.6),"white", # Sex
+                
+                inferno(5,begin =0.65,  end = 0.95, direction = -1), "white", # Colony 
+                
+                viridis(3, begin = 0.65, end = 0.85),"white", # Raising type
+                
+                gray(0:7 / 8), viridis(1, begin = 0.5))) # Mortality type
+
+axis(1, at = c(3,7.5,12.5,17.5,24.5), labels = c("", "", "", "", ""), cex.axis = 3)
+axis(1, at = c(3,7.5,12.5,17.5,24.5), labels = c("Stage", "Sex", "Colony", "Raising type", "Mortality type"), cex.axis = 3, line = 1, lwd = 0)
+box()
+```
+
+Save the Plot
+```{r}
+# png(filename = here("plots", "01_description", "Barplot_all.png"), width = 1300, height = 835)
+# par(mar = c(5,5,2,0))
+# 
+# barplot(NBI_mat, beside = T, ylim = c(0,220), ylab = "Number of Individuals", border = NA, 
+#         cex.axis = 3, cex.lab = 3,
+#         col = c(
+#                 magma(4, begin = 0.25, end = 0.6), "white", # Stage
+#                 
+#                 plasma(1, direction = -1, begin = 0.0, end = 0.6), viridis(1, begin = 0.2, alpha = 0.9), # Sex
+#                   magma(1, begin = 0.1, alpha = 0.6),"white", # Sex
+#                 
+#                 inferno(5,begin =0.65,  end = 0.95, direction = -1), "white", # Colony 
+#                 
+#                 viridis(3, begin = 0.65, end = 0.85),"white", # Raising type
+#                 
+#                 gray(0:7 / 8), viridis(1, begin = 0.5))) # Mortality type
+# 
+# axis(1, at = c(3,7.5,12.5,17.5,24.5), labels = c("", "", "", "", ""), cex.axis = 3)
+# axis(1, at = c(3,7.5,12.5,17.5,24.5), labels = c("Stage", "Sex", "Colony", "Raising type", "Mortality type"), cex.axis = 3, line = 1, lwd = 0)
+# box()
+# 
+# dev.off()
+```
+Legend
+```{r, fig.height=6, fig.width=4}
+par(mar = mar_small)
+plot(1, type = "n", axes = "F", xlab = "", ylab = "") # empty plot
+
+legend(x = "center", 
+       legend = c("Stage","Juveniles","1 Year Old","2 Year Old","Adults",   "",
+                  "Sex","Females","Males","Unknown",   "", 
+                  "Colony","Burghausen","Kuchl","Überlingen", "Rosegg", "unassigned yet",   "", 
+                  "Raising type","Foster parents","Biological Parents", "Supplementation",   "", 
+                  "Mortality type","During human care","Electrocution","Injury or illness","Predation","Shot","Other", "Unknown", "Delivered", "Alive"), 
+       fill = c("white",magma(4, begin = 0.25, end = 0.6),   "white", # Stage
+                "white",plasma(1, direction = -1, begin = 0.0, end = 0.6), viridis(1, begin = 0.2, alpha = 0.9), # Sex
+                        magma(1, begin = 0.1, alpha = 0.6),"white", # Sex
+                "white",inferno(5,begin =0.65,  end = 0.95, direction = -1),   "white", # Colony
+                "white",viridis(3, begin = 0.65, end = 0.85),         "white", # Raising type
+                "white" , gray(0:7 / 8), viridis(1, begin = 0.5)), # Mortality type
+       border = NA, cex = 3)
+
+par(mar = mar_default)
+```
+
+Save the Legend
+```{r}
+# png(filename = here("plots", "01_description", "Barplot_all_legend.png"), width = 2174, height = 1800)
+# 
+# par(mar = mar_small)
+# plot(1, type = "n", axes = "F", xlab = "", ylab = "") # empty plot
+# 
+# legend(x = "center", 
+#        legend = c("Stage","Juveniles","1 Year Old","2 Year Old","Adults",   "",
+#                   "Sex","Females","Males","Unknown",   "", 
+#                   "Colony","Burghausen","Kuchl","Überlingen", "Rosegg", "unassigned yet",   "", 
+#                   "Raising type","Foster parents","Biological Parents", "Supplementation",   "", 
+#                   "Mortality type","During human care","Electrocution","Injury or illness","Predation","Shot","Other", "Unknown", "Delivered", "Alive"), 
+#        fill = c("white",magma(4, begin = 0.25, end = 0.6),   "white", # Stage
+#                 "white",plasma(1, direction = -1, begin = 0.0, end = 0.6), viridis(1, begin = 0.2, alpha = 0.9), # Sex
+#                         magma(1, begin = 0.1, alpha = 0.6),"white", # Sex
+#                 "white",inferno(5,begin =0.65,  end = 0.95, direction = -1),   "white", # Colony
+#                 "white",viridis(3, begin = 0.65, end = 0.85),         "white", # Raising type
+#                 "white" , gray(0:7 / 8), viridis(1, begin = 0.5)), # Mortality type
+#        border = NA, cex = 3)
+# 
+# par(mar = mar_default)
+# 
+# dev.off()
+```
+## Alive female individuals
+```{r}
+# subset the data
+NBI_f <- subset(x = NBI, subset = NBI$sex == "f" & NBI$project_status == "0")
+```
+
+```{r}
+table(NBI_f$reached_stage)
+table(NBI_f$breeding_area)
+table(NBI_f$raising_type)
+```
+
+```{r}
+NBI_mat_f <- matrix(data = c(
+             37, 11,8,18,NA,           # Stage
+             19, 15,28,6,6,NA,         # Colony (B, K, Ue, R, Allo)
+             41, 32,1))                # Raising type
+            
+```
+
+Plot
+```{r}
+par(mar = c(5,5,2,0))
+barplot(NBI_mat_f, beside = T, ylim = c(0,50), ylab = "Number of Individuals", border = NA, 
+        cex.axis = 3, cex.lab = 3,
+        col = c(
+                magma(4, begin = 0.25, end = 0.6), "white", # Stage
+                
+                inferno(5,begin =0.65,  end = 0.95, direction = -1), "white", # Colony 
+                
+                viridis(3, begin = 0.65, end = 0.85) # Raising type
+                
+                ))
+axis(1, at = c(3,8.5,13.5), labels = c("", "", ""), cex.axis = 3)
+axis(1, at = c(3,8.5,13.5), labels = c("Stage", "Colony", "Raising type"), cex.axis = 3, line = 1, lwd = 0)
+
+box()
+```
+
+Save the Plot
+```{r}
+# png(filename = here("plots", "01_description", "Barplot_alive_f.png"), width = 1300, height = 835)
+# par(mar = c(5,5,2,0))
+# 
+# barplot(NBI_mat_f, beside = T, ylim = c(0,50), ylab = "Number of Individuals", border = NA, 
+#         cex.axis = 3, cex.lab = 3,
+#         col = c(
+#                 magma(4, begin = 0.25, end = 0.6), "white", # Stage
+#                 
+#                 inferno(5,begin =0.65,  end = 0.95, direction = -1), "white", # Colony 
+#                 
+#                 viridis(3, begin = 0.65, end = 0.85) # Raising type
+#                 
+#                 ))
+# axis(1, at = c(3,8.5,13.5), labels = c("", "", ""), cex.axis = 3)
+# axis(1, at = c(3,8.5,13.5), labels = c("Stage", "Colony", "Raising type"), cex.axis = 3, line = 1, lwd = 0)
+# 
+# box()
+# 
+# dev.off()
+```
+Legend
+```{r, fig.height=4, fig.width=4}
+par(mar = mar_small)
+plot(1, type = "n", axes = "F", xlab = "", ylab = "")
+legend("center", legend = c("Stage","Juveniles","1 Year Old","2 Year Old","Adults",   "",
+                            "Colony","Burghausen","Kuchl","Überlingen", "Rosegg", "unassigned yet",   "",
+                            "Raising type","Foster parents","Biological Parents", "Supplementation"),
+       fill = c("white",magma(4, begin = 0.25, end = 0.6),   "white",
+                "white",inferno(5,begin =0.65,  end = 0.95, direction = -1),   "white",
+                "white",viridis(3, begin = 0.65, end = 0.85)), border = NA, cex = 1)
+par(mar = mar_default)
+```
+Save the legend
+```{r}
+# png(filename = here("plots", "01_description", "Barplot_alive_f_legend.png"), res = 130) # width = 300, height = 400
+# par(mar = mar_small)
+# 
+# plot(1, type = "n", axes = "F", xlab = "", ylab = "")
+# legend("center", legend = c("Stage","Juveniles","1 Year Old","2 Year Old","Adults",   "",
+#                             "Colony","Burghausen","Kuchl","Überlingen", "Rosegg", "unassigned yet",   "",
+#                             "Raising type","Foster parents","Biological Parents", "Supplementation"),
+#        fill = c("white",magma(4, begin = 0.25, end = 0.6),   "white",
+#                 "white",inferno(5,begin =0.65,  end = 0.95, direction = -1),   "white",
+#                 "white",viridis(3, begin = 0.65, end = 0.85)), border = NA, cex = 1)
+# 
+# par(mar = mar_default)
+# dev.off()
+```
 
 ***
 
