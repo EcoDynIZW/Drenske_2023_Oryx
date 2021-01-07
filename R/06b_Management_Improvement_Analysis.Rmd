@@ -19,7 +19,7 @@ knitr::opts_chunk$set(echo = TRUE, warning = TRUE, message = TRUE,
 
 * **Research question:** (Q1) How will the NBI population develop in the next 50 years and what will be the extinction risk, given that the colonies will be either managed or left to themselves? (Q2) Will the developments in the two already established colonies Burghausen & Kuchl be different? 
 * **Study area:** Austria, Germany and Italy
-* **Data:** 
+* **Data:** Results of the first NetLogo Model
 
 
 # Setup
@@ -33,15 +33,384 @@ knitr::opts_chunk$set(echo = TRUE, warning = TRUE, message = TRUE,
 ## please add ALL LIBRARIES NEEDED HERE
 ## please remove libraries from the list that are not needed anymore 
 ## at a later stage
-library()
+library("here")  
+library("tidyverse")     ## data manipulation
+library("magrittr")
 ```
 
 
 # Data
 
 ```{r data}
-#df <- readr::read_csv("your-data.csv")
-#sf <- sf::read_sf("your-geo-data.shp")
+df_Basic <- readRDS(file = here("output", "data-proc", "NetLogo-proc", "df_Basic.rds"))
+
+df_Basic_100 <- readRDS(file = here("output", "data-proc", "NetLogo-proc", "df_Baseline_100.rds"))
+```
+
+
+# Data overview
+## Minimum
+```{r}
+df_min <- df_Basic %>% group_by(Run, Scenario) %>% summarize_if(is.numeric, min) # lowest value per run
+df_min_100 <- df_Basic_100 %>% group_by(Run, Scenario) %>% summarize_if(is.numeric, min)
+```
+
+```{r}
+range(df_min$IndAll) # range of the lowest values
+range(df_min_100$IndAll)
+```
+
+```{r}
+df_min <- droplevels(df_min)
+df_min_100 <- droplevels(df_min_100)
+```
+
+```{r}
+# How often went the population extinct per scenario (100 runs)? TRUE = went extinct, FALSE = went not extinct
+df_min_tab <- table(df_min$Scenario, df_min$IndAll < 1) 
+table(df_min$IndAll < 1)
+
+df_min_tab_100 <- table(df_min_100$Scenario, df_min_100$IndAll < 1) 
+table(df_min_100$IndAll < 1)
+```
+
+```{r}
+# Have a look at the table
+# There is one row per scenario with the numbers of scenarios that went extinct or not
+head(df_min_tab)
+tail(df_min_tab)
+```
+
+```{r}
+# Baseline 100 years
+df_min_tab_100
+```
+
+## Extinctions
+```{r}
+ext <- df_min_tab[,2]
+ext_100 <- df_min_tab_100[,2]
+```
+
+```{r}
+df_ext <- df_min %>% group_by(Scenario) %>% summarize_if(is.numeric, min) # calculate the lowest value of all runs per scenario
+df_ext$Extinct <- ext
+
+df_ext_100 <- df_min_100 %>% group_by(Scenario) %>% summarize_if(is.numeric, min) # calculate the lowest value of all runs per scenario
+df_ext_100$Extinct <- ext_100
+```
+
+```{r}
+table(df_ext$Extinct) # Table the number of runs that went extinct. In 316 scenarios the population never went extinct
+table(df_ext_100$Extinct) # in 87 of 100 repetitions (87%) the population went extinct when model ran for 100 years
+```
+
+```{r}
+table(df_ext$Extinct < 6) # Extinction probability: How often went the population extinct 5 times or less?
+# In 324 of 326 scenarios the population went not extinct more than 5 times of 100 runs (Extinction probability <= 5%)
+```
+
+```{r}
+rm(df_min_tab, ext)
+rm(df_min_tab_100, ext_100)
+```
+
+## Maximum
+```{r}
+df_max <- df_Basic %>% group_by(Run,Scenario) %>% summarize_if(is.numeric, max) # highest value per run
+```
+
+```{r}
+range(df_max$IndAll) # 74 - 7146
+```
+
+```{r}
+df_max <- droplevels(df_max)
+df_max_sc <- df_max %>% group_by(Scenario) %>% summarize_if(is.numeric, max) # highest value per scenario
+```
+
+## Save data
+```{r}
+# saveRDS(object = df_ext, file = here("output", "data-proc", "NetLogo-proc", "df_ext.rds"))
+# saveRDS(object = df_max_sc, file = here("output", "data-proc", "NetLogo-proc", "df_max_sc.rds"))
+```
+
+
+# Calculation of Lambda
+Calculate the difference between the years per run, put NA for the first value of each run (because there you can not calculate a difference)
+```{r}
+df_Basic <- df_Basic %>%  group_by(Run) %>% mutate(Diff = c(NA,diff(IndAll)))
+```
+
+Calculate the ratio (quotient) between the difference (step before) and the number of individuals in the year before
+```{r}
+df_Basic <- df_Basic %>%  group_by(Run) %>% mutate(Quot = Diff / lag(IndAll,1))
+```
+
+Calculate the stochastic Lambda by add 1 to the ratio (step before). Now we have a Lambda per year per run
+```{r}
+df_Basic <- df_Basic %>%  group_by(Run) %>% mutate(Lambda_sto = Quot + 1)
+```
+
+```{r}
+range(df_Basic$Lambda_sto, na.rm = T) # 0 2
+df_Basic <- df_Basic[, -c(35,36)] # remove the first columns for the Lambda calculation
+```
+
+
+
+## Other possibility to calculate Lambda
+```{r}
+#df_Basic <- df_Basic %>%  group_by(Run) %>% mutate(Lambda2 = IndAll/ lag(IndAll,1))
+```
+
+```{r}
+# # Analyse the differences
+# table(round(df_Basic$Lambda_sto, digits = 5) == round(df_Basic$Lambda2, digits = 5), useNA = "always")
+# which(round(df_Basic$Lambda_sto, digits = 5) != round(df_Basic$Lambda2, digits = 5))
+# 
+# table(round(df_Basic$Lambda_sto, digits = 2) == round(df_Basic$Lambda2, digits = 2), useNA = "always")
+
+```
+
+
+## Save data
+Save a new version of df_Basic with Lambda
+```{r}
+#saveRDS(object = df_Basic, file = here("output", "data-proc", "NetLogo-proc", "df_Basic_Lambda.rds"))
+```
+
+
+# Mean per scenario
+At first we calculate mean values per run. E.g. there is one value per run for Lambda or for the number of individuals during this run for all years of this run.
+```{r}
+# Mean for each run
+df_run <- df_Basic %>%  group_by(Run, Scenario) %>% summarize_if(is.numeric, mean, na.rm = TRUE)
+# 32600 rows, 1 row for each Run. This is needed to calculate the SD of Lambda
+```
+
+Calculate the SD of the stochastic Lambda per scenario
+```{r}
+df_scenario <- df_run %>% group_by(Scenario) %>% mutate(SD = sd(Lambda_sto, na.rm = T))
+```
+
+Calculate the SD
+```{r}
+df_sc_sd <- df_scenario %>% group_by(Scenario) %>% summarize(SD = mean(SD, na.rm = T))
+```
+
+Now there will be one value for each column per scenario
+```{r}
+df_sc_mean <- df_Basic %>% group_by(Scenario) %>% summarize_if(is.numeric, mean, na.rm = TRUE)
+```
+
+Combine the SD and Extinction with df_Basic
+```{r}
+df_sc_mean$SD_Lambda <- df_sc_sd$SD
+df_sc_mean$Extinct <- df_ext$Extinct
+rm(df_sc_sd)
+```
+
+
+## Overview of the data
+```{r}
+range(df_sc_mean$Lambda_sto)
+# 0.9538676 1.3987626
+table(df_sc_mean$Lambda_sto > 1) 
+# TRUE for 308 scenarios - positive population growth in 308 scenarios
+
+table(df_sc_mean$Extinct <= 5) 
+# Extinction probability 5% or less in 324 scenarios
+
+table(df_sc_mean$Lambda_sto > 1 & df_sc_mean$Extinct <= 5) 
+# Positive population growth and an extinction probability of 5% or less in 308 scenarios of 326 (94.48%)
+```
+
+## Save data 
+```{r}
+#saveRDS(object = df_sc_mean, file = here("output", "data-proc", "NetLogo-proc", "df_sc_mean.rds"))
+```
+
+
+# Analysis I: Scenarios with positive population growth
+```{r}
+df_lambda_pos <- subset(df_sc_mean, df_sc_mean$Lambda_sto > 1 & df_sc_mean$Extinct <= 5) # 308 rows
+df_lambda_pos <- droplevels(df_lambda_pos)
+```
+
+Overview
+```{r}
+range(df_lambda_pos$Lambda_sto)
+table(df_lambda_pos$Extinct)
+```
+
+Table the distributions between the different mortalities and reproduction rates
+```{r}
+table(df_lambda_pos$Mortality_Juveniles)
+# 0.20  0.30  0.36 
+#  107   102    99          
+table(df_lambda_pos$Mortality_Subadults1)
+# 0.08  0.19  0.26   
+#  107   102    99          
+table(df_lambda_pos$Mortality_Subadults2)
+# 0.14  0.24  0.31 
+#  107   102    99          
+table(df_lambda_pos$Mortality_Adults)
+# 0.02  0.14  0.22 
+#  108   108    92          
+table(df_lambda_pos$Repro)
+# 0.53  0.58  0.66  1.06  1.41  3.97 
+#   71    74    80    81     1     1   
+```
+
+
+## Save data 
+```{r}
+#saveRDS(object = df_lambda_pos, file = here("output", "data-proc", "NetLogo-proc", "df_lambda_pos.rds"))
+```
+
+# Analysis II: Scenarios of special interest
+Find the rows of specific scenarios
+```{r}
+# Baseline
+which(df_sc_mean$Mortality_Juveniles == 0.36 & df_sc_mean$Mortality_Subadults1 == 0.26 & df_sc_mean$Mortality_Subadults2 == 0.31 & df_sc_mean$Mortality_Adults == 0.22 & df_sc_mean$Repro == 0.53)
+
+
+# Better reproduction
+## Reproduction increased by 10%
+which(df_sc_mean$Mortality_Juveniles == 0.36 & df_sc_mean$Mortality_Subadults1 == 0.26 & df_sc_mean$Mortality_Subadults2 == 0.31 & df_sc_mean$Mortality_Adults == 0.22 & df_sc_mean$Repro == 0.58)
+
+## Reproduction increased by 25%
+which(df_sc_mean$Mortality_Juveniles == 0.36 & df_sc_mean$Mortality_Subadults1 == 0.26 & df_sc_mean$Mortality_Subadults2 == 0.31 & df_sc_mean$Mortality_Adults == 0.22 & df_sc_mean$Repro == 0.66)
+
+## Reproduction increased by 100%
+which(df_sc_mean$Mortality_Juveniles == 0.36 & df_sc_mean$Mortality_Subadults1 == 0.26 & df_sc_mean$Mortality_Subadults2 == 0.31 & df_sc_mean$Mortality_Adults == 0.22 & df_sc_mean$Repro == 1.06)
+
+
+# Better juveniles survival (s1)
+## s1 increased by 10%
+which(df_sc_mean$Mortality_Juveniles == 0.3 & df_sc_mean$Mortality_Subadults1 == 0.26 & df_sc_mean$Mortality_Subadults2 == 0.31 & df_sc_mean$Mortality_Adults == 0.22 & df_sc_mean$Repro == 0.53)
+
+## s1 increased by 25%
+which(df_sc_mean$Mortality_Juveniles == 0.2 & df_sc_mean$Mortality_Subadults1 == 0.26 & df_sc_mean$Mortality_Subadults2 == 0.31 & df_sc_mean$Mortality_Adults == 0.22 & df_sc_mean$Repro == 0.53)
+
+
+# Better adult survival (s4)
+## s4 increased by 10%
+which(df_sc_mean$Mortality_Juveniles == 0.36 & df_sc_mean$Mortality_Subadults1 == 0.26 & df_sc_mean$Mortality_Subadults2 == 0.31 & df_sc_mean$Mortality_Adults == 0.14 & df_sc_mean$Repro == 0.53)
+
+## s4 increased by 25%
+which(df_sc_mean$Mortality_Juveniles == 0.36 & df_sc_mean$Mortality_Subadults1 == 0.26 & df_sc_mean$Mortality_Subadults2 == 0.31 & df_sc_mean$Mortality_Adults == 0.02 & df_sc_mean$Repro == 0.53)
+
+# Better survival all stages (s1-s4)
+## s1-s4 increased by 10%
+which(df_sc_mean$Mortality_Juveniles == 0.3 & df_sc_mean$Mortality_Subadults1 == 0.19 & df_sc_mean$Mortality_Subadults2 == 0.24 & df_sc_mean$Mortality_Adults == 0.14 & df_sc_mean$Repro == 0.53)
+
+## s1-s4 increased by 25%
+which(df_sc_mean$Mortality_Juveniles == 0.2 & df_sc_mean$Mortality_Subadults1 == 0.08 & df_sc_mean$Mortality_Subadults2 == 0.14 & df_sc_mean$Mortality_Adults == 0.02 & df_sc_mean$Repro == 0.53)
+
+
+# Better survival all stages & better reproduction (s1-s4 + reproduction)
+## s1-s4 + reproduction increased by 10%
+which(df_sc_mean$Mortality_Juveniles == 0.3 & df_sc_mean$Mortality_Subadults1 == 0.19 & df_sc_mean$Mortality_Subadults2 == 0.24 & df_sc_mean$Mortality_Adults == 0.14 & df_sc_mean$Repro == 0.58)
+
+## s1-s4 + reproduction increased by 25%
+which(df_sc_mean$Mortality_Juveniles == 0.2 & df_sc_mean$Mortality_Subadults1 == 0.08 & df_sc_mean$Mortality_Subadults2 == 0.14 & df_sc_mean$Mortality_Adults == 0.02 & df_sc_mean$Repro == 0.66)
+
+
+# Status quo 
+which(df_sc_mean$Mortality_Juveniles == 0.36 & df_sc_mean$Mortality_Subadults1 == 0.26 & df_sc_mean$Mortality_Subadults2 == 0.31 & df_sc_mean$Mortality_Adults == 0.22 & df_sc_mean$Repro == 1.41)
+
+
+# All chicks
+which(df_sc_mean$Mortality_Juveniles == 0.36 & df_sc_mean$Mortality_Subadults1 == 0.26 & df_sc_mean$Mortality_Subadults2 == 0.31 & df_sc_mean$Mortality_Adults == 0.22 & df_sc_mean$Repro == 3.97)
+
+```
+
+Build a table with the scenarios
+```{r}
+df_scen <- df_sc_mean[c( 321,322,323,324, 213,105,317,313, 161,1,162,3, 325,326),] 
+df_scen$Scenario_name <- c("Baseline","10RR", "25RR","100RR",
+                           "10juv","25juv","10adu","25adu",
+                           "10all","25all","10all10RR","25all25RR",
+                           "Statusquo", "All_chicks")
+```
+
+delete & reorder columns
+```{r}
+df_scen <- df_scen[,-c(2,3,25:32)] # Run, Year, Catastrophe settings (not used yet), settings for the starting population
+df_scen <- droplevels(df_scen)
+
+# Which columns are still there?
+names(df_scen)
+```
+
+Reorder the columns
+```{r}
+df_scen %<>%
+  select(Scenario_name,Scenario, Lambda_sto,SD_Lambda,Extinct,
+         IndAll,IndB,IndK,IndUb,IndFP,IndP,                
+         IndBFP,IndBP,IndKFP,IndKP,IndUbFP,IndUbP,
+         IndJuv,IndSub1,IndSub2,IndAdu,         
+         Mortality_Juveniles,Mortality_Subadults1,Mortality_Subadults2,Mortality_Adults,Repro)
+```
+
+## Save data
+```{r}
+#saveRDS(object = df_scen, file = here("output", "data-proc", "NetLogo-proc", "df_scen.rds"))
+```
+
+
+## Scenarios where Lambda > 1
+```{r}
+df_scen_Lambda <- df_scen[which(df_scen$Lambda_sto > 1 & df_scen$Extinct < 6), ] # 9 rows
+```
+
+## Calculation of the mean per year per Scenario
+```{r}
+levels(df_scen$Scenario)
+```
+
+Subset all rows from df_Basic of the 14 scenarios of interest
+```{r}
+df_Basic_scen <- subset(df_Basic,
+                        df_Basic$Scenario == "0.20.080.140.020.53true04true00.25" |
+                        df_Basic$Scenario == "0.20.080.140.020.66true04true00.25" |
+                        df_Basic$Scenario == "0.20.260.310.220.53true04true00.25" |
+                        df_Basic$Scenario == "0.30.190.240.140.53true04true00.25" |
+                        df_Basic$Scenario == "0.30.190.240.140.58true04true00.25" | # 5
+                          
+                        df_Basic$Scenario == "0.30.260.310.220.53true04true00.25" |
+                        df_Basic$Scenario == "0.360.260.310.020.53true04true00.25" |
+                        df_Basic$Scenario == "0.360.260.310.140.53true04true00.25" |
+                        df_Basic$Scenario == "0.360.260.310.220.53true04true00.25" |
+                        df_Basic$Scenario == "0.360.260.310.220.58true04true00.25" | # 10
+                          
+                        df_Basic$Scenario == "0.360.260.310.220.66true04true00.25" |
+                        df_Basic$Scenario == "0.360.260.310.221.06true04true00.25" |
+                        df_Basic$Scenario == "0.360.260.310.221.41true04true00.25" |
+                        df_Basic$Scenario == "0.360.260.310.223.97true04true00.25")  # 14
+
+df_Basic_scen <- droplevels(df_Basic_scen)
+```
+
+```{r}
+levels(df_Basic_scen$Scenario) # 14
+table(df_Basic_scen$Scenario)
+```
+### Calculate the mean per year per scenario
+```{r}
+df_mean <- df_Basic_scen %>% group_by(Scenario,Year) %>% summarize_if(is.numeric, mean)
+```
+
+```{r}
+table(df_mean$Year)
+```
+
+### Save data
+```{r}
+# saveRDS(object = df_mean, file = here("output", "data-proc", "NetLogo-proc", "df_mean.rds"))
+# saveRDS(object = df_Basic_scen, file = here("output", "data-proc", "NetLogo-proc", "df_Basic_scen.rds"))
 ```
 
 

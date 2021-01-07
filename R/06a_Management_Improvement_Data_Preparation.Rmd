@@ -19,7 +19,7 @@ knitr::opts_chunk$set(echo = TRUE, warning = TRUE, message = TRUE,
 
 * **Research question:** (Q1) How will the NBI population develop in the next 50 years and what will be the extinction risk, given that the colonies will be either managed or left to themselves? (Q2) Will the developments in the two already established colonies Burghausen & Kuchl be different? 
 * **Study area:** Austria, Germany and Italy
-* **Data:** 
+* **Data:** Results of the first NetLogo Model
 
 
 # Setup
@@ -33,16 +33,258 @@ knitr::opts_chunk$set(echo = TRUE, warning = TRUE, message = TRUE,
 ## please add ALL LIBRARIES NEEDED HERE
 ## please remove libraries from the list that are not needed anymore 
 ## at a later stage
-library()
+library("here")          ## loading data
+library("tidyverse")     ## data manipulation
+library("magrittr")      ## Pipes
+library("data.table")    ## fread() and fwrite()
 ```
 
 
 # Data
+Load data tables, increase run numbers of the other partial models and combine them. We had to split up the model in 4 partial models, because of different model options (df_Basic, df_Baseline_SD, df_All_chicks) or because of different model running time (50 years for the model vs. 100 years for a simulation of the baseline scenario).
+df Basic is a model with all possible combinations of the baseline survival and reproduction values and their improvements.
+df_Baseline_SD is a model where we included the standard deviation in the NetLogo model. We did not do that for the other models.
+df_All_chicks is a model where we combined the reproduction values "Status quo" or "All chicks" only with the Baseline survival probabilities. 
+df_Baseline_100 is a model where the running time was for 100 years not 50 years as for all the other models.
 
 ```{r data}
-#df <- readr::read_csv("your-data.csv")
-#sf <- sf::read_sf("your-geo-data.shp")
+# Baseline without SD and improvements of survival and reproduction
+df_Basic <- 
+  df_Basic_raw <- fread(file = here("output", "NetLogo_raw", "NBI_Baseline_and_Improvements.csv"),
+                        skip = 6)
+
+# Baseline with SD
+df_Baseline_SD <- 
+  df_Baseline_SD_raw <- fread(file = here("output", "NetLogo_raw", "NBI_Baseline_SD.csv"),
+                              skip = 6)
+
+## Increase the run number so we have each run number only once
+df_Baseline_SD$`[run number]` <- as.numeric(as.character(df_Baseline_SD$`[run number]`))
+df_Baseline_SD$`[run number]` <- df_Baseline_SD$`[run number]` + 50000
+
+
+# Status quo & All chicks
+df_All_Chicks <- 
+  df_All_Chicks_raw <- fread(file = here("output", "NetLogo_raw", "NBI_All_chicks_Statquo.csv"), 
+                             skip = 6)
+
+## Increase the run number so we have each run number only once
+df_All_Chicks$`[run number]` <- as.numeric(as.character(df_All_Chicks$`[run number]`))
+df_All_Chicks$`[run number]` <- df_All_Chicks$`[run number]` + 60000
+
+# Baseline for 100 years
+df_Baseline_100 <- 
+  df_Baseline_SD_raw <- fread(file = here("output", "NetLogo_raw", "NBI_Baseline_SD_100years.csv"),
+                              skip = 6)
 ```
+
+Combine the datasets 
+```{r}
+df_combine <- rbind(df_Baseline_SD, df_All_Chicks)
+df_combine$`[run number]` <- as.character(df_combine$`[run number]`)
+table(df_combine$`[run number]` < 60000) # 6956 Rows from Baseline_SD, increased by 50 000 not 60 000 
+```
+
+Delete Baseline scenario without SD in df_Basic
+```{r}
+# The description of the Baseline scenario can be found in the respective column of the table of the baseline simulation with SD
+unique(df_Baseline_SD$`(word Mortality_Juveniles Mortality_Subadults_Age1 Mortality_Subadults_Age2 Mortality_Adults Fecundity Supplements? Number_Supplements Supplement_Time Catastrophes? Frequency Severity)`)
+```
+
+```{r}
+# How many rows will be removed?
+table(df_Basic$`(word Mortality_Juveniles Mortality_Subadults_Age1 Mortality_Subadults_Age2 Mortality_Adults Fecundity Supplements? Number_Supplements Supplement_Time Catastrophes? Frequency Severity)` == "0.360.260.310.220.53true04true00.25")
+
+# Remove the baseline scenario without SD
+df_Basic <- df_Basic[df_Basic$`(word Mortality_Juveniles Mortality_Subadults_Age1 Mortality_Subadults_Age2 Mortality_Adults Fecundity Supplements? Number_Supplements Supplement_Time Catastrophes? Frequency Severity)` != "0.360.260.310.220.53true04true00.25"]
+```
+
+Combine df_Basic and df_combine
+```{r}
+df_Basic <- rbind(df_Basic, df_combine)
+```
+
+
+# Data preparation
+```{r}
+head(df_Basic)
+```
+
+## Rename columns
+```{r}
+names(df_Basic)
+```
+
+```{r}
+rename_map <- c(
+  "[run number]"                                                                      = "Run",
+  "Number_Juveniles"                                                                  = "N_Juveniles",
+  "Number_Subadults_Age1"                                                             = "N_Subadults1",
+  "Number_Subadults_Age2"                                                             = "N_Subadults2",
+  "Number_Adults"                                                                     = "N_Adults",
+  "Mortality_Juveniles"                                                               = "Mortality_Juveniles",
+  "Mortality_Subadults_Age1"                                                          = "Mortality_Subadults1",
+  "Mortality_Subadults_Age2"                                                          = "Mortality_Subadults2",
+  "Mortality_Adults"                                                                  = "Mortality_Adults",
+  "Fecundity"                                                                         = "Repro",
+  "Supplements?"                                                                      = "Supplemented",
+  "Number_Supplements"                                                                = "N_Supplements",
+  "Supplement_Time"                                                                   = "Supplement_Time",
+  "Catastrophes?"                                                                     = "Stoch_events",
+  "Frequency"                                                                         = "Stoch_Frequency",
+  "Severity"                                                                          = "Stoch_Severity",
+  "[step]"                                                                            = "Year",
+  "(word Mortality_Juveniles Mortality_Subadults_Age1 Mortality_Subadults_Age2 Mortality_Adults Fecundity Supplements? Number_Supplements Supplement_Time Catastrophes? Frequency Severity)" = "Scenario",
+  "count turtles"                                                                     = "IndAll",
+  "count turtles with [colony = \"\"Burghausen\"\"]"                                  = "IndB",
+  "count turtles with [colony = \"\"Kuchl\"\"]"                                       = "IndK",
+  "count turtles with [colony = \"\"Ueberlingen\"\"]"                                 = "IndUb",
+  "count turtles with [raising = \"\"FP\"\"]"                                         = "IndFP",
+  "count turtles with [raising = \"\"P\"\"]"                                          = "IndP",
+  "count turtles with [colony = \"\"Burghausen\"\" and raising = \"\"FP\"\"]"         = "IndBFP",
+  "count turtles with [colony = \"\"Kuchl\"\" and raising = \"\"FP\"\"]"              = "IndKFP",
+  "count turtles with [colony = \"\"Ueberlingen\"\" and raising = \"\"FP\"\"]"        = "IndUbFP",
+  "count turtles with [colony = \"\"Burghausen\"\" and raising = \"\"P\"\"]"          = "IndBP",
+  "count turtles with [colony = \"\"Kuchl\"\" and raising = \"\"P\"\"]"               = "IndKP",
+  "count turtles with [colony = \"\"Ueberlingen\"\" and raising = \"\"P\"\"]"         = "IndUbP",
+  "count turtles with [age = 0]"                                                      = "IndJuv",
+  "count turtles with [age = 1]"                                                      = "IndSub1",
+  "count turtles with [age = 2]"                                                      = "IndSub2",
+  "count turtles with [age >= 3]"                                                     = "IndAdu")
+
+names(df_Basic) <- rename_map[names(df_Basic)]
+names(df_Baseline_100) <- rename_map[names(df_Baseline_100)]
+rm(rename_map)
+head(df_Basic)
+```
+
+## Factorize & numerize variables
+```{r}
+str(df_Basic)
+df_Basic %<>% 
+  mutate(Scenario     = factor(Scenario),
+         Supplemented = factor(Supplemented),
+         Stoch_events = factor(Stoch_events))
+df_Basic %<>%
+  mutate(Run                    = as.numeric(as.character(Run)),
+         N_Juveniles            = as.numeric(as.character(N_Juveniles)),
+         N_Subadults1           = as.numeric(as.character(N_Subadults1)),
+         N_Subadults2           = as.numeric(as.character(N_Subadults2)),
+         N_Adults               = as.numeric(as.character(N_Adults)),
+         Mortality_Juveniles    = as.numeric(as.character(Mortality_Juveniles)),
+         Mortality_Subadults1   = as.numeric(as.character(Mortality_Subadults1)),
+         Mortality_Subadults2   = as.numeric(as.character(Mortality_Subadults2)),
+         Mortality_Adults       = as.numeric(as.character(Mortality_Adults)),
+         Repro                  = as.numeric(as.character(Repro)),
+         N_Supplements          = as.numeric(as.character(N_Supplements)),
+         Supplement_Time        = as.numeric(as.character(Supplement_Time)),
+         Stoch_Frequency        = as.numeric(as.character(Stoch_Frequency)),
+         Stoch_Severity         = as.numeric(as.character(Stoch_Severity)),
+         Year                   = as.numeric(as.character(Year)),
+         IndAll                 = as.numeric(as.character(IndAll)),
+         IndB                   = as.numeric(as.character(IndB)),
+         IndK                   = as.numeric(as.character(IndK)),
+         IndUb                  = as.numeric(as.character(IndUb)),
+         IndFP                  = as.numeric(as.character(IndFP)),
+         IndP                   = as.numeric(as.character(IndP)),
+         IndBFP                 = as.numeric(as.character(IndBFP)),
+         IndKFP                 = as.numeric(as.character(IndKFP)),
+         IndUbFP                = as.numeric(as.character(IndUbFP)),
+         IndBP                  = as.numeric(as.character(IndBP)),
+         IndKP                  = as.numeric(as.character(IndKP)),
+         IndUbP                 = as.numeric(as.character(IndUbP)),
+         IndJuv                 = as.numeric(as.character(IndJuv)),
+         IndSub1                = as.numeric(as.character(IndSub1)),
+         IndSub2                = as.numeric(as.character(IndSub2)),
+         IndAdu                 = as.numeric(as.character(IndAdu)))
+
+str(df_Basic)
+```
+
+```{r}
+# DO the same for the simulation for 100 years
+df_Baseline_100 %<>% 
+  mutate(Scenario     = factor(Scenario),
+         Supplemented = factor(Supplemented),
+         Stoch_events = factor(Stoch_events))
+df_Baseline_100 %<>%
+  mutate(Run                    = as.numeric(as.character(Run)),
+         N_Juveniles            = as.numeric(as.character(N_Juveniles)),
+         N_Subadults1           = as.numeric(as.character(N_Subadults1)),
+         N_Subadults2           = as.numeric(as.character(N_Subadults2)),
+         N_Adults               = as.numeric(as.character(N_Adults)),
+         Mortality_Juveniles    = as.numeric(as.character(Mortality_Juveniles)),
+         Mortality_Subadults1   = as.numeric(as.character(Mortality_Subadults1)),
+         Mortality_Subadults2   = as.numeric(as.character(Mortality_Subadults2)),
+         Mortality_Adults       = as.numeric(as.character(Mortality_Adults)),
+         Repro                  = as.numeric(as.character(Repro)),
+         N_Supplements          = as.numeric(as.character(N_Supplements)),
+         Supplement_Time        = as.numeric(as.character(Supplement_Time)),
+         Stoch_Frequency        = as.numeric(as.character(Stoch_Frequency)),
+         Stoch_Severity         = as.numeric(as.character(Stoch_Severity)),
+         Year                   = as.numeric(as.character(Year)),
+         IndAll                 = as.numeric(as.character(IndAll)),
+         IndB                   = as.numeric(as.character(IndB)),
+         IndK                   = as.numeric(as.character(IndK)),
+         IndUb                  = as.numeric(as.character(IndUb)),
+         IndFP                  = as.numeric(as.character(IndFP)),
+         IndP                   = as.numeric(as.character(IndP)),
+         IndBFP                 = as.numeric(as.character(IndBFP)),
+         IndKFP                 = as.numeric(as.character(IndKFP)),
+         IndUbFP                = as.numeric(as.character(IndUbFP)),
+         IndBP                  = as.numeric(as.character(IndBP)),
+         IndKP                  = as.numeric(as.character(IndKP)),
+         IndUbP                 = as.numeric(as.character(IndUbP)),
+         IndJuv                 = as.numeric(as.character(IndJuv)),
+         IndSub1                = as.numeric(as.character(IndSub1)),
+         IndSub2                = as.numeric(as.character(IndSub2)),
+         IndAdu                 = as.numeric(as.character(IndAdu)))
+```
+
+
+## Reorder rows
+```{r}
+df_Basic  %<>%
+  arrange(Run, Year)%>%
+  tibble::as_tibble()
+
+# for 100 years
+df_Baseline_100  %<>%
+  arrange(Run, Year)%>%
+  tibble::as_tibble()
+```
+
+## Reorder columns
+```{r}
+df_Basic %<>% 
+  select(Run, Scenario, Year, 
+         IndAll,IndB,IndK,IndUb,IndFP,IndP,
+         IndBFP,IndBP,IndKFP,IndKP,IndUbFP,IndUbP,
+         IndJuv,IndSub1,IndSub2,IndAdu,
+         Mortality_Juveniles,Mortality_Subadults1,Mortality_Subadults2,Mortality_Adults,Repro,
+         Supplemented,N_Supplements,Supplement_Time, Stoch_events, Stoch_Frequency, Stoch_Severity,
+         N_Juveniles,N_Subadults1,N_Subadults2,N_Adults)
+
+# For 100 years
+df_Baseline_100 %<>% 
+  select(Run, Scenario, Year, 
+         IndAll,IndB,IndK,IndUb,IndFP,IndP,
+         IndBFP,IndBP,IndKFP,IndKP,IndUbFP,IndUbP,
+         IndJuv,IndSub1,IndSub2,IndAdu,
+         Mortality_Juveniles,Mortality_Subadults1,Mortality_Subadults2,Mortality_Adults,Repro,
+         Supplemented,N_Supplements,Supplement_Time, Stoch_events, Stoch_Frequency, Stoch_Severity,
+         N_Juveniles,N_Subadults1,N_Subadults2,N_Adults)
+```
+
+
+# Save data
+```{r}
+# saveRDS(object = df_Basic, file = here("output", "data-proc", "NetLogo-proc", "df_Basic.rds"))
+# saveRDS(object = df_Baseline_100, file = here("output", "data-proc", "NetLogo-proc", "df_Baseline_100.rds"))
+```
+
+# Questions/To Do
+EIgentlich sollten die SPalten für die Kolonien usw entfernt werden oder in Netlogo muss boch Rosegg hinzugefügt werden
 
 
 ***

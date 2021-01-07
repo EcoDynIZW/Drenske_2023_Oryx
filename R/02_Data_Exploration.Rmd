@@ -36,6 +36,7 @@ In this script we created different plots for the description of the NBI populat
 ## please remove libraries from the list that are not needed anymore 
 ## at a later stage
 library("here")
+library("tidyverse")
 #library("knitr")
 library("viridisLite")
 ```
@@ -141,23 +142,23 @@ par(mar = mar_default)
 
 Save the plot
 ```{r}
-png(filename = here("plots", "01_description", "Popsize_per_year.png"))
-par(mar = (c(5, 4.5, 1, 2) + 0.1))
-
-plot(pop_num, type = "n", xaxt = "n", yaxt = "n", xlab = "Year", ylab = "Number of individuals", cex.lab = 2, ylim = c(0,200))
-axis(1, at = 1:12, labels = 2008:2019, cex.axis = 2)
-axis(2, cex.axis = 2)
-
-lines(zero_line, col = "grey85")
-polygon(c(1:12, rev(1:12)), c(pop_num, rev(zero_line)), col = "grey85", border= NA)
-
-lines(pop_num, lwd = 3)
-points(pop_num, pch = 16, cex = 1.5)
-
-box()
-par(mar = mar_default)
-
-dev.off()
+# png(filename = here("plots", "01_description", "Popsize_per_year.png"))
+# par(mar = (c(5, 4.5, 1, 2) + 0.1))
+# 
+# plot(pop_num, type = "n", xaxt = "n", yaxt = "n", xlab = "Year", ylab = "Number of individuals", cex.lab = 2, ylim = c(0,200))
+# axis(1, at = 1:12, labels = 2008:2019, cex.axis = 2)
+# axis(2, cex.axis = 2)
+# 
+# lines(zero_line, col = "grey85")
+# polygon(c(1:12, rev(1:12)), c(pop_num, rev(zero_line)), col = "grey85", border= NA)
+# 
+# lines(pop_num, lwd = 3)
+# points(pop_num, pch = 16, cex = 1.5)
+# 
+# box()
+# par(mar = mar_default)
+# 
+# dev.off()
 ```
 # Customized barplots
 ## Overall population
@@ -277,6 +278,7 @@ Save the Legend
 ```
 ## Alive female individuals
 ```{r}
+table(NBI$sex, NBI$project_status) # 74 alive females, 69 alive males = 143 alive individuals
 # subset the data
 NBI_f <- subset(x = NBI, subset = NBI$sex == "f" & NBI$project_status == "0")
 ```

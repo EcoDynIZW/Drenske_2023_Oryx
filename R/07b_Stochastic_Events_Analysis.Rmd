@@ -19,7 +19,7 @@ knitr::opts_chunk$set(echo = TRUE, warning = TRUE, message = TRUE,
 
 * **Research question:** (Q1) How will the NBI population develop in the next 50 years and what will be the extinction risk, given that the colonies will be either managed or left to themselves? (Q2) Will the developments in the two already established colonies Burghausen & Kuchl be different? 
 * **Study area:** Austria, Germany and Italy
-* **Data:** 
+* **Data:** Results of the second NetLogo Model
 
 
 # Setup
@@ -33,17 +33,300 @@ knitr::opts_chunk$set(echo = TRUE, warning = TRUE, message = TRUE,
 ## please add ALL LIBRARIES NEEDED HERE
 ## please remove libraries from the list that are not needed anymore 
 ## at a later stage
-library()
+library("here")
+library("tidyverse")     ## data manipulation
+library("magrittr")
 ```
 
 
 # Data
-
 ```{r data}
-#df <- readr::read_csv("your-data.csv")
-#sf <- sf::read_sf("your-geo-data.shp")
+df_StevS <- readRDS(file = here("output", "data-proc", "NetLogo-proc", "df_StevS.rds"))
 ```
 
+# Data overview
+## Minimum
+```{r}
+df_min_StevS <- df_StevS %>% group_by(Run,Scenario) %>% summarize_if(is.numeric, min) # lowest value per run
+```
+
+```{r}
+range(df_min_StevS$IndAll) # range of the lowest values: 0-104
+```
+
+```{r}
+df_min_StevS <- droplevels(df_min_StevS)
+```
+
+```{r}
+# How often went the population extinct per scenario (100 runs)? TRUE = went extinct, FALSE = went not extinct
+df_min_StevS_tab <- table(df_min_StevS$Scenario, df_min_StevS$IndAll < 1) 
+table(df_min_StevS$IndAll < 1)
+```
+
+```{r}
+# Have a look at the table
+# There is one row per scenario with the numbers of scenarios that went extinct or not
+head(df_min_StevS_tab)
+tail(df_min_StevS_tab)
+```
+
+## Extinctions
+df_min_CataS_tab has 2 columns with overall 1604 values (802*2). The second column ("TRUE") gives the number of runs per scenario (at most 100) that went extinct.
+```{r}
+ext <- df_min_StevS_tab[,2]
+```
+
+```{r}
+df_ext_StevS <- df_min_StevS %>% group_by(Scenario) %>% summarize_if(is.numeric, min) # calculate the lowest value of all runs per scenario
+df_ext_StevS$Extinct <- ext
+df_ext_StevS <- droplevels(df_ext_StevS)
+```
+
+```{r}
+table(df_ext_StevS$Extinct) # Table the number of runs that went extinct. In 727 scenarios of 820 scenarios the population never went extinct
+#727/820  = 88.66 %
+```
+
+```{r}
+table(df_ext_StevS$Extinct < 6 ) 
+# Extinction probability: How often went the population extinct 5 times or less?
+# In 748 of 820 scenarios the population went not extinct more than 5 times of 100 runs (Extinction probability <= 5%)
+# 748/820 = 91.22 %
+```
+
+```{r}
+rm(df_min_StevS_tab,ext)
+```
+
+## Maximum
+```{r}
+df_max_StevS <- df_StevS %>% group_by(Run,Scenario) %>% summarize_if(is.numeric, max) # highest value per run
+```
+
+```{r}
+range(df_max_StevS$IndAll) # 89 7386
+```
+
+```{r}
+df_max_StevS <- droplevels(df_max_StevS)
+df_max_StevS_sc <- df_max_StevS %>% group_by(Scenario) %>% summarize_if(is.numeric, max) # highest value per scenario
+range(df_max_StevS_sc$IndAll) # 89 7386
+```
+
+## Save data
+```{r}
+# saveRDS(object = df_ext_StevS, file = here("output", "data-proc", "NetLogo-proc", "df_ext_StevS.rds"))
+# saveRDS(object = df_max_StevS_sc, file = here("output", "data-proc", "NetLogo-proc", "df_max_StevS_sc.rds"))
+```
+
+# Calculation of Lambda
+Calculate the difference between the years per run, put NA for the first value of each run (because there you can not calculate a difference)
+```{r}
+df_StevS <- df_StevS %>%  group_by(Run) %>% mutate(Diff = c(NA,diff(IndAll)))
+```
+
+Calculate the ratio (quotient) between the difference (step before) and the number of individuals in the year before
+```{r}
+df_StevS <- df_StevS %>%  group_by(Run) %>% mutate(Quot = Diff / lag(IndAll,1))
+```
+
+Calculate the stochastic Lambda by add 1 to the ratio (step before). Now we have a Lambda per year per run
+```{r}
+df_StevS <- df_StevS %>%  group_by(Run) %>% mutate(Lambda_sto = Quot + 1)
+```
+
+```{r}
+range(df_StevS$Lambda_sto, na.rm = T) # 0 2 
+df_StevS <- df_StevS[, -c(37,38)]
+```
+
+## Save data
+```{r}
+#saveRDS(object = df_StevS, file = here("output", "data-proc", "NetLogo-proc", "df_StevS.rds"))
+```
+
+# Mean per scenario
+At first we calculated mean values per run. E.g. there is one value per run for Lambda or for the number of individuals during this run for all years of this run.
+```{r}
+## Mean for each run
+df_run_StevS <- df_StevS %>%  group_by(Run, Scenario) %>% summarize_if(is.numeric, mean, na.rm = TRUE)
+# 82000 rows, 1 for each Run. 
+```
+
+Calculate the SD of the stochastic Lambda per scenario
+```{r}
+df_scenario_StevS <- df_run_StevS %>% group_by(Scenario) %>% mutate(SD = sd(Lambda_sto, na.rm = T))
+```
+
+Calculate the SD
+```{r}
+df_sc_StevS_sd <- df_scenario_StevS %>% group_by(Scenario) %>% summarize(SD = mean(SD, na.rm = T))
+```
+
+Mean for each scenario (Lambda per Scenario)
+```{r}
+df_sc_StevS_mean <- df_StevS %>% group_by(Over_Scenario,Scenario) %>% summarize_if(is.numeric, mean, na.rm = TRUE) # 820 rows
+```
+
+Combine SD and Extinction per scenario with the mean per scenario
+```{r}
+df_sc_StevS_mean$SD_Lambda <- df_sc_StevS_sd$SD
+df_sc_StevS_mean$Extinct <- df_ext_StevS$Extinct
+rm(df_sc_StevS_sd)
+df_sc_StevS_mean <- droplevels(df_sc_StevS_mean)
+```
+
+## Overview of the data
+```{r}
+range(df_sc_StevS_mean$Lambda_sto) # 0.91-1.40
+
+table(df_sc_StevS_mean$Lambda_sto > 1) 
+# TRUE for 714 scenarios - positive population growth in 714 scenarios 
+
+table(df_sc_StevS_mean$Extinct <= 5)
+# Extinction probability is 5% or less in 748 scenarios 
+
+table(df_sc_StevS_mean$Lambda_sto > 1 & df_sc_StevS_mean$Extinct <= 5) 
+# Positive population growth and an extinction probability of 5% or less in 714 scenarios of 820 scenarios (87.07%)
+```
+
+```{r}
+table(df_sc_StevS_mean$Stoch_Frequency, df_sc_StevS_mean$Stoch_Severity, df_sc_StevS_mean$Over_Scenario)
+```
+
+## Save data
+```{r}
+#saveRDS(object = df_sc_StevS_mean, file = here("output", "data-proc", "NetLogo-proc", "df_sc_StevS_mean.rds"))
+```
+
+# Analysis I: Scenarios with positive population growth
+```{r}
+df_StevS_lambda_pos <- subset(df_sc_StevS_mean, df_sc_StevS_mean$Lambda_sto > 1 & df_sc_StevS_mean$Extinct <= 5)
+df_StevS_lambda_pos <- droplevels(df_StevS_lambda_pos)
+```
+
+Table the distributions between the different mortalities and reproduction rates
+
+a) Overall
+```{r}
+table(df_sc_StevS_mean$Mortality_Juveniles)
+# 0.20  0.30  0.36 
+#  160   160   500   
+table(df_sc_StevS_mean$Mortality_Subadults1)
+# 0.08  0.19  0.26   
+#  160   160   500
+table(df_sc_StevS_mean$Mortality_Subadults2)
+# 0.14  0.24  0.31 
+#  160   160   500  
+table(df_sc_StevS_mean$Mortality_Adults)
+# 0.02  0.14  0.22 
+#  240   240   340 
+table(df_sc_StevS_mean$Repro)
+# 0.53  0.58  0.66  1.06  1.41  3.97 
+#  400    80    80    80    80   100
+```
+
+b) scenarios with positive population growth
+```{r}
+table(df_StevS_lambda_pos$Mortality_Juveniles)
+# 0.20  0.30  0.36 
+#  160   160   394   
+table(df_StevS_lambda_pos$Mortality_Subadults1)
+# 0.08  0.19  0.26   
+#  160   160   394   
+table(df_StevS_lambda_pos$Mortality_Subadults2)
+# 0.14  0.24  0.31 
+#  160   160   394   
+table(df_StevS_lambda_pos$Mortality_Adults)
+# 0.02  0.14  0.22 
+#  240   214   260  
+table(df_StevS_lambda_pos$Repro)
+# 0.53  0.58  0.66  1.06  1.41  3.97 
+#  294    80    80    80    80   100
+```
+
+## Save Data
+```{r}
+#saveRDS(object = df_StevS_lambda_pos, file = here("output", "data-proc", "NetLogo-proc", "df_StevS_lambda_pos.rds"))
+```
+
+# Analysis II: Only Baseline values and Improvements
+Now without Status quo, All chicks and All chicks without supplements
+```{r}
+df_sc_StevS_mean2 <- df_sc_StevS_mean[!(df_sc_StevS_mean$Over_Scenario %in% c("Statusquo","All_chicks","All_chicks_Cata")), ]
+df_sc_StevS_mean2 <- droplevels(df_sc_StevS_mean2)
+
+df_StevS_lambda_sub <- df_StevS_lambda_pos[ !(df_StevS_lambda_pos$Over_Scenario %in% c("Statusquo", "All_chicks", "All_chicks_Cata")), ]
+```
+
+a) Overall
+```{r}
+table(df_sc_StevS_mean2$Mortality_Juveniles)
+# 0.20  0.30  0.36 
+#  160   160   320 
+table(df_sc_StevS_mean2$Mortality_Subadults1)
+# 0.08 0.19 0.26 
+#  160  160  320
+table(df_sc_StevS_mean2$Mortality_Subadults2)
+#0 .14 0.24 0.31 
+#  160  160  320
+table(df_sc_StevS_mean2$Mortality_Adults)
+# 0.02 0.14 0.22 
+#  240  240  160   
+table(df_sc_StevS_mean2$Repro)
+# 0.53 0.58 0.66 1.06 
+#  400   80   80   80
+```
+
+b) Scenarios with positive population growth
+```{r}
+table(df_StevS_lambda_sub$Mortality_Juveniles)
+# 0.20  0.30  0.36 
+#  160   160   214    
+table(df_StevS_lambda_sub$Mortality_Subadults1)
+# 0.08 0.19 0.26 
+#  160  160  214   
+table(df_StevS_lambda_sub$Mortality_Subadults2)
+#0 .14 0.24 0.31 
+#  160  160  214    
+table(df_StevS_lambda_sub$Mortality_Adults)
+# 0.02 0.14 0.22 
+#  240  214   80   
+table(df_StevS_lambda_sub$Repro)
+# 0.53 0.58 0.66 1.06 
+#  294   80   80   80
+```
+
+# Comparison of values
+## Over_scenario
+
+```{r}
+table(df_StevS_lambda_pos$Over_Scenario)
+```
+
+## Number and time of supplements
+```{r}
+table(df_sc_StevS_mean$N_Supplements, df_sc_StevS_mean$Supplement_Time)
+```
+
+```{r}
+table(df_StevS_lambda_pos$N_Supplements,df_StevS_lambda_pos$Supplement_Time)
+```
+
+## catastrophe frequency and severity
+
+```{r}
+table(df_sc_StevS_mean$Stoch_Frequency, df_sc_StevS_mean$Stoch_Severity)
+```
+
+```{r}
+table(df_StevS_lambda_pos$Stoch_Frequency, df_StevS_lambda_pos$Stoch_Severity)
+```
+
+```{r}
+table(df_StevS_lambda_pos$Stoch_Frequency, df_StevS_lambda_pos$Stoch_Severity,df_StevS_lambda_pos$Mortality_Juveniles)
+```
 
 ***
 

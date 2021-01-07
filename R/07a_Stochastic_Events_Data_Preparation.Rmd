@@ -19,7 +19,7 @@ knitr::opts_chunk$set(echo = TRUE, warning = TRUE, message = TRUE,
 
 * **Research question:** (Q1) How will the NBI population develop in the next 50 years and what will be the extinction risk, given that the colonies will be either managed or left to themselves? (Q2) Will the developments in the two already established colonies Burghausen & Kuchl be different? 
 * **Study area:** Austria, Germany and Italy
-* **Data:** 
+* **Data:** Results of the second NetLogo model
 
 
 # Setup
@@ -33,15 +33,182 @@ knitr::opts_chunk$set(echo = TRUE, warning = TRUE, message = TRUE,
 ## please add ALL LIBRARIES NEEDED HERE
 ## please remove libraries from the list that are not needed anymore 
 ## at a later stage
-library()
+library("here")
+library("tidyverse")     ## data manipulation
+library("magrittr")      ## Pipes
+library("data.table")    ## fread() and fwrite()
 ```
 
 
 # Data
-
+Load data tables, increase run numbers of the other partial models and combine them. Here we splitted the models because of RAM or a different option for the supplement scenarios. The All Chicks scenario was modelled with and without supplements. 
 ```{r data}
-#df <- readr::read_csv("your-data.csv")
-#sf <- sf::read_sf("your-geo-data.shp")
+# Improvements of survival and reproduction
+df_StevS <- df_StevS_raw <- fread(
+                              file = here("output", "NetLogo_raw", "NBI_StevS_Improvements.csv"),
+                              skip = 6)
+
+# Baseline with SD 
+df_StevS_Baseline <- fread(
+                       file = here("output", "NetLogo_raw", "NBI_StevS_Baseline_SD.csv"),
+                       skip = 6)
+
+df_StevS_Baseline$`[run number]` <- as.numeric(as.character(df_StevS_Baseline$`[run number]`))
+df_StevS_Baseline$`[run number]` <- df_StevS_Baseline$`[run number]` + 70000
+df_StevS_Baseline$`[run number]` <- as.character(df_StevS_Baseline$`[run number]`)
+
+# All chicks
+df_StevS_All_chicks <- fread(
+                        file = here("output", "NetLogo_raw", "NBI_StevS_All_chicks.csv"), 
+                        skip = 6)
+
+df_StevS_All_chicks$`[run number]` <- as.numeric(as.character(df_StevS_All_chicks$`[run number]`))
+df_StevS_All_chicks$`[run number]` <- df_StevS_All_chicks$`[run number]` + 80000
+df_StevS_All_chicks$`[run number]` <- as.character(df_StevS_All_chicks$`[run number]`)
+
+# All chicks without supplements
+df_Stev_All_chicks <- fread(
+                        file = here("output", "NetLogo_raw", "NBI_Stev_All_chicks_without_Supp.csv"), 
+                        skip = 6)
+
+df_Stev_All_chicks$`[run number]` <- as.numeric(as.character(df_Stev_All_chicks$`[run number]`))
+df_Stev_All_chicks$`[run number]` <- df_Stev_All_chicks$`[run number]` + 90000
+df_Stev_All_chicks$`[run number]` <- as.character(df_Stev_All_chicks$`[run number]`)
+```
+
+## Combine the tables
+```{r}
+df_StevS <- rbind(df_StevS, df_StevS_Baseline, df_StevS_All_chicks, df_Stev_All_chicks)
+```
+
+# Data Preparation
+```{r}
+names(df_StevS)
+```
+
+## Rename columns
+```{r}
+rename_map <- c(
+  "[run number]"                                                                      = "Run",
+  "scenario"                                                                          = "Over_Scenario",
+  "Number_Juveniles"                                                                  = "N_Juveniles",
+  "Number_Subadults_Age1"                                                             = "N_Subadults1",
+  "Number_Subadults_Age2"                                                             = "N_Subadults2",
+  "Number_Adults"                                                                     = "N_Adults",
+  "Supplements?"                                                                      = "Supplemented",
+  "Number_Supplements"                                                                = "N_Supplements",
+  "Supplement_Time"                                                                   = "Supplement_Time",
+  "Catastrophes?"                                                                     = "Stoch_events",
+  "Frequency"                                                                         = "Stoch_Frequency",
+  "Severity"                                                                          = "Stoch_Severity",
+  "[step]"                                                                            = "Year",
+  "(word scenario Supplements? Number_Supplements Supplement_Time Catastrophes? Frequency Severity)"   = "Scenario_detail",
+  "Mortality_Juveniles"                                                               = "Mortality_Juveniles",
+  "Mortality_Subadults_Age1"                                                          = "Mortality_Subadults1",
+  "Mortality_Subadults_Age2"                                                          = "Mortality_Subadults2",
+  "Mortality_Adults"                                                                  = "Mortality_Adults",
+  "Fecundity"                                                                         = "Repro",
+  "count turtles"                                                                     = "IndAll",
+  "count turtles with [colony = \"\"Burghausen\"\"]"                                  = "IndB",
+  "count turtles with [colony = \"\"Kuchl\"\"]"                                       = "IndK",
+  "count turtles with [colony = \"\"Ueberlingen\"\"]"                                 = "IndUb",
+  "count turtles with [raising = \"\"FP\"\"]"                                         = "IndFP",
+  "count turtles with [raising = \"\"P\"\"]"                                          = "IndP",
+  "count turtles with [colony = \"\"Burghausen\"\" and raising = \"\"FP\"\"]"         = "IndBFP",
+  "count turtles with [colony = \"\"Kuchl\"\" and raising = \"\"FP\"\"]"              = "IndKFP",
+  "count turtles with [colony = \"\"Ueberlingen\"\" and raising = \"\"FP\"\"]"        = "IndUbFP",
+  "count turtles with [colony = \"\"Burghausen\"\" and raising = \"\"P\"\"]"          = "IndBP",
+  "count turtles with [colony = \"\"Kuchl\"\" and raising = \"\"P\"\"]"               = "IndKP",
+  "count turtles with [colony = \"\"Ueberlingen\"\" and raising = \"\"P\"\"]"         = "IndUbP",
+  "count turtles with [age = 0]"                                                      = "IndJuv",
+  "count turtles with [age = 1]"                                                      = "IndSub1",
+  "count turtles with [age = 2]"                                                      = "IndSub2",
+  "count turtles with [age >= 3]"                                                     = "IndAdu")
+
+names(df_StevS) <- rename_map[names(df_StevS)]
+rm(rename_map)
+head(df_StevS)
+```
+## Combine Over_Scenario & Scenario detail
+```{r}
+df_StevS$Scenario <- paste(df_StevS$Over_Scenario, df_StevS$Scenario_detail, sep = "")
+unique(df_StevS$Over_Scenario) # 11 (All chicks 2 x, 1 of them without supplements)
+# unique(df_StevS$Scenario)
+```
+
+Delete column Scenario_detail
+```{r}
+df_StevS <- df_StevS[, -14] # Delete Scenario_detail
+```
+
+## Factorize & numerize variables
+```{r}
+str(df_StevS)
+df_StevS %<>% 
+  mutate(Over_Scenario = factor(Over_Scenario),
+         Scenario      = factor(Scenario),
+         Supplemented  = factor(Supplemented),
+         Stoch_events  = factor(Stoch_events))
+
+df_StevS %<>%
+  mutate(Run                    = as.numeric(as.character(Run)),
+         N_Juveniles            = as.numeric(as.character(N_Juveniles)),
+         N_Subadults1           = as.numeric(as.character(N_Subadults1)),
+         N_Subadults2           = as.numeric(as.character(N_Subadults2)),
+         N_Adults               = as.numeric(as.character(N_Adults)),
+         Mortality_Juveniles    = as.numeric(as.character(Mortality_Juveniles)),
+         Mortality_Subadults1   = as.numeric(as.character(Mortality_Subadults1)),
+         Mortality_Subadults2   = as.numeric(as.character(Mortality_Subadults2)),
+         Mortality_Adults       = as.numeric(as.character(Mortality_Adults)),
+         Repro                  = as.numeric(as.character(Repro)),
+         N_Supplements          = as.numeric(as.character(N_Supplements)),
+         Supplement_Time        = as.numeric(as.character(Supplement_Time)),
+         Stoch_Frequency        = as.numeric(as.character(Stoch_Frequency)),
+         Stoch_Severity         = as.numeric(as.character(Stoch_Severity)),
+         Year                   = as.numeric(as.character(Year)),
+         IndAll                 = as.numeric(as.character(IndAll)),
+         IndB                   = as.numeric(as.character(IndB)),
+         IndK                   = as.numeric(as.character(IndK)),
+         IndUb                  = as.numeric(as.character(IndUb)),
+         IndFP                  = as.numeric(as.character(IndFP)),
+         IndP                   = as.numeric(as.character(IndP)),
+         IndBFP                 = as.numeric(as.character(IndBFP)),
+         IndKFP                 = as.numeric(as.character(IndKFP)),
+         IndUbFP                = as.numeric(as.character(IndUbFP)),
+         IndBP                  = as.numeric(as.character(IndBP)),
+         IndKP                  = as.numeric(as.character(IndKP)),
+         IndUbP                 = as.numeric(as.character(IndUbP)),
+         IndJuv                 = as.numeric(as.character(IndJuv)),
+         IndSub1                = as.numeric(as.character(IndSub1)),
+         IndSub2                = as.numeric(as.character(IndSub2)),
+         IndAdu                 = as.numeric(as.character(IndAdu)))
+
+str(df_StevS)
+```
+
+## Reorder rows
+```{r}
+df_StevS  %<>%
+  arrange(Run, Year)%>%
+  tibble::as_tibble()
+```
+
+## Reorder columns
+```{r}
+df_StevS %<>% 
+  select(Run, Scenario, Year, 
+         IndAll,IndB,IndK,IndUb,IndFP,IndP,
+         IndBFP,IndBP,IndKFP,IndKP,IndUbFP,IndUbP,
+         IndJuv,IndSub1,IndSub2,IndAdu,
+         Mortality_Juveniles,Mortality_Subadults1,Mortality_Subadults2,Mortality_Adults,Repro,
+         Supplemented,N_Supplements,Supplement_Time, Stoch_events, Stoch_Frequency, Stoch_Severity,
+         N_Juveniles,N_Subadults1,N_Subadults2,N_Adults, Over_Scenario)
+df_StevS <- droplevels(df_StevS)
+```
+
+# Save data
+```{r}
+#saveRDS(object = df_StevS, file = here("output", "data-proc", "NetLogo-proc", "df_StevS.rds"))
 ```
 
 
