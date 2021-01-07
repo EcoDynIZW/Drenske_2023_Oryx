@@ -34,9 +34,9 @@ to setup
        set size 1.5                           ; change the size of the turtles
      ]
      ; set up the colony and the raising type for the individuals
-       ask n-of 3 turtles with [colony = 0 and raising = 0 and age = 0]  [set colony "Burghausen" set raising "P" set color green]
-       ask n-of 2 turtles with [colony = 0 and raising = 0 and age = 0]  [set colony "Kuchl" set raising "P" set color yellow]
-       ask n-of 11 turtles with [colony = 0 and raising = 0 and age = 0] [set colony "Ueberlingen" set raising "FP" set color blue]
+;       ask n-of 3 turtles with [colony = 0 and raising = 0 and age = 0]  [set colony "Burghausen" set raising "P" set color green]
+;       ask n-of 2 turtles with [colony = 0 and raising = 0 and age = 0]  [set colony "Kuchl" set raising "P" set color yellow]
+;       ask n-of 11 turtles with [colony = 0 and raising = 0 and age = 0] [set colony "Ueberlingen" set raising "FP" set color blue]
 
  ; create 1-Year-Old NBI
    create-turtles Number_Subadults_Age1
@@ -48,9 +48,9 @@ to setup
        set size 1.5
      ]
      ; set up the colony and the raising type for the individuals
-       ask n-of 3 turtles with [colony = 0 and raising = 0 and age = 1] [set colony "Burghausen" set raising "FP" set color green]
-       ask n-of 2 turtles with [colony = 0 and raising = 0 and age = 1] [set colony "Kuchl" set raising "FP" set color yellow]
-       ask n-of 2 turtles with [colony = 0 and raising = 0 and age = 1] [set colony "Ueberlingen" set raising "FP" set color blue]
+;       ask n-of 3 turtles with [colony = 0 and raising = 0 and age = 1] [set colony "Burghausen" set raising "FP" set color green]
+;       ask n-of 2 turtles with [colony = 0 and raising = 0 and age = 1] [set colony "Kuchl" set raising "FP" set color yellow]
+;       ask n-of 2 turtles with [colony = 0 and raising = 0 and age = 1] [set colony "Ueberlingen" set raising "FP" set color blue]
 
  ; create 2-Year-Old NBI
    create-turtles Number_Subadults_Age2
@@ -62,9 +62,9 @@ to setup
        set size 1.5
      ]
      ; set up the colony and the raising type for the individuals
-       ask n-of 4 turtles with [colony = 0 and raising = 0 and age = 2] [set colony "Burghausen" set raising "FP" set color green]
-       ask n-of 3 turtles with [colony = 0 and raising = 0 and age = 2] [set colony "Kuchl" set raising "FP" set color yellow]
-       ask n-of 3 turtles with [colony = 0 and raising = 0 and age = 2] [set colony "Kuchl" set raising "P" set color blue]
+;       ask n-of 4 turtles with [colony = 0 and raising = 0 and age = 2] [set colony "Burghausen" set raising "FP" set color green]
+;       ask n-of 3 turtles with [colony = 0 and raising = 0 and age = 2] [set colony "Kuchl" set raising "FP" set color yellow]
+;       ask n-of 3 turtles with [colony = 0 and raising = 0 and age = 2] [set colony "Kuchl" set raising "P" set color blue]
 
  ; create adult NBI
    create-turtles Number_Adults
@@ -76,8 +76,8 @@ to setup
        set size 1.5
      ]
      ; set up the colony and the raising type for the individuals
-       ask n-of 3 turtles with [colony = 0 and raising = 0 and age = 3] [set colony "Burghausen" set raising "P" set color green]
-       ask n-of 5 turtles with [colony = 0 and raising = 0 and age = 3] [set colony "Kuchl" set raising "FP" set color yellow]
+;       ask n-of 3 turtles with [colony = 0 and raising = 0 and age = 3] [set colony "Burghausen" set raising "P" set color green]
+;       ask n-of 5 turtles with [colony = 0 and raising = 0 and age = 3] [set colony "Kuchl" set raising "FP" set color yellow]
 
 
 ;; reset monitors and ticks
@@ -387,39 +387,14 @@ end
 ; these are scenarios for the catastrophe & supplement simulations
 to prep
 
-  if scenario = "baseline"
+  if scenario = "Baseline"
     [
-     set Mortality_Juveniles 0.38
+     set Mortality_Juveniles 0.36
      set Mortality_Subadults_Age1 0.26
-     set Mortality_Subadults_Age2 0.32
-     set Mortality_Adults 0.31
-     set Fecundity 0.48
+     set Mortality_Subadults_Age2 0.31
+     set Mortality_Adults 0.22
+     set Fecundity 0.53
     ]
-  if scenario = "25all"
-    [
-     set Mortality_Juveniles 0.22
-     set Mortality_Subadults_Age1 0.07
-     set Mortality_Subadults_Age2 0.15
-     set Mortality_Adults 0.14
-     set Fecundity 0.58
-    ]
-  if scenario = "25all25Fecun"
-    [
-     set Mortality_Juveniles 0.22
-     set Mortality_Subadults_Age1 0.07
-     set Mortality_Subadults_Age2 0.15
-     set Mortality_Adults 0.14
-     set Fecundity 0.58
-    ]
-  if scenario = "all_chicks"
-    [
-     set Mortality_Juveniles 0.38
-     set Mortality_Subadults_Age1 0.26
-     set Mortality_Subadults_Age2 0.32
-     set Mortality_Adults 0.31
-     set Fecundity 3.05
-    ]
-
 end
 @#$#@#$#@
 GRAPHICS-WINDOW
@@ -475,7 +450,7 @@ Fecundity
 Fecundity
 0
 4
-0.48
+0.53
 0.01
 1
 NIL
@@ -490,7 +465,7 @@ Mortality_Juveniles
 Mortality_Juveniles
 0
 1
-0.38
+0.36
 0.01
 1
 NIL
@@ -520,7 +495,7 @@ Mortality_Subadults_Age2
 Mortality_Subadults_Age2
 0
 1
-0.32
+0.31
 0.01
 1
 NIL
@@ -535,7 +510,7 @@ Mortality_Adults
 Mortality_Adults
 0
 1
-0.31
+0.22
 0.01
 1
 NIL
@@ -604,7 +579,7 @@ Number_Juveniles
 Number_Juveniles
 0
 100
-16.0
+37.0
 1
 1
 NIL
@@ -619,7 +594,7 @@ Number_Subadults_Age1
 Number_Subadults_Age1
 0
 100
-7.0
+11.0
 1
 1
 NIL
@@ -634,7 +609,7 @@ Number_Subadults_Age2
 Number_Subadults_Age2
 0
 100
-10.0
+8.0
 1
 1
 NIL
@@ -649,7 +624,7 @@ Number_Adults
 Number_Adults
 0
 100
-8.0
+18.0
 1
 1
 NIL
@@ -709,7 +684,7 @@ Number_Supplements
 Number_Supplements
 0
 50
-30.0
+0.0
 1
 1
 NIL
@@ -800,7 +775,7 @@ Frequency
 Frequency
 0
 1
-0.2
+0.0
 0.1
 1
 NIL
@@ -890,7 +865,7 @@ Supplement_Time
 Supplement_Time
 0
 10
-7.0
+4.0
 1
 1
 NIL
@@ -1585,7 +1560,7 @@ count turtles &lt; 1</exitCondition>
     <metric>count turtles with [age = 2]</metric>
     <metric>count turtles with [age &gt;= 3]</metric>
     <enumeratedValueSet variable="scenario">
-      <value value="&quot;baseline&quot;"/>
+      <value value="&quot;Baseline&quot;"/>
     </enumeratedValueSet>
     <enumeratedValueSet variable="Number_Juveniles">
       <value value="37"/>

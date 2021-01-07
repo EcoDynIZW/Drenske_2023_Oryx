@@ -178,7 +178,7 @@ to breeding
                    set age 0
                    set raising "P"
                    set label ""
-                   print "I hatch 2"
+                  ; print "I hatch 2"
                  ]
              ]
              [ ;else
@@ -195,14 +195,45 @@ to breeding
          ]
      ]
 
+  if (Fecundity >= 2) and (Fecundity < 3)                      ; if the fecundity is at least 1 and smaller than 2
+     [
+       ask turtles with[age >= 3]
+         [
+           ifelse random-float 1 + 2 < Fecundity                ; increase the random number by 1 because the fecundity is higher
+             [ ;if
+               hatch 3                                          ; hatch 3 chicks (turtles)
+                 [
+                   set births births + 1
+                   setxy random-pxcor random-pycor
+                   set heading random 360
+                   set age 0
+                   set raising "P"
+                   set label ""
+                 ;  print "I hatch 3"
+                 ]
+             ]
+             [ ;else
+               hatch 2
+                 [
+                   set births births + 1
+                   setxy random-pxcor random-pycor
+                   set heading random 360
+                   set age 0
+                   set raising "P"
+                   set label ""
+                 ]
+             ]
+         ]
+     ]
 
-   if Fecundity >= 3
+
+   if (Fecundity >= 3) and (Fecundity < 4)
      [
        ask turtles with[age >= 3]
          [
            ifelse random-float 1 + 3 < Fecundity
              [ ; if
-               print "I hatch 4"
+            ;r   print "I hatch 4"
                hatch 4
                  [
                    set births births + 1
@@ -391,54 +422,91 @@ end
 ; these are scenarios for the catastrophe & supplement simulations
 to prep
 
-  if scenario = "25adu_Mid2"
+  if scenario = "100Fec"
     [
-     set Mortality_Juveniles 0.38
+     set Mortality_Juveniles 0.36
      set Mortality_Subadults_Age1 0.26
-     set Mortality_Subadults_Age2 0.32
+     set Mortality_Subadults_Age2 0.31
+     set Mortality_Adults 0.22
+     set Fecundity 1.06
+    ]
+
+  if scenario = "10adu"
+    [
+     set Mortality_Juveniles 0.36
+     set Mortality_Subadults_Age1 0.26
+     set Mortality_Subadults_Age2 0.31
      set Mortality_Adults 0.14
-     set Fecundity 0.48
+     set Fecundity 0.53
+    ]
+
+  if scenario = "25adu"
+    [
+     set Mortality_Juveniles 0.36
+     set Mortality_Subadults_Age1 0.26
+     set Mortality_Subadults_Age2 0.31
+     set Mortality_Adults 0.02
+     set Fecundity 0.53
+    ]
+
+  if scenario = "10all"
+    [
+     set Mortality_Juveniles 0.30
+     set Mortality_Subadults_Age1 0.19
+     set Mortality_Subadults_Age2 0.24
+     set Mortality_Adults 0.14
+     set Fecundity 0.53
     ]
 
   if scenario = "25all"
     [
-     set Mortality_Juveniles 0.22
+     set Mortality_Juveniles 0.20
      set Mortality_Subadults_Age1 0.08
-     set Mortality_Subadults_Age2 0.15
-     set Mortality_Adults 0.14
-     set Fecundity 0.48
+     set Mortality_Subadults_Age2 0.14
+     set Mortality_Adults 0.02
+     set Fecundity 0.53
     ]
+
+  if scenario = "10all10Fecun"
+    [
+     set Mortality_Juveniles 0.30
+     set Mortality_Subadults_Age1 0.19
+     set Mortality_Subadults_Age2 0.24
+     set Mortality_Adults 0.14
+     set Fecundity 0.58
+    ]
+
   if scenario = "25all25Fecun"
     [
-     set Mortality_Juveniles 0.22
+     set Mortality_Juveniles 0.20
      set Mortality_Subadults_Age1 0.08
-     set Mortality_Subadults_Age2 0.15
-     set Mortality_Adults 0.14
-     set Fecundity 0.60
+     set Mortality_Subadults_Age2 0.14
+     set Mortality_Adults 0.02
+     set Fecundity 0.66
     ]
   if scenario = "Statusquo"
     [
-     set Mortality_Juveniles 0.38
+     set Mortality_Juveniles 0.36
      set Mortality_Subadults_Age1 0.26
-     set Mortality_Subadults_Age2 0.32
-     set Mortality_Adults 0.31
-     set Fecundity 1.30
+     set Mortality_Subadults_Age2 0.31
+     set Mortality_Adults 0.22
+     set Fecundity 1.41
     ]
-  if scenario = "All_chicks_Max1"
+  if scenario = "All_chicks"
     [
-     set Mortality_Juveniles 0.38
+     set Mortality_Juveniles 0.36
      set Mortality_Subadults_Age1 0.26
-     set Mortality_Subadults_Age2 0.32
-     set Mortality_Adults 0.31
-     set Fecundity 3.05
+     set Mortality_Subadults_Age2 0.31
+     set Mortality_Adults 0.22
+     set Fecundity 3.97
     ]
-  if scenario = "All_chicks_Max1_Cata"
+  if scenario = "All_chicks_Cata"
     [
-     set Mortality_Juveniles 0.38
+     set Mortality_Juveniles 0.36
      set Mortality_Subadults_Age1 0.26
-     set Mortality_Subadults_Age2 0.32
-     set Mortality_Adults 0.31
-     set Fecundity 3.05
+     set Mortality_Subadults_Age2 0.31
+     set Mortality_Adults 0.22
+     set Fecundity 3.97
     ]
 
 end
@@ -496,7 +564,7 @@ Fecundity
 Fecundity
 0
 4
-1.0
+3.97
 0.01
 1
 NIL
@@ -511,7 +579,7 @@ Mortality_Juveniles
 Mortality_Juveniles
 0
 1
-0.22
+0.36
 0.01
 1
 NIL
@@ -526,7 +594,7 @@ Mortality_Subadults_Age1
 Mortality_Subadults_Age1
 0
 1
-0.08
+0.26
 0.01
 1
 NIL
@@ -541,7 +609,7 @@ Mortality_Subadults_Age2
 Mortality_Subadults_Age2
 0
 1
-0.15
+0.31
 0.01
 1
 NIL
@@ -556,7 +624,7 @@ Mortality_Adults
 Mortality_Adults
 0
 1
-0.14
+0.22
 0.01
 1
 NIL
@@ -625,7 +693,7 @@ Number_Juveniles
 Number_Juveniles
 0
 100
-16.0
+37.0
 1
 1
 NIL
@@ -640,7 +708,7 @@ Number_Subadults_Age1
 Number_Subadults_Age1
 0
 100
-7.0
+11.0
 1
 1
 NIL
@@ -655,7 +723,7 @@ Number_Subadults_Age2
 Number_Subadults_Age2
 0
 100
-10.0
+8.0
 1
 1
 NIL
@@ -670,7 +738,7 @@ Number_Adults
 Number_Adults
 0
 100
-8.0
+18.0
 1
 1
 NIL
@@ -717,7 +785,7 @@ SWITCH
 638
 Supplements?
 Supplements?
-1
+0
 1
 -1000
 
@@ -1812,6 +1880,12 @@ count turtles &lt; 1</exitCondition>
     <metric>count turtles with [colony = "Ueberlingen"]</metric>
     <metric>count turtles with [raising = "FP"]</metric>
     <metric>count turtles with [raising = "P"]</metric>
+    <metric>count turtles with [colony = "Burghausen" and raising = "FP"]</metric>
+    <metric>count turtles with [colony = "Kuchl" and raising = "FP"]</metric>
+    <metric>count turtles with [colony = "Ueberlingen" and raising = "FP"]</metric>
+    <metric>count turtles with [colony = "Burghausen" and raising = "P"]</metric>
+    <metric>count turtles with [colony = "Kuchl" and raising = "P"]</metric>
+    <metric>count turtles with [colony = "Ueberlingen" and raising = "P"]</metric>
     <metric>count turtles with [age = 0]</metric>
     <metric>count turtles with [age = 1]</metric>
     <metric>count turtles with [age = 2]</metric>
@@ -1922,7 +1996,7 @@ count turtles &lt; 1</exitCondition>
     </enumeratedValueSet>
     <enumeratedValueSet variable="Fecundity">
       <value value="1.41"/>
-      <value value="2.88"/>
+      <value value="3.97"/>
     </enumeratedValueSet>
     <enumeratedValueSet variable="Supplements?">
       <value value="true"/>
@@ -1973,20 +2047,14 @@ count turtles &lt; 1</exitCondition>
     <metric>count turtles with [age = 2]</metric>
     <metric>count turtles with [age &gt;= 3]</metric>
     <enumeratedValueSet variable="scenario">
-      <value value="&quot;25adu_Mid2&quot;"/>
+      <value value="&quot;100Fec&quot;"/>
+      <value value="&quot;10adu&quot;"/>
+      <value value="&quot;25adu&quot;"/>
+      <value value="&quot;10all&quot;"/>
       <value value="&quot;25all&quot;"/>
+      <value value="&quot;10all10Fecun&quot;"/>
       <value value="&quot;25all25Fecun&quot;"/>
       <value value="&quot;Statusquo&quot;"/>
-      <value value="&quot;All_chicks_Max1&quot;"/>
-      <value value="&quot;Mid1&quot;"/>
-      <value value="&quot;Mid3&quot;"/>
-      <value value="&quot;Mid4&quot;"/>
-      <value value="&quot;Mid5&quot;"/>
-      <value value="&quot;Max6&quot;"/>
-      <value value="&quot;Max5&quot;"/>
-      <value value="&quot;Max4&quot;"/>
-      <value value="&quot;Max3&quot;"/>
-      <value value="&quot;Max2&quot;"/>
     </enumeratedValueSet>
     <enumeratedValueSet variable="Number_Juveniles">
       <value value="37"/>
@@ -2058,7 +2126,7 @@ count turtles &lt; 1</exitCondition>
     <metric>count turtles with [age = 2]</metric>
     <metric>count turtles with [age &gt;= 3]</metric>
     <enumeratedValueSet variable="scenario">
-      <value value="&quot;All_chicks_Max1_Cata&quot;"/>
+      <value value="&quot;All_chicks_Cata&quot;"/>
     </enumeratedValueSet>
     <enumeratedValueSet variable="Number_Juveniles">
       <value value="37"/>
@@ -2080,6 +2148,78 @@ count turtles &lt; 1</exitCondition>
     </enumeratedValueSet>
     <enumeratedValueSet variable="Supplement_Time">
       <value value="4"/>
+    </enumeratedValueSet>
+    <enumeratedValueSet variable="Catastrophes?">
+      <value value="true"/>
+    </enumeratedValueSet>
+    <enumeratedValueSet variable="Frequency">
+      <value value="0.05"/>
+      <value value="0.1"/>
+      <value value="0.15"/>
+      <value value="0.2"/>
+    </enumeratedValueSet>
+    <enumeratedValueSet variable="Severity">
+      <value value="0.05"/>
+      <value value="0.1"/>
+      <value value="0.15"/>
+      <value value="0.2"/>
+      <value value="0.25"/>
+    </enumeratedValueSet>
+  </experiment>
+  <experiment name="CataS_AllChicks_2020" repetitions="100" runMetricsEveryStep="true">
+    <setup>prep
+setup</setup>
+    <go>go</go>
+    <timeLimit steps="50"/>
+    <exitCondition>count turtles &gt; 5000 or 
+count turtles &lt; 1</exitCondition>
+    <metric>(word scenario Supplements? Number_Supplements Supplement_Time Catastrophes? Frequency Severity)</metric>
+    <metric>Mortality_Juveniles</metric>
+    <metric>Mortality_Subadults_Age1</metric>
+    <metric>Mortality_Subadults_Age2</metric>
+    <metric>Mortality_Adults</metric>
+    <metric>Fecundity</metric>
+    <metric>count turtles</metric>
+    <metric>count turtles with [colony = "Burghausen"]</metric>
+    <metric>count turtles with [colony = "Kuchl"]</metric>
+    <metric>count turtles with [colony = "Ueberlingen"]</metric>
+    <metric>count turtles with [raising = "FP"]</metric>
+    <metric>count turtles with [raising = "P"]</metric>
+    <metric>count turtles with [colony = "Burghausen" and raising = "FP"]</metric>
+    <metric>count turtles with [colony = "Kuchl" and raising = "FP"]</metric>
+    <metric>count turtles with [colony = "Ueberlingen" and raising = "FP"]</metric>
+    <metric>count turtles with [colony = "Burghausen" and raising = "P"]</metric>
+    <metric>count turtles with [colony = "Kuchl" and raising = "P"]</metric>
+    <metric>count turtles with [colony = "Ueberlingen" and raising = "P"]</metric>
+    <metric>count turtles with [age = 0]</metric>
+    <metric>count turtles with [age = 1]</metric>
+    <metric>count turtles with [age = 2]</metric>
+    <metric>count turtles with [age &gt;= 3]</metric>
+    <enumeratedValueSet variable="scenario">
+      <value value="&quot;All_chicks&quot;"/>
+    </enumeratedValueSet>
+    <enumeratedValueSet variable="Number_Juveniles">
+      <value value="37"/>
+    </enumeratedValueSet>
+    <enumeratedValueSet variable="Number_Subadults_Age1">
+      <value value="11"/>
+    </enumeratedValueSet>
+    <enumeratedValueSet variable="Number_Subadults_Age2">
+      <value value="8"/>
+    </enumeratedValueSet>
+    <enumeratedValueSet variable="Number_Adults">
+      <value value="18"/>
+    </enumeratedValueSet>
+    <enumeratedValueSet variable="Supplements?">
+      <value value="true"/>
+    </enumeratedValueSet>
+    <enumeratedValueSet variable="Number_Supplements">
+      <value value="15"/>
+      <value value="30"/>
+    </enumeratedValueSet>
+    <enumeratedValueSet variable="Supplement_Time">
+      <value value="4"/>
+      <value value="7"/>
     </enumeratedValueSet>
     <enumeratedValueSet variable="Catastrophes?">
       <value value="true"/>
