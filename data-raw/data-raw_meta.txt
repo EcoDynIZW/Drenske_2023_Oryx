@@ -1,0 +1,11 @@
+Drenske et al. 2021
+Halfway to self-sustainability: Reintroduced migratory European Northern Bald Ibises (Geronticus eremita) still need management interventions for population viability
+
+Metadata for the folder "data-raw"
+filename: short description, script XY
+
+NBI_all_data_2008_2019
+
+NBI_breeding_data_2008_2019
+
+NBI_life_history_data_2008_2019

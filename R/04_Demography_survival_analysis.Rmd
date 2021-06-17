@@ -1,0 +1,1394 @@
+---
+title: "PVA of the NBI: Demography - Survival analysis" ## name of your project
+author: "Sinah Drenske, Viktoriia Radchuk"                     ## your name(s)
+date: "`r Sys.Date()`"                  ## current date
+output:
+  rmdformats::readthedown:
+    code_folding: hide                  ## hide or show code by default?
+    toc_depth: 3                        ## 3-level TOC
+---
+
+```{r setup, include=FALSE}
+## You can ignore this chunk in most cases
+## If you want to modify chunk options, you can do it here for all chunks or
+## add the options in the repsective chunk header, e.g. `{r, message = FALSE}`
+knitr::opts_chunk$set(echo = TRUE, warning = TRUE, message = TRUE,
+                      fig.width = 9, fig.height = 6, dpi = 500, 
+                      retina = 1, fig.showtext = TRUE)
+```
+
+* **Research question:** (Q1) How will the NBI population develop in the next 50 years and what will be the extinction risk, given that the colonies will be either managed or left to themselves? (Q2) Will the developments in the two already established colonies Burghausen & Kuchl be different? 
+* **Study area:** Austria, Germany and Italy
+* **Data:** Life History data of the NBI
+
+
+# Setup
+
+```{r packages}
+## for non-CRAN packages please keep install instruction
+## but commented so it is not run each time, e.g.
+# devtools::install_github("EcoDynIZW/template")
+
+## libraries used in this script
+## please add ALL LIBRARIES NEEDED HERE
+## please remove libraries from the list that are not needed anymore 
+## at a later stage
+library("here")
+library("survival")
+library("survminer")
+library("tidyverse")
+library("viridisLite")
+library("timelineS")
+```
+
+
+# Data
+
+```{r data}
+NBI <- readRDS(file = here("output", "data-proc", "NBI_data.rds"))
+NBI_breeding_all <- readRDS(file = here("output", "data-proc", "NBI_breeding.rds")) # For pre-fledgling survival
+
+# Prepare two new columns
+## The status has to be a number not a factor, otherwise the calculations are not correct
+NBI$life_status_num <- as.numeric(NBI$life_status)
+NBI$project_status_num <- as.numeric(NBI$project_status)
+# for the paper we will consider only the life status
+```
+
+# Estimating survival probabilities
+Procedure
+1. Create survival objects with the days of life. 
+   There are extra survival objects for stage, colony and sex, 
+   since not all values are considered 
+   (see explanations under the respective points under 3.)
+2. Create different survival curves with the Kaplan-Meier estimate, 
+   divided by the defined group: 
+   Overall (~1), Stage, Colony, Raising type and Sex
+3. Log-rank test: Test if there is a statistical difference between the survival times 
+   of two or more samples
+4. Plot the Kaplan-Meier estimate with the p-value from the Log-rank test
+5. Cox proportional hazards model
+
+## 1. Overall
+Survival of the whole population, without further differences
+
+Survival object
+```{r overall surv obj}
+# Surv creates a survival object with the follow-up time (days of life, dof) for right-censored data and the event (life status: dead or alive). The event has to be a numeric variable, otherwise the calculation is not correct
+
+# Life status
+s_days <- Surv(time = NBI$dof, event = NBI$life_status_num)
+# Project status
+#s_days2 <- Surv(time = NBI$dof, event = NBI$project_status_num)
+```
+
+Survival curve
+```{r overall surv curve}
+# Creates survival curves from a formula. Here it is the survival object against 1, because we want to test all individuals 
+# without considering subgroups.
+sfit_days <- survfit(s_days ~ 1, data = NBI)
+sfit_days
+
+# sfit_days2 <- survfit(s_days2 ~ 1, data = NBI)
+# sfit_days2
+```
+
+
+Cox proportional hazards model
+```{r overall cox ph}
+# Life status
+# Use the created survival object on the left side of the "~" and terms you want to test on the right side
+cox_overall <- coxph(Surv(NBI$dof, NBI$life_status_num) ~ 1, data = NBI)
+sum_cox_overall <- summary(cox_overall) # summary of the cox proportional hazards model
+sum_cox_overall
+
+# Project status
+# cox_overall2 <- coxph(Surv(NBI$dof, NBI$project_status_num) ~ 1, data = NBI)
+# sum_cox_overall2 <- summary(cox_overall2) # summary of the cox proportional hazards model
+# sum_cox_overall2
+```
+
+
+Survival plot
+```{r overall surv plot, fig.height=7, fig.width=10}
+ggsurvplot(sfit_days, data = NBI, palette = "black", xlab = "Years", 
+           font.x = 35, font.tickslab = 34, font.y = 35, font.legend = 35,
+           risk.table = F, break.time.by = 365.25, xscale = 365.25, legend = "none",
+           ggtheme = theme_bw() + theme(panel.grid.major = element_blank(), panel.grid.minor = element_blank()))
+
+# ggsurvplot(sfit_days2, data = NBI, palette = "black", xlab = "Years", 
+#            font.x = 18, font.tickslab = 18, font.y = 18, font.legend = 18,
+#            risk.table = F, break.time.by = 365.25, xscale = 365.25, legend = "none",
+#            ggtheme = theme_bw() + theme(panel.grid.major = element_blank(), panel.grid.minor = element_blank()))
+```
+
+
+Save the Plot
+```{r overall save plot}
+# png(filename = here("plots", "02_survival", "survplot_life_overall.png"), width = 1200, height = 772)
+# ggsurvplot(sfit_days, data = NBI, palette = "black", xlab = "Years",
+#            font.x = 35, font.tickslab = 34, font.y = 35,font.legend = 35,
+#            risk.table = F, break.time.by = 365.25, xscale = 365.25, legend = "none",
+#            ggtheme = theme_bw() + theme(panel.grid.major = element_blank(), panel.grid.minor = element_blank()))
+# dev.off()
+# 
+# png(filename = here("plots", "02_survival", "survplot_project_overall.png"), width = 1200, height = 772)
+# ggsurvplot(sfit_days2, data = NBI, palette = "black", xlab = "Years",
+#            font.x = 18, font.tickslab = 18, font.y = 18,font.legend = 18,
+#            risk.table = F, break.time.by = 365.25, xscale = 365.25, legend = "none",
+#            ggtheme = theme_bw() + theme(panel.grid.major = element_blank(), panel.grid.minor = element_blank()))
+# dev.off()
+```
+
+
+## 2. Stages
+### 2.1 All life history stages
+For the whole population, but with differences between the stages
+
+Survival object
+We have to split the NBI dataset. Now every individual has as many lines as reached stages.
+```{r stage surv obj}
+# life status
+NBI_timesplit <- survSplit(formula = Surv(NBI$dof, NBI$life_status_num) ~ ., 
+                           data = NBI, 
+                           cut = c(365,730,1095), 
+                           episode = "STAGE")
+
+# project status
+# NBI_timesplit2 <- survSplit(formula = Surv(NBI$dof, NBI$project_status_num) ~ ., 
+#                             data = NBI, 
+#                             cut = c(365,730,1095), 
+#                             episode = "STAGE")
+```
+
+Then create a start and end time per stage for the individuals. 
+```{r stage prep obj}
+# life status
+## TimeStart is 0 for all rows, so that all stages start at the same time
+NBI_timesplit$TimeStart <- 0
+NBI_timesplit$TimeStop <- NBI_timesplit$tstop
+NBI_timesplit$STAGE_F <- as.factor(NBI_timesplit$STAGE)
+
+## for another type of comparison. The stages overlap at the start
+NBI_timesplit$TimeStart2 <- 0
+## TimeStop2 is the difference of tstop - tstart. With this we take into account that the start time is 0 for all lines
+NBI_timesplit$TimeStop2 <- NBI_timesplit$tstop - NBI_timesplit$tstart
+
+# # project status
+# ## TimeStart is 0 for all rows, so that all stages start at the same time
+# NBI_timesplit2$TimeStart <- 0
+# NBI_timesplit2$TimeStop <- NBI_timesplit2$tstop
+# NBI_timesplit2$STAGE_F <- as.factor(NBI_timesplit2$STAGE)
+# 
+# ## for another type of comparison. The stages overlap at the start
+# NBI_timesplit2$TimeStart2 <- 0
+# ## TimeStop2 is the difference of tstop - tstart. With this we take into account that the start time is 0 for all lines
+# NBI_timesplit2$TimeStop2 <- NBI_timesplit2$tstop - NBI_timesplit2$tstart
+```
+
+Survival curve
+We use the curves where the survival probabilities overlap right from the start, because we do not want to take time differences into account
+
+```{r stage surv curve life}
+# life status
+sfit_stage <- survfit(formula = Surv(time = NBI_timesplit$TimeStart2,
+                                      time2 = NBI_timesplit$TimeStop2, 
+                                      event = NBI_timesplit$event) ~ NBI_timesplit$STAGE_F, 
+                       data = NBI_timesplit)
+sum_sfit_stage <- summary(sfit_stage, times = c(0, 365, 730, 1095, 1460, 1825, 2190, 2555, 2920, 3285))
+sum_sfit_stage
+```
+
+
+```{r surv curve proj}
+# # project status
+# sfit_stage2 <- survfit(formula = Surv(time = NBI_timesplit2$TimeStart2,
+#                                       time2 = NBI_timesplit2$TimeStop2, 
+#                                       event = NBI_timesplit2$event) ~ NBI_timesplit2$STAGE_F, 
+#                        data = NBI_timesplit2)
+# sum_sfit_stage2 <- summary(sfit_stage2, times = c(0, 365, 730, 1095, 1460, 1825, 2190, 2555, 2920, 3285))
+# sum_sfit_stage2
+# 
+# # differences to the survival of the life status only in s1 and s2. The values for s3 and s4 are the same
+```
+
+Calculation of s4
+We calculate a change rate per year in s4. This stage comprises many years, from 3 years of life on.
+```{r stage s4}
+# life status & project status (numbers are equal)
+s4_1 <- sum_sfit_stage$surv[8]/sum_sfit_stage$surv[7] #survival change for the first year in s4, they start with a survival of 1 in each stage
+s4_2 <- sum_sfit_stage$surv[9]/sum_sfit_stage$surv[8] # survival change for the second year in s4
+s4_3 <- sum_sfit_stage$surv[10]/sum_sfit_stage$surv[9] 
+s4_4 <- sum_sfit_stage$surv[11]/sum_sfit_stage$surv[10]
+s4_5 <- sum_sfit_stage$surv[12]/sum_sfit_stage$surv[11]
+
+s4 <- mean(c(s4_1,s4_2,s4_3,s4_4,s4_5))
+s4
+```
+Calculate the standard deviation (SD) for the baseline values 
+Formula: SE * sqrt(n) = SD                  
+SE = Standard error, sqrt = Square root, n = number individuals
+```{r stage sd}
+# life status & project status (numbers are equal)
+sd_s1 <- round(sum_sfit_stage$std.err[2]*sqrt(sum_sfit_stage$n.risk[2]), digits = 2)
+sd_s2 <- round(sum_sfit_stage$std.err[4]*sqrt(sum_sfit_stage$n.risk[4]), digits = 2)
+sd_s3 <- round(sum_sfit_stage$std.err[6]*sqrt(sum_sfit_stage$n.risk[6]), digits = 2)
+
+sd_s4 <- round(sd(c(s4_1,s4_2,s4_3,s4_4,s4_5)), digits = 2)
+
+sd_s1
+sd_s2
+sd_s3
+sd_s4
+```
+
+
+Cox proportional hazards model
+```{r stage cox ph}
+# Life status
+## Use the values where the start times and end times overlap. We do not want to take time differences into account only the survival
+cox_stage <- coxph(Surv(NBI_timesplit$TimeStart2, NBI_timesplit$TimeStop2, NBI_timesplit$event) ~ NBI_timesplit$STAGE_F, data = NBI_timesplit)
+sum_cox_stage <- summary(cox_stage)
+sum_cox_stage
+
+# # Project status
+# ## Use the values where the start times and end times overlap. We do not want to take time differences into account only the survival
+# cox_stage2 <- coxph(Surv(NBI_timesplit2$TimeStart2, NBI_timesplit2$TimeStop2, NBI_timesplit2$event) ~ NBI_timesplit2$STAGE_F, data = NBI_timesplit2)
+# sum_cox_stage2 <- summary(cox_stage2)
+# sum_cox_stage2
+# 
+# # No significant differences for all individuals
+```
+
+Survival plot
+```{r stage surv plot, fig.height=7, fig.width=10}
+# Life status
+ggsurvplot(sfit_stage, data = NBI_timesplit, conf.int = T, risk.table = F, 
+           xlab = "Years", xlim = c(0,5*365.25), font.x = 35, font.tickslab = 34, font.y = 35,font.legend = 35,
+           ggtheme = theme_bw() + theme(panel.grid.major = element_blank(), panel.grid.minor = element_blank()),
+           break.time.by = 365.25, xscale = 365.25, pval = 0.4, pval.coord = c(x = 4.34*365.25, y = 0.8), pval.size = 8, 
+           legend = c(0.9,0.89), legend.title = "Stages", legend.labs = c("Juveniles", "1 Year Old", "2 Year Old", "Adults"), 
+           palette = magma(4, begin = 0.25, end = 0.6))
+
+# # Project status
+# ggsurvplot(sfit_stage2, data = NBI_timesplit, conf.int = T, risk.table = F, 
+#            xlab = "Years", xlim = c(0,5*365.25), font.x = 25, font.tickslab = 24, font.y = 25,font.legend = 25,
+#            ggtheme = theme_bw() + theme(panel.grid.major = element_blank(), panel.grid.minor = element_blank()),
+#            break.time.by = 365.25, xscale = 365.25, pval = 0.1, pval.coord = c(x = 4.34*365.25, y = 0.8), pval.size = 8, 
+#            legend = c(0.9,0.89), legend.title = "Stages", legend.labs = c("Juveniles", "1 Year Old", "2 Year Old", "Adults"), 
+#            palette = magma(4, begin = 0.25, end = 0.6))
+```
+
+Save the Plot
+```{r save plot}
+# # Life status
+# png(filename = here("plots","02_survival", "survplot_life_stages.png"), width = 1200, height = 772)
+# 
+# ggsurvplot(sfit_stage, data = NBI_timesplit, conf.int = T, risk.table = F,
+#            xlab = "Years", xlim = c(0,5*365.25), font.x = 35, font.tickslab = 34, font.y = 35,font.legend = 35,
+#            ggtheme = theme_bw() + theme(panel.grid.major = element_blank(), panel.grid.minor = element_blank()),
+#            break.time.by = 365.25, xscale = 365.25, pval = 0.4, pval.coord = c(x = 4.2*365.25, y = 0.7), pval.size = 12,
+#            legend = c(0.9,0.85), legend.title = "Stages", legend.labs = c("Juveniles", "1 Year Old", "2 Year Old", "Adults"),
+#            palette = magma(4, begin = 0.25, end = 0.6))
+# 
+# dev.off()
+#
+# # Project status
+# png(filename = here("plots","02_survival", "survplot_project_stages.png"), width = 1200, height = 772)
+# 
+# ggsurvplot(sfit_stage2, data = NBI_timesplit, conf.int = T, risk.table = F, 
+#            xlab = "Years", xlim = c(0,5*365.25), font.x = 25, font.tickslab = 24, font.y = 25,font.legend = 25,
+#            ggtheme = theme_bw() + theme(panel.grid.major = element_blank(), panel.grid.minor = element_blank()),
+#            break.time.by = 365.25, xscale = 365.25, pval = 0.1, pval.coord = c(x = 4.34*365.25, y = 0.8), pval.size = 8, 
+#            legend = c(0.9,0.89), legend.title = "Stages", legend.labs = c("Juveniles", "1 Year Old", "2 Year Old", "Adults"), 
+#            palette = magma(4, begin = 0.25, end = 0.6))
+# 
+# dev.off()
+```
+
+### 2.2 Pre maturity - cumulative survival
+Here we calculate the survival until the NBI reach sexual maturity
+
+Survival object
+We have to split the NBI dataset. Now every individual has one line for the time before they reach sexual maturity and one line for the time after they reached it.
+```{r}
+NBI_timesplit_sex <- survSplit(formula = Surv(NBI$dof, NBI$life_status_num) ~ ., 
+                               data = NBI, 
+                               cut = c(1095), 
+                               episode = "MATURITY")
+```
+
+
+```{r}
+# life status
+## TimeStart is 0 for all rows, so that all stages start at the same time
+NBI_timesplit_sex$TimeStart <- 0
+NBI_timesplit_sex$TimeStop <- NBI_timesplit_sex$tstop
+NBI_timesplit_sex$MATURITY_F <- as.factor(NBI_timesplit_sex$MATURITY)
+
+## for another type of comparison. The stages overlap at the start
+NBI_timesplit_sex$TimeStart2 <- 0
+## TimeStop2 is the difference of tstop - tstart. With this we take into account that the start time is 0 for all lines
+NBI_timesplit_sex$TimeStop2 <- NBI_timesplit_sex$tstop - NBI_timesplit_sex$tstart
+```
+
+Survival curve
+We use the curves where the survival probabilities overlap right from the start, because we do not want to take time differences into account
+
+```{r stage surv curve life}
+# life status
+sfit_matu <- survfit(formula = Surv(time = NBI_timesplit_sex$TimeStart2,
+                                      time2 = NBI_timesplit_sex$TimeStop2, 
+                                      event = NBI_timesplit_sex$event) ~ NBI_timesplit_sex$MATURITY_F, 
+                       data = NBI_timesplit_sex)
+
+sum_sfit_matu <- summary(sfit_matu, times = c(0, 1095, 1460, 1825, 2190, 2555, 2920, 3285))
+sum_sfit_matu
+```
+
+Second possibility: Multiply the survival values of the first three stages
+```{r}
+sum_sfit_matu$surv[2]
+sum_sfit_stage$surv[2] * sum_sfit_stage$surv[4] * sum_sfit_stage$surv[6]
+# Both have the same value 0.3285587 (0.33)
+
+# Calculate the SD
+round(sum_sfit_matu$std.err[2]*sqrt(sum_sfit_matu$n.risk[2]), digits = 2)
+```
+
+
+## 3. Colonies
+We will only use three colonies. The colony in Rosegg consists only of 22 NBI and was funded 2 years ago (2018). And we do not want to calculate here the survival for individuals that do not belong to a colony yet. 
+```{r col sub}
+NBI_3col <- subset(NBI, NBI$breeding_area == "Burghausen" | NBI$breeding_area == "Kuchl")
+NBI_3col <- droplevels(NBI_3col)
+```
+
+Survival object
+```{r col surv obj}
+# Life status
+s_days_3col <- Surv(time = NBI_3col$dof, event = NBI_3col$life_status_num)
+
+# # Project status
+# s_days_3col2 <- Surv(time = NBI_3col$dof, event = NBI_3col$project_status_num)
+```
+
+Survival curve
+```{r col surv curve}
+# Life status
+sfit_3col <- survfit(s_days_3col ~ NBI_3col$breeding_area, data = NBI_3col)
+sfit_3col
+
+# # Project status
+# sfit_3col2 <- survfit(s_days_3col2 ~ NBI_3col$breeding_area, data = NBI_3col)
+# sfit_3col2
+```
+
+
+Cox proportional hazards model
+```{r col cox ph}
+# Life status
+cox_3col <- coxph(Surv(time = NBI_3col$dof, event = NBI_3col$life_status_num) ~ NBI_3col$breeding_area, data = NBI_3col)
+sum_cox_col <- summary(cox_3col)
+sum_cox_col
+
+# # Project status
+# cox_3col2 <- coxph(Surv(time = NBI_3col$dof, event = NBI_3col$project_status_num) ~ NBI_3col$breeding_area, data = NBI_3col)
+# sum_cox_col2 <- summary(cox_3col2)
+# sum_cox_col2
+```
+
+
+
+Survival plot
+```{r col surv plot}
+# Life status
+ggsurvplot(sfit_3col, data = NBI_3col, conf.int = T, risk.table = F, xlab = "Years", xlim = c(0,8*365.25),
+           font.x = 23, font.tickslab = 22, font.y = 23,font.legend = 22,
+           ggtheme = theme_bw()+ theme(panel.grid.major = element_blank(), panel.grid.minor = element_blank()),
+           break.time.by = 365.25, xscale = 365.25, pval = 0.2, pval.coord = c(x = 6.95*365.25, y = 0.85), pval.size = 7,
+           legend = c(0.9,0.91), legend.title = "Colony", legend.labs = c("Burghausen", "Kuchl"), 
+           palette = inferno(5,begin =0.65,  end = 0.95, direction = -1))
+
+# # Project status
+# ggsurvplot(sfit_3col2, data = NBI_3col, conf.int = T, risk.table = F, xlab = "Years", xlim = c(0,8*365.25),
+#            font.x = 23, font.tickslab = 22, font.y = 23,font.legend = 22,
+#            ggtheme = theme_bw()+ theme(panel.grid.major = element_blank(), panel.grid.minor = element_blank()),
+#            break.time.by = 365.25, xscale = 365.25, pval = T, pval.coord = c(x = 6.95*365.25, y = 0.85), pval.size = 7,
+#            legend = c(0.9,0.91), legend.title = "Colony", legend.labs = c("Burghausen", "Kuchl", "Überlingen"), 
+#            palette = inferno(5,begin =0.65,  end = 0.95, direction = -1))
+```
+
+Save the Plot
+```{r col save plot}
+# # Life status
+# png(filename = here("plots","02_survival", "survplot_life_colonies.png"), width = 1200, height = 772)
+# ggsurvplot(sfit_3col, data = NBI_3col, conf.int = T, risk.table = F, xlab = "Years", xlim = c(0,8*365.25),
+#            font.x = 35, font.tickslab = 34, font.y = 35,font.legend = 35,
+#            ggtheme = theme_bw()+ theme(panel.grid.major = element_blank(), panel.grid.minor = element_blank()),
+#            break.time.by = 365.25, xscale = 365.25, pval = 0.2, pval.coord = c(x = 6.55*365.25, y = 0.80), pval.size = 12,
+#            legend = c(0.89,0.90), legend.title = "Colony", legend.labs = c("Burghausen", "Kuchl"),
+#            palette = inferno(5,begin =0.65,  end = 0.95, direction = -1))
+# dev.off()
+# 
+# # Project status
+# png(filename = here("plots","02_survival", "survplot_project_colonies.png"), width = 1200, height = 772)
+# ggsurvplot(sfit_3col2, data = NBI_3col, conf.int = T, risk.table = F, xlab = "Years", xlim = c(0,8*365.25),
+#            font.x = 23, font.tickslab = 22, font.y = 23,font.legend = 22,
+#            ggtheme = theme_bw()+ theme(panel.grid.major = element_blank(), panel.grid.minor = element_blank()),
+#            break.time.by = 365.25, xscale = 365.25, pval = 0.2, pval.coord = c(x = 6.95*365.25, y = 0.85), pval.size = 7,
+#            legend = c(0.9,0.91), legend.title = "Colony", legend.labs = c("Burghausen", "Kuchl", "Überlingen"), 
+#            palette = inferno(5,begin =0.65,  end = 0.95, direction = -1))
+# dev.off()
+```
+
+
+## 4. Colonies and stages
+This is done for a better differentiation between the colonies and the stages.
+
+Survival object
+```{r sc surv obj}
+# Life status
+#NBI_timesplit_colony <- subset(NBI_timesplit, NBI_timesplit$breeding_area == "Burghausen" | NBI_timesplit$breeding_area == "Kuchl" | NBI_timesplit$breeding_area == "Ueberlingen")
+NBI_timesplit_colony <- subset(NBI_timesplit, NBI_timesplit$breeding_area == "Burghausen" | NBI_timesplit$breeding_area == "Kuchl")
+NBI_timesplit_colony <- droplevels(NBI_timesplit_colony)
+
+# # Project status
+# #NBI_timesplit_colony2 <- subset(NBI_timesplit2, NBI_timesplit2$breeding_area == "Burghausen" | NBI_timesplit2$breeding_area == "Kuchl" | NBI_timesplit2$breeding_area == "Ueberlingen")
+# NBI_timesplit_colony2 <- subset(NBI_timesplit2, NBI_timesplit2$breeding_area == "Burghausen" | NBI_timesplit2$breeding_area == "Kuchl")
+# NBI_timesplit_colony2 <- droplevels(NBI_timesplit_colony2)
+```
+
+
+Survival curve
+```{r sc surv curve life}
+# life status
+sfit_sc <- survfit(formula = Surv(time = NBI_timesplit_colony$TimeStart2,
+                                      time2 = NBI_timesplit_colony$TimeStop2, 
+                                      event = NBI_timesplit_colony$event) ~ NBI_timesplit_colony$STAGE_F + NBI_timesplit_colony$breeding_area, 
+                       data = NBI_timesplit_colony)
+sum_sfit_sc <- summary(sfit_sc, times = c(0, 365, 730, 1095, 1460, 1825, 2190, 2555, 2920, 3285))
+sum_sfit_sc
+```
+
+
+```{r sc surv curve proj}
+# # project status
+# sfit_sc2 <- survfit(formula = Surv(time = NBI_timesplit_colony2$TimeStart2,
+#                                       time2 = NBI_timesplit_colony2$TimeStop2, 
+#                                       event = NBI_timesplit_colony2$event) ~ NBI_timesplit_colony2$STAGE_F + NBI_timesplit_colony2$breeding_area, 
+#                        data = NBI_timesplit_colony2)
+# sum_sfit_sc2 <- summary(sfit_sc2, times = c(0, 365, 730, 1095, 1460, 1825, 2190, 2555, 2920, 3285))
+# sum_sfit_sc2
+# 
+# # differences to the survival of the life status only in s1 and s2. The values for s3 and s4 are the same
+```
+
+Values of s1-s3
+```{r}
+# life status & project status (numbers are equal)
+## Burghausen
+print("Burghausen")
+sum_sfit_sc$surv[2]
+sum_sfit_sc$surv[6]
+sum_sfit_sc$surv[10]
+
+## Kuchl
+print("Kuchl")
+sum_sfit_sc$surv[4]
+sum_sfit_sc$surv[8]
+sum_sfit_sc$surv[12]
+```
+
+Calculation of s4 
+```{r sc s4}
+# life status & project status (numbers are equal)
+# only for Burghausen and Kuchl - none of the individuals from Überlingen is in Stage 4 yet
+## Burghausen
+# s4_1_B <- sum_sfit_sc$surv[19]/sum_sfit_sc$surv[18] 
+# s4_2_B <- sum_sfit_sc$surv[20]/sum_sfit_sc$surv[19] 
+# s4_3_B <- sum_sfit_sc$surv[21]/sum_sfit_sc$surv[20] 
+# s4_4_B <- sum_sfit_sc$surv[22]/sum_sfit_sc$surv[21]
+# s4_5_B <- sum_sfit_sc$surv[23]/sum_sfit_sc$surv[22]
+# 
+# s4_B <- mean(c(s4_1_B,s4_2_B,s4_3_B,s4_4_B,s4_5_B))
+# s4_B
+# 13-18
+s4_1_B <- sum_sfit_sc$surv[14]/sum_sfit_sc$surv[13] 
+s4_2_B <- sum_sfit_sc$surv[15]/sum_sfit_sc$surv[14] 
+s4_3_B <- sum_sfit_sc$surv[16]/sum_sfit_sc$surv[15] 
+s4_4_B <- sum_sfit_sc$surv[17]/sum_sfit_sc$surv[16]
+s4_5_B <- sum_sfit_sc$surv[18]/sum_sfit_sc$surv[17]
+
+s4_B <- mean(c(s4_1_B,s4_2_B,s4_3_B,s4_4_B,s4_5_B))
+s4_B
+
+## Kuchl
+# s4_1_K <- sum_sfit_sc$surv[25]/sum_sfit_sc$surv[24] 
+# s4_2_K <- sum_sfit_sc$surv[26]/sum_sfit_sc$surv[25] 
+# s4_3_K <- sum_sfit_sc$surv[27]/sum_sfit_sc$surv[26] 
+# s4_4_K <- sum_sfit_sc$surv[28]/sum_sfit_sc$surv[27]
+# s4_5_K <- sum_sfit_sc$surv[29]/sum_sfit_sc$surv[28]
+# 
+# s4_K <- mean(c(s4_1_K,s4_2_K,s4_3_K,s4_4_K,s4_5_K))
+# s4_K
+# 19-24
+s4_1_K <- sum_sfit_sc$surv[20]/sum_sfit_sc$surv[19] 
+s4_2_K <- sum_sfit_sc$surv[21]/sum_sfit_sc$surv[20] 
+s4_3_K <- sum_sfit_sc$surv[22]/sum_sfit_sc$surv[21] 
+s4_4_K <- sum_sfit_sc$surv[23]/sum_sfit_sc$surv[22]
+s4_5_K <- sum_sfit_sc$surv[24]/sum_sfit_sc$surv[23]
+
+s4_K <- mean(c(s4_1_K,s4_2_K,s4_3_K,s4_4_K,s4_5_K))
+s4_K
+
+```
+
+Calculate the standard deviation (SD) for the baseline values 
+Formula: SE * sqrt(n) = SD                  
+SE = Standard error, sqrt = Square root, n = number individuals
+```{r sc sd}
+# life status & project status (numbers are equal)
+## Burghausen
+# sd_s1_B <- round(sum_sfit_sc$std.err[2]*sqrt(sum_sfit_sc$n.risk[2]), digits = 2)
+# sd_s2_B <- round(sum_sfit_sc$std.err[8]*sqrt(sum_sfit_sc$n.risk[8]), digits = 2)
+# sd_s3_B <- round(sum_sfit_sc$std.err[14]*sqrt(sum_sfit_sc$n.risk[14]), digits = 2)
+# 
+# sd_s4_B <- round(sd(c(s4_1_B,s4_2_B,s4_3_B,s4_4_B,s4_5_B)), digits = 2)
+# 
+# sd_s1_B
+# sd_s2_B
+# sd_s3_B
+# sd_s4_B
+
+sd_s1_B <- round(sum_sfit_sc$std.err[2]*sqrt(sum_sfit_sc$n.risk[2]), digits = 2)
+sd_s2_B <- round(sum_sfit_sc$std.err[6]*sqrt(sum_sfit_sc$n.risk[6]), digits = 2)
+sd_s3_B <- round(sum_sfit_sc$std.err[10]*sqrt(sum_sfit_sc$n.risk[10]), digits = 2)
+
+sd_s4_B <- round(sd(c(s4_1_B,s4_2_B,s4_3_B,s4_4_B,s4_5_B)), digits = 2)
+
+sd_s1_B
+sd_s2_B
+sd_s3_B
+sd_s4_B
+
+
+## Kuchl
+# sd_s1_K <- round(sum_sfit_sc$std.err[4]*sqrt(sum_sfit_sc$n.risk[4]), digits = 2)
+# sd_s2_K <- round(sum_sfit_sc$std.err[10]*sqrt(sum_sfit_sc$n.risk[10]), digits = 2)
+# sd_s3_K <- round(sum_sfit_sc$std.err[16]*sqrt(sum_sfit_sc$n.risk[16]), digits = 2)
+# 
+# sd_s4_K <- round(sd(c(s4_1_K,s4_2_K,s4_3_K,s4_4_K,s4_5_K)), digits = 2)
+# 
+# sd_s1_K
+# sd_s2_K
+# sd_s3_K
+# sd_s4_K
+
+sd_s1_K <- round(sum_sfit_sc$std.err[4]*sqrt(sum_sfit_sc$n.risk[4]), digits = 2)
+sd_s2_K <- round(sum_sfit_sc$std.err[8]*sqrt(sum_sfit_sc$n.risk[8]), digits = 2)
+sd_s3_K <- round(sum_sfit_sc$std.err[12]*sqrt(sum_sfit_sc$n.risk[12]), digits = 2)
+
+sd_s4_K <- round(sd(c(s4_1_K,s4_2_K,s4_3_K,s4_4_K,s4_5_K)), digits = 2)
+
+sd_s1_K
+sd_s2_K
+sd_s3_K
+sd_s4_K
+
+## Überlingen
+# sd_s1_U <- round(sum_sfit_sc$std.err[6]*sqrt(sum_sfit_sc$n.risk[6]), digits = 2)
+# sd_s2_U <- round(sum_sfit_sc$std.err[12]*sqrt(sum_sfit_sc$n.risk[12]), digits = 2)
+# 
+# sd_s1_U
+# sd_s2_U
+```
+
+
+Cox proportional hazards model
+```{r sc cox ph}
+# life status
+cox_sc <- coxph(Surv(NBI_timesplit_colony$TimeStart2, NBI_timesplit_colony$TimeStop2, NBI_timesplit_colony$event) ~ 
+                NBI_timesplit_colony$STAGE_F + NBI_timesplit_colony$breeding_area, data = NBI_timesplit_colony)
+sum_cox_sc <- summary(cox_sc)
+sum_cox_sc
+
+
+# # Project status
+# cox_sc2 <- coxph(Surv(NBI_timesplit_colony2$TimeStart2, NBI_timesplit_colony2$TimeStop2, NBI_timesplit_colony2$event) ~ 
+#                 NBI_timesplit_colony2$STAGE_F + NBI_timesplit_colony2$breeding_area, data = NBI_timesplit_colony2)
+# sum_cox_sc2 <- summary(cox_sc2)
+# sum_cox_sc2
+```
+
+
+```{r sc surv plot}
+# Life status
+ggsurvplot(sfit_sc, data = NBI_timesplit_colony, conf.int = T, risk.table = F, xlab = "Years", xlim = c(0,5*365.25), 
+           font.x = 18, font.tickslab = 18, font.y = 18,font.legend = 18,
+           ggtheme = theme_bw() + theme(panel.grid.major = element_blank(), panel.grid.minor = element_blank()),
+           break.time.by = 365.25, xscale = 365.25, pval = 0.3, pval.coord = c(x = 4.25*365.25, y = 0.75), pval.size = 6, 
+           legend = c(0.6,0.7), legend.title = "Colony & Stage", 
+           legend.labs = c("B Stage 1","K Stage 1","B Stage 2","K Stage 2","B Stage 3", "K Stage 3","B Stage 4","K Stage 4"), 
+           palette = c("#F1ED72FF", "#FCB317FF", "#F4E055FF", "#FCA50AFF", "#F7D13DFF", "#FB9606FF", "#FAC329FF", "#F8880DFF"))
+
+# # Project status
+# ggsurvplot(sfit_sc2, data = NBI_timesplit_colony2, conf.int = T, risk.table = F, xlab = "Years", xlim = c(0,5*365.25), 
+#            font.x = 18, font.tickslab = 18, font.y = 18,font.legend = 18,
+#            ggtheme = theme_bw() + theme(panel.grid.major = element_blank(), panel.grid.minor = element_blank()),
+#            break.time.by = 365.25, xscale = 365.25, pval = 0.08, pval.coord = c(x = 4.25*365.25, y = 0.75), pval.size = 6, 
+#            legend = c(0.6,0.7), legend.title = "Colony & Stage", 
+#            legend.labs = c("B Stage 1","K Stage 1","B Stage 2","K Stage 2","B Stage 3", "K Stage 3","B Stage 4","K Stage 4"), 
+#            palette = c("#F1ED72FF", "#FCB317FF", "#F4E055FF", "#FCA50AFF", "#F7D13DFF", "#FB9606FF", "#FAC329FF", "#F8880DFF"))
+# 
+# # inferno(11,begin =0.65,  end = 0.95, direction = -1)
+```
+
+
+## 5. Raising types
+We consider here only the raising types BP and FP, because there are only 9 individuals with the raising type "supplementation".
+```{r rt sub}
+NBI_RT <- subset(NBI, NBI$raising_type == "foster parent" | NBI$raising_type == "parent")
+NBI_RT <- droplevels(NBI_RT)
+```
+
+Survival object
+```{r rt surv obj}
+# Life status
+s_days_rt <- Surv(time = NBI_RT$dof, event = NBI_RT$life_status_num)
+
+# # Project status
+# s_days_rt2 <- Surv(time = NBI_RT$dof, event = NBI_RT$project_status_num)
+```
+
+Survival curve
+```{r rt surv curve}
+# Life status
+sfit_rt <- survfit(s_days_rt ~ NBI_RT$raising_type, data = NBI_RT)
+sfit_rt
+
+# # Project status
+# sfit_rt2 <- survfit(s_days_rt2 ~ NBI_RT$raising_type, data = NBI_RT)
+# sfit_rt2
+```
+
+
+Cox proportional hazards model
+```{r rt cox ph}
+# Life status
+cox_rt <- coxph(Surv(time = NBI_RT$dof, event = NBI_RT$life_status_num) ~ NBI_RT$raising_type, data = NBI_RT)
+sum_cox_rt <- summary(cox_rt)
+sum_cox_rt
+
+# # Project status
+# cox_rt2 <- coxph(Surv(time = NBI_RT$dof, event = NBI_RT$project_status_num) ~ NBI_RT$raising_type, data = NBI_RT)
+# sum_cox_rt2 <- summary(cox_rt2)
+# sum_cox_rt2
+# 
+# # Significant differences between the raising types for both options. 
+```
+
+
+Survival plot
+```{r rt surv plot}
+# Life status
+ggsurvplot(sfit_rt, data = NBI_RT, conf.int = T, risk.table = F, xlab = "Years", xlim = c(0,8*365.25),
+           font.x = 23, font.tickslab = 22, font.y = 23,font.legend = 22,
+           ggtheme = theme_bw()+ theme(panel.grid.major = element_blank(), panel.grid.minor = element_blank()),
+           break.time.by = 365.25, xscale = 365.25, pval = 0.004, pval.coord = c(x = 6.75*365.25, y = 0.85), pval.size = 7,
+           legend = c(0.9,0.91), legend.title = "Raising type", 
+           legend.labs = c("Foster parents", "Biological parents"), 
+           palette = viridis(3, begin = 0.65, end = 0.85))
+
+# # Project status
+# ggsurvplot(sfit_rt2, data = NBI_RT, conf.int = T, risk.table = F, xlab = "Years", xlim = c(0,8*365.25),
+#            font.x = 23, font.tickslab = 22, font.y = 23,font.legend = 22,
+#            ggtheme = theme_bw()+ theme(panel.grid.major = element_blank(), panel.grid.minor = element_blank()),
+#            break.time.by = 365.25, xscale = 365.25, pval = T, pval.coord = c(x = 6.75*365.25, y = 0.85), pval.size = 7,
+#            legend = c(0.9,0.91), legend.title = "Raising type", 
+#            legend.labs = c("Foster parents", "Biological parents"), 
+#            palette = viridis(3, begin = 0.65, end = 0.85))
+```
+
+Save the Plot
+```{r rt save plot}
+# Life status
+# png(filename = here("plots","02_survival", "survplot_life_raising.png"), width = 1200, height = 772)
+# 
+# ggsurvplot(sfit_rt, data = NBI_RT, conf.int = T, risk.table = F, xlab = "Years", xlim = c(0,8*365.25),
+#            font.x = 35, font.tickslab = 34, font.y = 35,font.legend = 35,
+#            ggtheme = theme_bw()+ theme(panel.grid.major = element_blank(), panel.grid.minor = element_blank()),
+#            break.time.by = 365.25, xscale = 365.25, pval = 0.004, pval.coord = c(x = 5.85*365.25, y = 0.8), pval.size = 12,
+#            legend = c(0.85,0.90), legend.title = "Raising type",
+#            legend.labs = c("Foster parents", "Biological parents"),
+#            palette = viridis(3, begin = 0.65, end = 0.85))
+# 
+# dev.off()
+#
+# # Project status
+# png(filename = here("plots","02_survival", "survplot_project_raising.png"), width = 1200, height = 772)
+# 
+# ggsurvplot(sfit_rt2, data = NBI_RT, conf.int = T, risk.table = F, xlab = "Years", xlim = c(0,8*365.25),
+#            font.x = 23, font.tickslab = 22, font.y = 23,font.legend = 22,
+#            ggtheme = theme_bw()+ theme(panel.grid.major = element_blank(), panel.grid.minor = element_blank()),
+#            break.time.by = 365.25, xscale = 365.25, pval = 0.0005, pval.coord = c(x = 6.75*365.25, y = 0.85), pval.size = 7,
+#            legend = c(0.9,0.91), legend.title = "Raising type", 
+#            legend.labs = c("Foster parents", "Biological parents"), 
+#            palette = viridis(3, begin = 0.65, end = 0.85))
+# 
+# dev.off()
+```
+
+
+## 6. Raising types and stages
+
+Survival object
+```{r srt surv obj}
+# Life status
+NBI_timesplit_srt <- subset(NBI_timesplit, NBI_timesplit$raising_type == "foster parent" | NBI_timesplit$raising_type == "parent")
+NBI_timesplit_srt <- droplevels(NBI_timesplit_srt)
+
+# # Project status
+# NBI_timesplit_srt2 <- subset(NBI_timesplit2, NBI_timesplit2$raising_type == "foster parent" | NBI_timesplit2$raising_type == "parent")
+# NBI_timesplit_srt2 <- droplevels(NBI_timesplit_srt2)
+```
+
+
+Survival curve
+```{r srt surv curve life}
+# life status
+sfit_srt <- survfit(formula = Surv(time = NBI_timesplit_srt$TimeStart2,
+                                      time2 = NBI_timesplit_srt$TimeStop2, 
+                                      event = NBI_timesplit_srt$event) ~ NBI_timesplit_srt$STAGE_F + NBI_timesplit_srt$raising_type, 
+                       data = NBI_timesplit_srt)
+sum_sfit_srt <- summary(sfit_srt, times = c(0, 365, 730, 1095, 1460, 1825, 2190, 2555, 2920, 3285))
+sum_sfit_srt
+```
+
+
+```{r srt surv curve proj}
+# # project status
+# sfit_srt2 <- survfit(formula = Surv(time = NBI_timesplit_srt2$TimeStart2,
+#                                       time2 = NBI_timesplit_srt2$TimeStop2, 
+#                                       event = NBI_timesplit_srt2$event) ~ NBI_timesplit_srt2$STAGE_F + NBI_timesplit_srt2$raising_type, 
+#                        data = NBI_timesplit_srt2)
+# sum_sfit_srt2 <- summary(sfit_srt2, times = c(0, 365, 730, 1095, 1460, 1825, 2190, 2555, 2920, 3285))
+# sum_sfit_srt2
+# 
+# # differences to the survival of the life status only in s1 (BP) and s2 (FP). The values for s3 and s4 are the same
+```
+
+Values of s1-s3
+```{r}
+# life status & project status (numbers are equal)
+## FP individuals
+print("FP")
+sum_sfit_srt$surv[2]
+sum_sfit_srt$surv[6]
+sum_sfit_srt$surv[10]
+
+## BP individuals
+print("BP")
+sum_sfit_srt$surv[4]
+sum_sfit_srt$surv[8]
+sum_sfit_srt$surv[12]
+```
+
+
+Calculation of s4 
+```{r srt s4}
+# life status & project status (numbers are equal)
+## FP individuals
+s4_1_FP <- sum_sfit_srt$surv[14]/sum_sfit_srt$surv[13] 
+s4_2_FP <- sum_sfit_srt$surv[15]/sum_sfit_srt$surv[14] 
+s4_3_FP <- sum_sfit_srt$surv[16]/sum_sfit_srt$surv[15] 
+s4_4_FP <- sum_sfit_srt$surv[17]/sum_sfit_srt$surv[16]
+s4_5_FP <- sum_sfit_srt$surv[18]/sum_sfit_srt$surv[17]
+
+s4_FP <- mean(c(s4_1_FP,s4_2_FP,s4_3_FP,s4_4_FP,s4_5_FP))
+s4_FP
+
+## BP individuals
+s4_1_BP <- sum_sfit_srt$surv[20]/sum_sfit_srt$surv[19] 
+s4_2_BP <- sum_sfit_srt$surv[21]/sum_sfit_srt$surv[20] 
+s4_3_BP <- sum_sfit_srt$surv[22]/sum_sfit_srt$surv[21] 
+s4_4_BP <- sum_sfit_srt$surv[23]/sum_sfit_srt$surv[22]
+s4_5_BP <- sum_sfit_srt$surv[24]/sum_sfit_srt$surv[23]
+
+s4_BP <- mean(c(s4_1_BP,s4_2_BP,s4_3_BP,s4_4_BP,s4_5_BP))
+s4_BP
+
+```
+
+Calculate the standard deviation (SD) for the baseline values 
+Formula: SE * sqrt(n) = SD                  
+SE = Standard error, sqrt = Square root, n = number individuals
+```{r srt sd}
+# life status & project status (numbers are equal)
+## FP individuals
+sd_s1_FP <- round(sum_sfit_srt$std.err[2]*sqrt(sum_sfit_srt$n.risk[2]), digits = 2)
+sd_s2_FP <- round(sum_sfit_srt$std.err[6]*sqrt(sum_sfit_srt$n.risk[6]), digits = 2)
+sd_s3_FP <- round(sum_sfit_srt$std.err[10]*sqrt(sum_sfit_srt$n.risk[10]), digits = 2)
+
+sd_s4_FP <- round(sd(c(s4_1_FP,s4_2_FP,s4_3_FP,s4_4_FP,s4_5_FP)), digits = 2)
+
+print("FP")
+sd_s1_FP
+sd_s2_FP
+sd_s3_FP
+sd_s4_FP
+
+## BP individuals
+sd_s1_BP <- round(sum_sfit_srt$std.err[4]*sqrt(sum_sfit_srt$n.risk[4]), digits = 2)
+sd_s2_BP <- round(sum_sfit_srt$std.err[8]*sqrt(sum_sfit_srt$n.risk[8]), digits = 2)
+sd_s3_BP <- round(sum_sfit_srt$std.err[12]*sqrt(sum_sfit_srt$n.risk[12]), digits = 2)
+
+sd_s4_BP <- round(sd(c(s4_1_BP,s4_2_BP,s4_3_BP,s4_4_BP,s4_5_BP)), digits = 2)
+
+print("BP")
+sd_s1_BP
+sd_s2_BP
+sd_s3_BP
+sd_s4_BP
+```
+
+
+Cox proportional hazards model
+```{r srt cox ph}
+# life status
+cox_srt <- coxph(Surv(NBI_timesplit_srt$TimeStart2, NBI_timesplit_srt$TimeStop2, NBI_timesplit_srt$event) ~ 
+                NBI_timesplit_srt$STAGE_F + NBI_timesplit_srt$raising_type, data = NBI_timesplit_srt)
+sum_cox_srt <- summary(cox_srt)
+sum_cox_srt
+
+
+# # Project status
+# cox_srt2 <- coxph(Surv(NBI_timesplit_srt2$TimeStart2, NBI_timesplit_srt2$TimeStop2, NBI_timesplit_srt2$event) ~ 
+#                 NBI_timesplit_srt2$STAGE_F + NBI_timesplit_srt2$raising_type, data = NBI_timesplit_srt2)
+# sum_cox_srt2 <- summary(cox_srt2)
+# sum_cox_srt2
+```
+
+
+Survival plot
+```{r srt surv plot}
+# Life status
+ggsurvplot(sfit_srt, data = NBI_timesplit_srt, conf.int = T, risk.table = F, xlab = "Years", xlim = c(0,5*365.25), 
+           font.x = 18, font.tickslab = 18, font.y = 18,font.legend = 18,
+           ggtheme = theme_bw() + theme(panel.grid.major = element_blank(), panel.grid.minor = element_blank()),
+           break.time.by = 365.25, xscale = 365.25, pval = 0.04, pval.coord = c(x = 4.25*365.25, y = 0.75), pval.size = 6, 
+           legend = c(0.6,0.7), legend.title = "Colony & Stage", 
+           legend.labs = c("FP Stage 1","BP Stage 1","FP Stage 2","BP Stage 2", "FP Stage 3", "BP Stage 3", "FP Stage 4","BP Stage 4"), 
+           palette = c("#2FB47CFF","#65CB5EFF","#3ABA76FF","#75D054FF","#47C06FFF","#87D549FF","#55C668FF","#9AD93CFF"))
+
+# # Project status
+# ggsurvplot(sfit_srt2, data = NBI_timesplit_srt2, conf.int = T, risk.table = F, xlab = "Years", xlim = c(0,5*365.25), 
+#            font.x = 18, font.tickslab = 18, font.y = 18,font.legend = 18,
+#            ggtheme = theme_bw() + theme(panel.grid.major = element_blank(), panel.grid.minor = element_blank()),
+#            break.time.by = 365.25, xscale = 365.25, pval = 0.005, pval.coord = c(x = 4.25*365.25, y = 0.75), pval.size = 6, 
+#            legend = c(0.6,0.7), legend.title = "Colony & Stage", 
+#            legend.labs = c("FP Stage 1","BP Stage 1","FP Stage 2","BP Stage 2", "FP Stage 3", "BP Stage 3", "FP Stage 4","BP Stage 4"), 
+#            palette = c("#2FB47CFF","#65CB5EFF","#3ABA76FF","#75D054FF","#47C06FFF","#87D549FF","#55C668FF","#9AD93CFF"))
+# 
+# # viridis(8, begin = 0.65, end = 0.85)
+```
+
+
+## 7. Sexes
+To calculate differences in survival between males and females. Individuals with unknown sex are not taken into account.
+
+```{r sex sub}
+NBI_sex <- subset(NBI, NBI$sex == "f" | NBI$sex == "m")
+NBI_sex <- droplevels(NBI_sex)
+```
+
+Survival object
+```{r sex surv obj}
+# Life status
+s_days_sex <- Surv(time = NBI_sex$dof, event = NBI_sex$life_status_num)
+
+# # Project status
+# s_days_sex2 <- Surv(time = NBI_sex$dof, event = NBI_sex$project_status_num)
+```
+
+Survival curve
+```{r sex surv curve}
+# Life status
+sfit_sex <- survfit(s_days_sex ~ NBI_sex$sex, data = NBI_sex)
+sfit_sex
+
+# # Project status
+# sfit_sex2 <- survfit(s_days_sex2 ~ NBI_sex$sex, data = NBI_sex)
+# sfit_sex2
+```
+
+
+Cox proportional hazards model
+```{r sex cox ph}
+# Life status
+cox_sex <- coxph(Surv(time = NBI_sex$dof, event = NBI_sex$life_status_num) ~ NBI_sex$sex, data = NBI_sex)
+sum_cox_sex <- summary(cox_sex)
+sum_cox_sex
+
+# # Project status
+# cox_sex2 <- coxph(Surv(time = NBI_sex$dof, event = NBI_sex$project_status_num) ~ NBI_sex$sex, data = NBI_sex)
+# sum_cox_sex2 <- summary(cox_sex2)
+# sum_cox_sex2
+```
+
+
+Survival plot
+```{r sex surv plot}
+# Life status
+ggsurvplot(sfit_sex, data = NBI_sex, conf.int = T, risk.table = F, xlab = "Years", xlim = c(0,8*365.25),
+           font.x = 23, font.tickslab = 22, font.y = 23,font.legend = 22,
+           ggtheme = theme_bw()+ theme(panel.grid.major = element_blank(), panel.grid.minor = element_blank()),
+           break.time.by = 365.25, xscale = 365.25, pval = 0.4, pval.coord = c(x = 6.75*365.25, y = 0.85), pval.size = 7,
+           legend = c(0.9,0.91), legend.title = "Sex", 
+           legend.labs = c("females", "males"), 
+           palette = c(plasma(1, direction = -1, begin = 0.0, end = 0.6), viridis(1, begin = 0.2, alpha = 0.9)))
+
+# # Project status
+# ggsurvplot(sfit_sex2, data = NBI_sex, conf.int = T, risk.table = F, xlab = "Years", xlim = c(0,8*365.25),
+#            font.x = 23, font.tickslab = 22, font.y = 23,font.legend = 22,
+#            ggtheme = theme_bw()+ theme(panel.grid.major = element_blank(), panel.grid.minor = element_blank()),
+#            break.time.by = 365.25, xscale = 365.25, pval = T, pval.coord = c(x = 6.75*365.25, y = 0.85), pval.size = 7,
+#            legend = c(0.9,0.91), legend.title = "Sex", 
+#            legend.labs = c("females", "males"), 
+#            palette = c(plasma(1, direction = -1, begin = 0.0, end = 0.6), viridis(1, begin = 0.2, alpha = 0.9)))
+```
+
+
+Save the Plot
+```{r sex save plot}
+# Life status
+png(filename = here("plots","02_survival", "survplot_life_sex.png"), width = 1200, height = 772)
+
+ggsurvplot(sfit_sex, data = NBI_sex, conf.int = T, risk.table = F, xlab = "Years", xlim = c(0,8*365.25),
+           font.x = 35, font.tickslab = 34, font.y = 35,font.legend = 35,
+           ggtheme = theme_bw()+ theme(panel.grid.major = element_blank(), panel.grid.minor = element_blank()),
+           break.time.by = 365.25, xscale = 365.25, pval = 0.4, pval.coord = c(x = 7.05*365.25, y = 0.80), pval.size = 12,
+           legend = c(0.92,0.90), legend.title = "Sex",
+           legend.labs = c("females", "males"),
+           palette = c(plasma(1, direction = -1, begin = 0.0, end = 0.6), viridis(1, begin = 0.2, alpha = 0.9)))
+
+dev.off()
+#
+# # Project status
+# png(filename = here("plots","02_survival", "survplot_project_sex.png"), width = 1200, height = 772)
+# 
+# ggsurvplot(sfit_sex2, data = NBI_sex, conf.int = T, risk.table = F, xlab = "Years", xlim = c(0,8*365.25),
+#            font.x = 23, font.tickslab = 22, font.y = 23,font.legend = 22,
+#            ggtheme = theme_bw()+ theme(panel.grid.major = element_blank(), panel.grid.minor = element_blank()),
+#            break.time.by = 365.25, xscale = 365.25, pval = 0.4, pval.coord = c(x = 7.1*365.25, y = 0.85), pval.size = 7,
+#            legend = c(0.9,0.91), legend.title = "Sex", 
+#            legend.labs = c("females", "males"), 
+#            palette = c(plasma(1, direction = -1, begin = 0.0, end = 0.6), viridis(1, begin = 0.2, alpha = 0.9)))
+# 
+# dev.off()
+```
+
+
+# Calculate survival improvements 
+## Life status
+Build a Vector for the Baseline survival
+```{r setup baseline life}
+survival_Baseline <- round(c(
+                              sum_sfit_stage$surv[2], # Juveniles
+                              sum_sfit_stage$surv[4], # 1-Year-old NBI
+                              sum_sfit_stage$surv[6], # 2-Year-old NBI
+                              s4), digits = 2)         # Adults, calculated above
+survival_Baseline
+```
+
+Calculate the improvements of the survival
+```{r calc impro life}
+# 10%
+## survival probability + (survival probability / 10)
+survival_10 <- round(survival_Baseline + (survival_Baseline / 10), digits = 2)
+survival_10
+
+# 25%
+## survival probability + (survival probability / 4)
+survival_25 <- round(survival_Baseline + (survival_Baseline / 4), digits = 2)
+survival_25
+```
+
+Set up a table for the survival probabilities
+```{r baseline surv table life}
+survival_life <- data.frame(s1 = NA, s2 = NA, s3=NA, s4=NA)
+survival_life[1,1:4] <- c(survival_Baseline)
+survival_life[2,1:4] <- c(survival_10)  
+survival_life[3,1:4] <- c(survival_25)
+
+colnames(survival_life) <- c("s1","s2","s3","s4")
+row.names(survival_life) <- c("Baseline","Percent_10","Percent_25")
+survival_life
+```
+
+Calculate the mortality  for NetLogo
+```{r baseline mort table life}
+mortality_life <- 1-survival_life
+mortality_life
+```
+
+## Project status
+Build a Vector for the Baseline survival
+```{r setup baseline proj}
+# survival_Baseline <- round(c(
+#                               sum_sfit_stage2$surv[2], # Juveniles
+#                               sum_sfit_stage2$surv[4], # 1-Year-old NBI
+#                               sum_sfit_stage2$surv[6], # 2-Year-old NBI
+#                               s4), digits = 2)         # Adults, calculated above
+# survival_Baseline
+```
+
+Calculate the improvements of the survival
+```{r calc impro proj}
+# # 10%
+# ## survival probability + (survival probability / 10)
+# survival_10 <- round(survival_Baseline + (survival_Baseline / 10), digits = 2)
+# survival_10
+# 
+# # 25%
+# ## survival probability + (survival probability / 4)
+# survival_25 <- round(survival_Baseline + (survival_Baseline / 4), digits = 2)
+# survival_25
+```
+
+Set up a table for the survival probabilities
+```{r baseline surv table proj}
+# survival_proj <- data.frame(s1 = NA, s2 = NA, s3=NA, s4=NA)
+# survival_proj[1,1:4] <- c(survival_Baseline)
+# survival_proj[2,1:4] <- c(survival_10)  
+# survival_proj[3,1:4] <- c(survival_25)
+# 
+# colnames(survival_proj) <- c("s1","s2","s3","s4")
+# row.names(survival_proj) <- c("Baseline","Percent_10","Percent_25")
+# survival_proj
+```
+
+Calculate the mortality  for NetLogo
+```{r baseline mort table proj}
+# mortality_proj <- 1-survival_proj
+# mortality_proj
+```
+
+
+# Timelines
+We create a figure with one line per reached stage per individual, according to the survival analysis. 
+We consider here the life status
+
+## Preparation
+Factorize the stage
+```{r TL factor stage}
+NBI_timesplit$STAGE <- as.factor(NBI_timesplit$STAGE)
+```
+
+Build a column for the start date (and not the days) for each stage. 
+If Stage = 1, leave the hatching date. If Stage = 2, hatching date + 365 days, If stage = 4, hatching days + 1095 days. 
+```{r TL start dates}
+NBI_timesplit$Year <- ifelse(test = NBI_timesplit$STAGE == 1, 
+                             yes = NBI_timesplit$hatching_date, 
+                             no = ifelse(test = NBI_timesplit$STAGE == 2, 
+                                         yes = NBI_timesplit$hatching_date + 365, 
+                                         no = ifelse(test = NBI_timesplit$STAGE == 3, 
+                                                     yes = NBI_timesplit$hatching_date + 730, 
+                                                     no = ifelse(test = NBI_timesplit$STAGE == 4, 
+                                                                 yes = NBI_timesplit$hatching_date + 1095, 
+                                                                 no = as.Date("2001-01-01")))))
+
+# Change the datetype
+NBI_timesplit$Year <- as.Date(NBI_timesplit$Year, origin = "1970-01-01")
+```
+
+
+Build a column for the end date. Same like above, but here is the difference between dead and alive individuals important.
+```{r TL end date}
+NBI_timesplit$end_stage <- ifelse(
+                             test = NBI_timesplit$event == 1 & NBI_timesplit$STAGE == 1, 
+                             yes = NBI_timesplit$delivered_or_death_date, 
+                             no = ifelse(
+                                    test = NBI_timesplit$event == 0 & NBI_timesplit$STAGE == 1 , 
+                                    yes = NBI_timesplit$hatching_date + 365, 
+                                    no = ifelse(
+                                           test = NBI_timesplit$event == 1 & NBI_timesplit$STAGE == 2, 
+                                           yes = NBI_timesplit$delivered_or_death_date, 
+                                           no = ifelse(
+                                                  test = NBI_timesplit$event == 0 & NBI_timesplit$STAGE == 2, 
+                                                  yes =  NBI_timesplit$hatching_date + 730, 
+                                                  no = ifelse(
+                                                         test = NBI_timesplit$event == 1 & NBI_timesplit$STAGE == 3, 
+                                                         yes =  NBI_timesplit$delivered_or_death_date, 
+                                                         no = ifelse(
+                                                                test = NBI_timesplit$event == 0 & NBI_timesplit$STAGE == 3, 
+                                                                yes =  NBI_timesplit$hatching_date + 1095, 
+                                                                no = ifelse(
+                                                                       test = NBI_timesplit$event == 1 & NBI_timesplit$STAGE == 4, 
+                                                                       yes =  NBI_timesplit$delivered_or_death_date, 
+                                                                       no = ifelse(
+                                                                              test = NBI_timesplit$event == 0 & NBI_timesplit$STAGE == 4, 
+                                                                              yes =  NBI_timesplit$delivered_or_death_date, 
+                                                                              no = as.Date("2001-01-01")))))))))
+# Change the date type
+NBI_timesplit$end_stage <- as.Date(NBI_timesplit$end_stage, origin = "1970-01-01")
+# Also it is important to cut down the end date on the 19.01.2018 if it is to far in the future (because of the addition of days). And to change the date type.
+NBI_timesplit$end_stage <- ifelse(NBI_timesplit$end_stage > "2020-01-01", as.Date("2020-01-01"), NBI_timesplit$end_stage)
+NBI_timesplit$end_stage <- as.Date(NBI_timesplit$end_stage, origin = "1970-01-01")
+```
+
+
+## Write a function for the plot of timelines. 
+Based on the timelineG function from the timelineS package. I changed only the colors.
+```{r TL function}
+timeline_NBI <- function (df, start, end, names, phase = NA, group1 = NA, group2 = NA, 
+  width = 2, color = "black", theme = NULL, other = NULL) 
+{
+  if (!is.data.frame(df)) {
+    stop("'df' must be a data frame")
+  }
+  if (!(class(df[[start]]) == "Date") && (class(df[[end]]) == 
+    "Date")) {
+    stop("'start' and 'end' must be dates")
+  }
+  facets <- if (is.na(group1) & is.na(group2)) {
+    paste(names, "~.")
+  }
+  else if (is.na(group2)) {
+    paste(group1, "~.")
+  }
+  else {
+    paste(group1, "~", group2)
+  }
+  a <- if (is.na(phase)) {
+    ggplot(df, aes_string(x = start, y = names)) + geom_segment(aes_string(x = start, 
+      xend = end, y = names, yend = names), size = width, color = color)
+  }
+  else {
+    ggplot(df, aes_string(x = start, y = names, color = phase)) + 
+      geom_segment(aes_string(x = start, xend = end, y = names, yend = names), size = width) +
+        scale_color_manual(values=c("#51127CFF", "#7F2582FF", "#AE347BFF","#DE4968FF"))
+  }
+  a <- if (is.na(group1) & is.na(group2)) {
+    a
+  }
+  else {
+    a + facet_grid(facets, scales = "free_y", space = "free_y", 
+      drop = TRUE)
+  }
+  a <- a + theme + other
+  plot(a)
+}
+```
+
+
+## Plot
+```{r}
+test <- NBI_timesplit[1:5,]
+```
+
+Timelines for all individuals with the stages
+```{r TL plot}
+timeline_NBI(df = NBI_timesplit, start = "Year", end = "end_stage", names = "name", phase = "STAGE", group1 = "hatch_year", 
+             theme = theme_bw() + theme(panel.border = element_blank(), 
+                                        panel.spacing.y = unit(0.0, "lines"), 
+                                        panel.grid.major.y = element_blank(), 
+                                        panel.grid.major.x = element_line(), 
+                                        panel.grid.minor = element_line(), 
+                                        strip.background = element_blank(), 
+                                        strip.text = element_blank(), 
+                                        axis.text.y = element_blank(), 
+                                        axis.ticks.y = element_blank(), 
+                                        axis.title = element_text(size = 18), 
+                                        axis.text = element_text(size = 16), 
+                                        legend.text = element_text(size = 16), 
+                                        legend.title = element_text(size = 18)), 
+             other = labs(colour = "Stage", y = "Individuals"))
+```
+
+
+Save the Plot
+```{r TL save plot}
+# png(filename = here("plots", "02_survival", "timelines_all.png"), width = 700, height = 763)
+# timeline_NBI(df = NBI_timesplit, start = "Year", end = "end_stage", names = "name", phase = "STAGE", group1 = "hatch_year", 
+#              theme = theme_bw() + theme(panel.border = element_blank(), 
+#                                         panel.spacing.y = unit(0.0, "lines"), 
+#                                         panel.grid.major.y = element_blank(), 
+#                                         panel.grid.major.x = element_line(), 
+#                                         panel.grid.minor = element_line(), 
+#                                         strip.background = element_blank(), 
+#                                         strip.text = element_blank(), 
+#                                         axis.text.y = element_blank(), 
+#                                         axis.ticks.y = element_blank(), 
+#                                         axis.title = element_text(size = 18), 
+#                                         axis.text = element_text(size = 16), 
+#                                         legend.text = element_text(size = 16), 
+#                                         legend.title = element_text(size = 18)), 
+#              other = labs(colour = "Stage", y = "Individuals"))
+# dev.off()
+```
+
+# Pre-fledgling survival
+```{r}
+NBI_breeding_all$breed_year <- substring(NBI_breeding_all$b_pair_date, 1, 4)
+
+# Please note: These values differed from those used to calculate the reproduction rates of baseline, status quo and all chicks. 
+# In this table, the actual nests are counted, not the individuals that could theoretically breed. In addition, nests of temporarily added individuals are included in this table.
+
+# Add the raising type of the mothers
+nest_numbers_fm <- left_join(x = NBI_breeding_all, y =  NBI[c(2,7)], by = c("b_parent_f" = "name"))
+
+# If the raising type is missing, add the raising type "added" for temporarily added female individuals
+# add a new factor level
+levels(nest_numbers_fm$raising_type) <- c(levels(nest_numbers_fm$raising_type), "added")
+# replace the NAs
+nest_numbers_fm$raising_type <- replace_na(data = nest_numbers_fm$raising_type, replace = "added")
+# remove unneeded factor levels (here supplementation)
+nest_numbers_fm$raising_type <- droplevels(nest_numbers_fm$raising_type)
+levels(nest_numbers_fm$raising_type)
+
+# Correct a typo in the original data
+```
+
+
+```{r}
+N_nests <- nest_numbers_fm %>% count(breed_year)
+
+NBI_breeding_year <- nest_numbers_fm %>% group_by(breed_year) %>% summarize_if(is.numeric, sum, na.rm = TRUE)
+NBI_breeding_year <- NBI_breeding_year[,-c(2,3)]
+NBI_breeding_year$n_nests <- N_nests$n
+```
+
+```{r}
+NBI_breeding_SD <- nest_numbers_fm %>% group_by(breed_year) %>% mutate(SD_eggs = sd(b_count_eggs),SD_chicks = sd(b_count_hatching), SD_fledg = sd(b_count_fledgling)) 
+NBI_breeding_SD2 <- NBI_breeding_SD %>% group_by(breed_year) %>% summarize(SD_eggs = mean(SD_eggs, na.rm = T), SD_chicks = mean(SD_chicks, na.rm = T), SD_fledg = mean(SD_fledg, na.rm = T))
+#NBI_breeding_SD2 <- NBI_breeding_SD2[, -c(2:6)]
+```
+
+
+```{r}
+# Values per year
+
+## Mean eggs per nest
+NBI_breeding_year$eggs_per_nest <- NBI_breeding_year$b_count_eggs/NBI_breeding_year$n_nests
+NBI_breeding_year$eggs_per_nest <- NBI_breeding_year$b_count_eggs/NBI_breeding_year$n_nests
+
+## mean chicks per nest
+NBI_breeding_year$chicks_per_nest <- NBI_breeding_year$b_count_hatching/NBI_breeding_year$n_nests
+
+## mean fledglings per nest
+NBI_breeding_year$fledg_per_nest <- NBI_breeding_year$b_count_fledgling/NBI_breeding_year$n_nests
+
+## survival egg to chick
+NBI_breeding_year$surv_egg_chick <- NBI_breeding_year$b_count_hatching/NBI_breeding_year$b_count_eggs
+
+## survival egg to fledgling
+NBI_breeding_year$surv_egg_fledg <- NBI_breeding_year$b_count_fledgling/NBI_breeding_year$b_count_eggs
+
+## survival chick to fledgling
+NBI_breeding_year$surv_chick_fledg <- NBI_breeding_year$b_count_fledgling/NBI_breeding_year$b_count_hatching
+```
+
+```{r}
+# For all years
+## Sum of eggs, chicks, fledglings, nestst
+print("Sum")
+sum(NBI_breeding_year$b_count_eggs)
+sum(NBI_breeding_year$b_count_hatching)
+sum(NBI_breeding_year$b_count_fledgling)
+sum(NBI_breeding_year$n_nests)
+
+## Mean number of eggs, chicks, fledglings
+print("Mean")
+mean(NBI_breeding_year$eggs_per_nest)
+mean(NBI_breeding_year$chicks_per_nest)
+mean(NBI_breeding_year$fledg_per_nest)
+
+## SD of mean number of eggs, chicks, fledglings
+print("SD")
+sd(NBI_breeding_year$eggs_per_nest)
+sd(NBI_breeding_year$chicks_per_nest)
+sd(NBI_breeding_year$fledg_per_nest)
+
+## Survival egg to chick
+print("survival")
+sum(NBI_breeding_year$b_count_hatching)/sum(NBI_breeding_year$b_count_eggs)
+## Survival egg to fledgling
+sum(NBI_breeding_year$b_count_fledgling)/sum(NBI_breeding_year$b_count_eggs)
+## Survival chick to fledgling
+sum(NBI_breeding_year$b_count_fledgling)/sum(NBI_breeding_year$b_count_hatching)
+
+print("survival possibility 2")
+#mean(NBI_breeding_year$surv_egg_chick)
+sd(NBI_breeding_year$surv_egg_chick)
+
+#mean(NBI_breeding_year$surv_egg_fledg)
+sd(NBI_breeding_year$surv_egg_fledg)
+
+#mean(NBI_breeding_year$surv_chick_fledg)
+sd(NBI_breeding_year$surv_chick_fledg)
+
+```
+## Per raising type
+```{r}
+N_nests_raising <- nest_numbers_fm %>% count(raising_type, breed_year)
+
+NBI_breeding_raising <- nest_numbers_fm %>% group_by(raising_type, breed_year) %>% summarize_if(is.numeric, sum, na.rm = TRUE)
+NBI_breeding_raising <- NBI_breeding_raising[,-c(3,4)]
+NBI_breeding_raising$n_nests <- N_nests_raising$n
+
+# Calculate the number of fledglings per nest per year per raising type
+NBI_breeding_raising$fledg_nest <- NBI_breeding_raising$b_count_fledgling/NBI_breeding_raising$n_nests
+# Calculate the mean per raising type
+aggregate(x = NBI_breeding_raising, by = list(Raising = NBI_breeding_raising$raising_type), FUN = mean)
+round(sd(c(NBI_breeding_raising$fledg_nest[1:8])), digits = 2) # FP +-0.69
+round(sd(c(NBI_breeding_raising$fledg_nest[9:11])), digits = 2) # BP +- 2.52
+round(sd(c(NBI_breeding_raising$fledg_nest[12:20])), digits = 2) # added +- 0.89
+```
+
+## Per colony
+```{r}
+N_nests_col <- nest_numbers_fm %>% count(b_breeding_colony, breed_year)
+
+NBI_breeding_col <- nest_numbers_fm %>% group_by(b_breeding_colony, breed_year) %>% summarize_if(is.numeric, sum, na.rm = TRUE)
+NBI_breeding_col <- NBI_breeding_col[,-c(2,3)]
+NBI_breeding_col$n_nests <- N_nests_col$n
+
+# Calculate the number of fledglings per nest per year per raising type
+NBI_breeding_col$fledg_nest <- NBI_breeding_col$b_count_fledgling/NBI_breeding_col$n_nests
+# Calculate the mean per raising type
+aggregate(x = NBI_breeding_col, by = list(Raising = NBI_breeding_col$b_breeding_colony), FUN = mean)
+round(sd(c(NBI_breeding_raising$fledg_nest[1:9])), digits = 2) # Burghausen +- 0.96
+round(sd(c(NBI_breeding_raising$fledg_nest[10:15])), digits = 2) # Kuchl +- 1.63
+```
+
+## Save data
+```{r}
+# saveRDS(object = nest_numbers_fm, file = here::here("output", "data-proc", "nest_numbers_fm.rds"))
+# saveRDS(object = NBI_breeding_year, file = here::here("output", "data-proc", "NBI_breeding_year.rds"))
+```
+
+
+# Questions/To DO
+
+Die summary für die survival curves funktioniert jetzt anders? Ich hoffe alles ist so richtig
+
+Alles auskommentieren
+
+
+
+***
+
+<details><summary>Session Info</summary>
+
+```{r sessionInfo}
+## DO NOT REMOVE!
+## We store the settings of your computer and the current versions of the
+## packages used to allow for reproducibility
+Sys.time()
+#git2r::repository() ## uncomment if you are using GitHub
+sessionInfo()
+```
+
+</details>
+

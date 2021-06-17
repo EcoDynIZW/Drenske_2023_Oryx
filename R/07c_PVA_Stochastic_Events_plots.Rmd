@@ -1,0 +1,379 @@
+---
+title: "PVA of the NBI: Analysis of Stochastic Event Scenarios - Plots" ## name of your project
+author: "Sinah Drenske"                     ## your name(s)
+date: "`r Sys.Date()`"                  ## current date
+output:
+  rmdformats::readthedown:
+    code_folding: hide                  ## hide or show code by default?
+    toc_depth: 3                        ## 3-level TOC
+---
+
+```{r setup, include=FALSE}
+## You can ignore this chunk in most cases
+## If you want to modify chunk options, you can do it here for all chunks or
+## add the options in the repsective chunk header, e.g. `{r, message = FALSE}`
+knitr::opts_chunk$set(echo = TRUE, warning = TRUE, message = TRUE,
+                      fig.width = 9, fig.height = 6, dpi = 500, 
+                      retina = 1, fig.showtext = TRUE)
+```
+
+* **Research question:** (Q1) How will the NBI population develop in the next 50 years and what will be the extinction risk, given that the colonies will be either managed or left to themselves? (Q2) Will the developments in the two already established colonies Burghausen & Kuchl be different? 
+* **Study area:** Austria, Germany and Italy
+* **Data:** Results of the second NetLogo model and tables created in script 7b
+
+
+# Setup
+
+```{r packages}
+## for non-CRAN packages please keep install instruction
+## but commented so it is not run each time, e.g.
+# devtools::install_github("EcoDynIZW/template")
+
+## libraries used in this script
+## please add ALL LIBRARIES NEEDED HERE
+## please remove libraries from the list that are not needed anymore 
+## at a later stage
+library("here")
+library("tidyverse")
+library("magrittr")
+library("ggplot2")
+library("viridisLite")
+library("gridExtra")
+```
+
+
+# Data
+
+```{r data}
+df_StevS_lambda_pos <- readRDS(file = here("output", "data-proc", "NetLogo-proc", "df_StevS_lambda_pos.rds"))
+df_sc_StevS_mean <- readRDS(file = here("output", "data-proc", "NetLogo-proc", "df_sc_StevS_mean.rds"))
+```
+
+# Barplot of all scenarios with positive population growth
+## Version 1: Absolute numbers
+Count the individuals
+a) Overall
+```{r}
+table(df_sc_StevS_mean$Mortality_Juveniles)
+# 0.20  0.30  0.36 
+#  160   160   500 
+table(df_sc_StevS_mean$Mortality_Subadults1)
+# 0.08 0.19 0.26 
+#  160  160  500
+table(df_sc_StevS_mean$Mortality_Subadults2)
+#0 .14 0.24 0.31 
+#  160  160  500
+table(df_sc_StevS_mean$Mortality_Adults)
+# 0.02 0.14 0.22 
+#  240  240  340   
+table(df_sc_StevS_mean$Repro)
+# 0.53 0.58 0.66 1.06  1.41 2.88
+#  400   80   80   80    80  100
+```
+
+b) Scenarios with positive population growth
+```{r}
+table(df_StevS_lambda_pos$Mortality_Juveniles)
+# 0.20  0.30  0.36 
+#  160   160   394    
+table(df_StevS_lambda_pos$Mortality_Subadults1)
+# 0.08 0.19 0.26 
+#  160  160  394   
+table(df_StevS_lambda_pos$Mortality_Subadults2)
+#0 .14 0.24 0.31 
+#  160  160  394    
+table(df_StevS_lambda_pos$Mortality_Adults)
+# 0.02 0.14 0.22 
+#  240  214  260   
+table(df_StevS_lambda_pos$Repro)
+# 0.53 0.58 0.66 1.06  1.41  3.97
+#  294   80   80   80    80   100
+```
+
+Create a matrix
+```{r}
+StevS_mort_RR_mat_all <- matrix(data = c(
+  500,160,160,NA, # Baseline, 10%, 25%
+  500,160,160,NA, # Baseline, 10%, 25%
+  500,160,160,NA, # Baseline, 10%, 25%
+  340,240,240, NA, # Baseline, 10%, 25%
+  400,80,80,80,80,100 # Baseline, 10%, 25%, Status quo, All chicks
+), byrow = F)
+StevS_mort_RR_mat_all
+
+StevS_mort_RR_mat <- matrix( data = c(
+  394,160,160,NA,
+  394,160,160,NA,
+  394,160,160,NA,
+  260,214,240,NA,
+  294,80,80,80,80,100 
+), byrow = F)
+StevS_mort_RR_mat
+```
+
+Plot
+```{r}
+par(mar = c(5,6,1,1))
+barplot(StevS_mort_RR_mat_all, beside = T, ylim = c(0,700), space = c(0,-0.3),  las = 1,
+        col = "grey", cex.axis = 1.5, cex.lab = 1.5,  border = NA)
+barplot(StevS_mort_RR_mat, beside = T, ylim = c(0,700), space = c(0,-0.3),  las = 1,
+        col = c(viridis(4, end = 0.95), viridis(4, end = 0.95), viridis(4, end = 0.95), viridis(4, end = 0.95), viridis(4, end = 0.95), cividis(2, begin = 0.3, end = 0.9)), cex.axis = 1.5, cex.lab = 1.5, ylab = "", border = NA, add = T)
+axis(1, at = c(1.2, 4.9,8.6,12.3,16.5), labels = c("","","","",""), cex.axis = 1.5)
+axis(1, at = c(1.2, 4.9,8.6,12.3,16.5), labels = c("s1","s2","s3","s4","RR"), cex.axis = 1.5, line = 0.2, lwd = 0)
+mtext("Count", side = 2, line = 4, cex = 1.5)
+box()
+```
+
+## Version 2: Percentage
+Calculate the percent of the used s1-s4 and reproduction values in scenarios with positive population growth
+```{r}
+StevS_mort_RR_mat_perc <- (StevS_mort_RR_mat/StevS_mort_RR_mat_all) * 100
+StevS_mort_RR_mat_perc
+```
+
+Plot
+```{r}
+par(mar = c(4,8,1,1))
+barplot(StevS_mort_RR_mat_perc, beside = T, ylim = c(0,100), space = c(0,-0.3),  las = 1,
+        col = c(viridis(4, end = 0.95), viridis(4, end = 0.95), viridis(4, end = 0.95), viridis(4, end = 0.95), viridis(4, end = 0.95), cividis(2, begin = 0.3, end = 0.9)), cex.axis = 2.5, cex.lab = 3, ylab = "", border = NA)
+axis(1, at = c(1.2, 5.1,9.2,13.2,18.7), labels = c("","","","",""), cex.axis = 2.5)
+axis(1, at = c(1.2, 5.1,9.2,13.2,18.7), labels = c("s1","s2","s3","s4","RR"), cex.axis = 2.5, line = 0.2, lwd = 0)
+mtext("% of used values in scenarios", side = 2, line = 6, cex = 3)
+mtext("with positive population growth", side = 2, line = 4, cex = 3)
+box()
+text(x = -2.8, y = -5, labels = "b)", xpd=NA, cex = 3)
+#784*467
+# In figure description: Please consider that overall, survival values increased by 25% were used more often
+```
+
+## Save plot
+```{r}
+# png(filename = here("plots", "04_PVA", "Stoch_eve_Supplements_bar.png"), width = 1200, height = 772)
+# 
+# par(mar = c(4,8,1,1))
+# barplot(StevS_mort_RR_mat_perc, beside = T, ylim = c(0,100), space = c(0,-0.3),  las = 1,
+#         col = c(viridis(4, end = 0.95), viridis(4, end = 0.95), viridis(4, end = 0.95), viridis(4, end = 0.95), viridis(4, end = 0.95), cividis(2, begin = 0.3, end = 0.9)), cex.axis = 2.5, cex.lab = 3, ylab = "", border = NA)
+# axis(1, at = c(1.2, 5.1,9.2,13.2,18.7), labels = c("","","","",""), cex.axis = 2.5)
+# axis(1, at = c(1.2, 5.1,9.2,13.2,18.7), labels = c("s1","s2","s3","s4","RR"), cex.axis = 2.5, line = 0.2, lwd = 0)
+# mtext("% of used values in scenarios", side = 2, line = 6, cex = 3)
+# mtext("with positive population growth", side = 2, line = 4, cex = 3)
+# box()
+# text(x = -2.8, y = -5, labels = "b)", xpd=NA, cex = 3)
+# 
+# dev.off()
+```
+
+A combinded figure of the barplots for the Baseline and Improvement scenarios and the catastrophe and supplement scenarios
+```{r}
+# Before this you have to run Script 06c until row 128
+```
+
+```{r}
+# png(filename = here("plots", "04_PVA", "combined_bar.png"), width = 1200, height = 772)
+# par(mar = c(0.4,4.6,1,0) + 0.1,
+#     mfrow= c(2,1),
+#     oma = c(3, 4, 0, 0) + 0.1)
+#     #mai = c(1, 0.9, 0, 0.1))
+# 
+# barplot(mort_RR_mat_perc, beside = T, ylim = c(0,100), space = c(0,-0.3),  las = 1,
+#         col = viridis(4, end = 0.95), cex.axis = 2.5, cex.lab = 3, border = NA,
+#         ylab = " ")
+# mtext("% of used values in scenarios", side = 2, line = 6.7, cex = 3, adj = 2)
+# mtext("with positive population growth", side = 2, line = 4.7, cex = 3, adj = 2)
+# box()
+# text(x = -0.7, y = 90, labels = "a)", xpd=NA, cex = 3)
+# #text(x = -2.8, y = -5, labels = "positive", xpd=NA, cex = 3)
+# 
+# barplot(StevS_mort_RR_mat_perc, beside = T, ylim = c(0,100), space = c(0,-0.3),  las = 1,
+#         col = c(viridis(4, end = 0.95), viridis(4, end = 0.95), viridis(4, end = 0.95), viridis(4, end = 0.95), viridis(4, end = 0.95), cividis(2, begin = 0.3, end = 0.9)), cex.axis = 2.5, cex.lab = 3, ylab = "", border = NA)
+# axis(1, at = c(1.2, 5.1,9.2,13.2,18.7), labels = c("","","","",""), cex.axis = 2.5, outer = F)
+# axis(1, at = c(1.2, 5.1,9.2,13.2,18.7), labels = c("s1","s2","s3","s4","RR"), cex.axis = 2.5, line = 0.2, lwd = 0, outer = F)
+# #mtext("% of used values in scenarios", side = 2, line = 6, cex = 3)
+# #mtext("with positive population growth", side = 2, line = 4, cex = 3)
+# box()
+# text(x = -0.7, y = 90, labels = "b)", xpd=NA, cex = 3)
+# dev.off()
+```
+
+# Catastrophe frequency and severity
+```{r}
+df_StevS_summ <- df_StevS_lambda_pos %>% 
+  group_by(Stoch_Frequency, Stoch_Severity) %>% 
+  summarise(Freq = n())
+```
+
+```{r}
+table(df_sc_StevS_mean$Stoch_Frequency, df_sc_StevS_mean$Stoch_Severity)
+table(df_StevS_summ$Freq)
+sum(df_StevS_summ$Freq)
+```
+
+```{r}
+df_StevS_summ$Freq_perc <- (df_StevS_summ$Freq/41)*100 # value of the number of scenarios with positive population growth per combination of stochastic event severity and frequency / the overall number of scenarios per combination of stochastic event frequency and severity * 100 for percentage
+  
+range(df_StevS_summ$Freq_perc) # 80.4878 90.2439, the range is not so wide
+```
+
+
+## Version 1: Absolute numbers
+```{r}
+# Basic Plot
+ggplot(data = df_StevS_summ, aes(x = Stoch_Severity, 
+                                 y = Stoch_Frequency, 
+                                 fill = Freq)) + 
+  geom_tile() + 
+  # Colour and borders
+  scale_fill_viridis_c(option = "viridis") + 
+  geom_hline(yintercept = c(0.025, 0.075, 0.125, 0.175, 0.225), 
+             colour = "white", 
+             size = 1) + 
+  geom_vline(xintercept = c(0.025, 0.075, 0.125, 0.175, 0.225, 0.275), 
+             colour = "white", 
+             size = 1) + 
+  # Axis breaks
+  scale_x_continuous(#name = "Stochastic event severity",  
+                     breaks = c(0.05, 0.10, 0.15, 0.20, 0.25), expand = c(0, 0)) + 
+  scale_y_continuous(#name = "Stochastic event frequency", 
+                     breaks = c(0.05, 0.10, 0.15, 0.20), expand = c(0, 0)) + 
+  # Theme
+  theme(rect = element_blank(), 
+        axis.text = element_text(size = 14), 
+        axis.ticks = element_line(size = 1), 
+        axis.ticks.length = unit(.25, "cm"), 
+        axis.title = element_text(size = 16), 
+        legend.title = element_text(size = 16), 
+        legend.text = element_text(size = 14)) + 
+  labs(x = "Stochastic event severity", y = "Stochastic event frequency", fill = "Frequency")
+```
+
+## Version 2: Percentage
+```{r}
+# Basic Plot
+ggplot(data = df_StevS_summ, aes(x = Stoch_Severity, 
+                                 y = Stoch_Frequency, 
+                                 fill = Freq_perc)) + 
+  geom_tile() + 
+  # Colour and borders
+  scale_fill_viridis_c(option = "viridis") + 
+  geom_hline(yintercept = c(0.025, 0.075, 0.125, 0.175, 0.225), 
+             colour = "white", 
+             size = 1) + 
+  geom_vline(xintercept = c(0.025, 0.075, 0.125, 0.175, 0.225, 0.275), 
+             colour = "white", 
+             size = 1) + 
+  # Axis breaks
+  scale_x_continuous(#name = "Catastrophe severity",  
+                     breaks = c(0.05, 0.10, 0.15, 0.20, 0.25), expand = c(0, 0)) + 
+  scale_y_continuous(#name = "Catastrophe frequency", 
+                     breaks = c(0.05, 0.10, 0.15, 0.20), expand = c(0, 0)) + 
+  # Theme
+  theme(rect = element_blank(), 
+        axis.text = element_text(size = 14), 
+        axis.ticks = element_line(size = 1), 
+        axis.ticks.length = unit(.25, "cm"), 
+        axis.title = element_text(size = 16), 
+        legend.title = element_text(size = 16), 
+        legend.text = element_text(size = 14)) + 
+  labs(x = "Stochastic event severity", y = "Stochastic event frequency", fill = "Percent") + 
+  geom_text(mapping = aes(y = 0.05, x = 0.05), label = "a)", vjust = 4.8, hjust = 5, size = 6) + 
+  coord_cartesian(clip = "off")
+```
+
+
+## Save plot
+The plot with percent is saved
+```{r}
+# ggsave(filename = here("plots", "04_PVA", "Stoch_event_percent.png"),
+#        width = 13, height = 8.2, units = "cm")
+```
+
+# Number of supplements & years of supplementation
+```{r}
+table(df_sc_StevS_mean$Supplement_Time, df_sc_StevS_mean$N_Supplements)
+```
+
+```{r}
+df_Supp_summ <- df_StevS_lambda_pos %>% 
+  group_by(N_Supplements, Supplement_Time) %>% 
+  summarise(Freq = n())
+df_Supp_summ
+```
+
+Remove the combination with 0 supplements
+```{r}
+df_Supp_summ <- df_Supp_summ[-1,]
+df_Supp_summ
+
+table(df_sc_StevS_mean$N_Supplements, df_sc_StevS_mean$Supplement_Time)
+```
+
+
+```{r}
+df_Supp_summ$Freq_perc <- (df_Supp_summ$Freq/200) *100
+
+range(df_Supp_summ$Freq_perc) # 85.5 87.5, very small range
+```
+
+
+```{r}
+df_Supp_summ$cat <- c(1:4)
+
+cols <- c("N_Supplements", "Supplement_Time",  "cat")
+df_Supp_summ[cols] <- lapply(df_Supp_summ[cols], as.factor)
+```
+
+
+```{r}
+# Plot with percent of scenarios
+ggplot(data = df_Supp_summ, aes(x = Supplement_Time, 
+                                y = N_Supplements, 
+                                fill = Freq_perc)) + 
+  geom_tile() + 
+  # Colour and borders
+  scale_fill_viridis_c(option = "viridis") + 
+  geom_hline(yintercept = c(0.5, 1.5, 2.5, 3.5), 
+             colour = "white", 
+             size = 1, na.rm = T) + 
+  geom_vline(xintercept = c(0.5, 1.5, 2.5), 
+             colour = "white", 
+             size = 1) + 
+  # Axis breaks
+  scale_x_discrete(#name = "Time of supplementation",  
+                     breaks = c(4,7), expand = c(0, 0)) +
+  scale_y_discrete(#name = "Number of supplements", 
+                   breaks= c(0,15,30), expand = c(0,0)) + 
+   # Theme
+  theme(rect = element_blank(), 
+        axis.text = element_text(size = 14), 
+        axis.ticks = element_line(size = 1), 
+        axis.ticks.length = unit(.25, "cm"), 
+        axis.title = element_text(size = 16), 
+        legend.title = element_text(size = 16), 
+        legend.text = element_text(size = 14), legend.box.spacing = unit(2.5, units = "cm")) + 
+  labs(x = "Year of supplementing", y = "Number of supplements", fill = "Percent")+ 
+  geom_text(mapping = aes(y = 1, x = 1), label = "b)", vjust = 6.5, hjust = 5.8, size = 6) + 
+  coord_cartesian(clip = "off")
+```
+
+
+## Save plot
+```{r}
+# ggsave(filename = here("plots", "04_PVA", "Supplements_percent.png"), 
+#        width = 13, height = 8, units = "cm")
+```
+
+***
+
+<details><summary>Session Info</summary>
+
+```{r sessionInfo}
+## DO NOT REMOVE!
+## We store the settings of your computer and the current versions of the
+## packages used to allow for reproducibility
+Sys.time()
+#git2r::repository() ## uncomment if you are using GitHub
+sessionInfo()
+```
+
+</details>
+

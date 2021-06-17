@@ -1,0 +1,1111 @@
+---
+title: "PVA of the NBI: Demography - Fecundity analysis" ## name of your project
+author: "Sinah Drenske"                     ## your name(s)
+date: "`r Sys.Date()`"                  ## current date
+output:
+  rmdformats::readthedown:
+    code_folding: hide                  ## hide or show code by default?
+    toc_depth: 3                        ## 3-level TOC
+---
+
+```{r setup, include=FALSE}
+## You can ignore this chunk in most cases
+## If you want to modify chunk options, you can do it here for all chunks or
+## add the options in the repsective chunk header, e.g. `{r, message = FALSE}`
+knitr::opts_chunk$set(echo = TRUE, warning = TRUE, message = TRUE,
+                      fig.width = 9, fig.height = 6, dpi = 500, 
+                      retina = 1, fig.showtext = TRUE)
+```
+
+* **Research question:** (Q1) How will the NBI population develop in the next 50 years and what will be the extinction risk, given that the colonies will be either managed or left to themselves? (Q2) Will the developments in the two already established colonies Burghausen & Kuchl be different? 
+* **Study area:** Austria, Germany and Italy
+* **Data:** Life History data and Breeding data of the NBI
+
+In this script we calculated the fecundity for the population. The fecundity is calculated is the number of fledged female chicks per year divided by the number of potential mothers per year. As potential mothers we used only females in stage 4, the adults. 
+We calculated the fecundity in 3 ways: "Baseline", "Status quo" and "All chicks".
+For the "Baseline" Fecundity we used only female fledged chicks which are born in the population from mothers who lived/lives in the population. We did not include chicks from temporarily added females and we did not include these temporarily added females as mothers. So we did not include some chicks which are part of the population.
+For the "Status quo" Fecundity we included also the parent raised chicks from the temporarily added females.
+In the third way "All chicks" we included the chicks which were raised by the human foster parents.
+
+
+# Setup
+
+```{r packages}
+## for non-CRAN packages please keep install instruction
+## but commented so it is not run each time, e.g.
+# devtools::install_github("EcoDynIZW/template")
+
+## libraries used in this script
+## please add ALL LIBRARIES NEEDED HERE
+## please remove libraries from the list that are not needed anymore 
+## at a later stage
+library("here")
+library("tidyverse")
+library("viridisLite")
+```
+
+
+# Data
+
+```{r data}
+NBI <- readRDS(file = here("output", "data-proc", "NBI_data.rds"))
+
+NBI_breeding_all <- readRDS(file = here("output", "data-proc", "NBI_breeding.rds"))
+```
+
+# Preparation
+## Potential mothers
+### Overall
+Investigate females in stage 4 that could breed.
+```{r}
+NBI_mothers <- subset(x = NBI, subset = NBI$sex == "f" & NBI$yof >3)
+rownames(NBI_mothers) <- NULL
+```
+
+```{r}
+# Subset rows from NBI_breeding where the females were part
+NBI_breeding <- subset(NBI_breeding_all, NBI_breeding_all$b_parent_f %in% NBI_mothers$name)
+
+# Add a column for the year of the breeding event
+NBI_breeding$breed_year <- substring(NBI_breeding$b_pair_date, 1, 4)
+```
+
+```{r}
+# Create test tables
+#test <- NBI_mothers[1:5,]
+#test_breed <- NBI_breeding[1:5,]
+
+# Create 12 columns for the years 2008-2019
+NBI_mothers[,26:37] <- as.numeric(NA)
+colnames(x = NBI_mothers)[26:37] <- c("2008", "2009", "2010", "2011", "2012", "2013", "2014", "2015", "2016", "2017", "2018", "2019")
+```
+
+```{r}
+# 
+nrow(NBI_mothers)
+nrow(NBI_breeding)
+
+# Compare values per row of NBI_mothers
+for (i in 1:nrow(NBI_mothers)) {
+  
+  # compare values per row of NBI_breedinging
+  for (j in 1:nrow(NBI_breeding)) {
+    
+    # if the name in row i of NBI_mothers is the same as the name in row j of NBI_breeding is the same ...
+    if (NBI_mothers$name[i] == NBI_breeding$b_parent_f[j]) {
+      # NBI_mothers function: print the name of the individual
+      #print(NBI_mothers$name[i])
+      # ... then compare the values per columns of NBI_mothers
+       for (k in 1:ncol(NBI_mothers)) {
+        # if the year in row j of NBI_breeding has the same number as the column k of NBI_mothers
+        if (NBI_breeding$breed_year[j] == colnames(NBI_mothers)[k]) {
+          # NBI_mothers function: print the number of fledglings ... 
+          #print(NBI_breeding[j,9])
+          # ... then write the number of fledglings (row j and column 9 of NBI_breeding) in row i and column k of NBI_mothers
+          NBI_mothers[i,k] <- NBI_breeding[j,9]
+
+      }
+
+
+      }
+    
+  }
+  
+    
+  }
+  
+}
+
+# There are 31 potential mothers between 2008 and 2019
+```
+
+```{r}
+#test <- NBI_mothers[,c(2,3,4,12, 26:37)]
+# add 0's in the table for years where a female could have breed
+# I will do it by hand, I hope I can change that later
+#1 "Gonzo"     2011 0
+#2 "Bima"      2012 0
+#3 "Pepe"      
+#4 "Goja"      
+#5 "Alberich"  2013 0
+#6 "Salem"     
+#7 "Iris"      2014-2016 0
+#8 "Senta"     2014,2015 0
+#9 "Luna"      2017 0
+#10 "Vitorio"   
+#11 "Peter"     
+#12 "Flumisel"  2018 0
+#13 "Luigi"     2017-2019 0
+#14 "Pernille"  2017 0
+#15 "Leopold"   2017-2019 0
+#16 "Leonardo"  
+#17 "Marvin"    
+#18 "Gemini"    2018 0
+#19 "Hannibal"  2018-2019 0
+#20 "Camillo"   
+#21 "Pinocchio" 2018 0
+#22 "Dante"     2018 0
+#23 "Fynn"      2018-2019 0
+#24 "Frieda"    2018 0
+#25 "Bianca"    2018-2019 0
+#26 "Fiona"     2019 0
+#27 "Altea"     2019 0
+#28 "Cassandra" 2019 0
+#29 "Poncho"    2019 0
+#30 "Dali"      2019 0
+#31 "Charlie"   2019 0
+
+# 2011 = col 29, 2012 = 30, 2013 = 31, 2014 = 32, 2015 = 33, 2016 = 34, 2017 = 35, 2018 = 36, 2019 = 37
+
+# Change values for 2011
+NBI_mothers[1,29] <- 0
+
+
+# Change values for 2012
+NBI_mothers[2,30] <- 0
+
+# Change values for 2013
+NBI_mothers[5,31] <- 0
+
+# Change values for 2014
+NBI_mothers[c(7,8),32] <- 0
+
+# Change values for 2015
+NBI_mothers[c(7,8),33] <- 0
+
+# Change values for 2016
+NBI_mothers[7,34] <- 0
+
+# Change values for 2017
+NBI_mothers[c(9,13,14,15),35] <- 0
+
+# Change values for 2018
+NBI_mothers[c(12,13,15,18,19,21,22,23,24,25),36] <- 0
+
+# Change values for 2019
+NBI_mothers[c(13,15,19,23,25,26,27,28,29,30,31),37] <- 0
+
+# 19 of 31 females never reproduced until the end of the observation = 61%, 39% of the females reproduced
+```
+
+
+### Per year
+Count the number of potential mothers per year from the table
+```{r}
+pot_mothers <- c(length(NBI_mothers$"2008"[!is.na(NBI_mothers$"2008")]),
+                 length(NBI_mothers$"2009"[!is.na(NBI_mothers$"2009")]),
+                 length(NBI_mothers$"2010"[!is.na(NBI_mothers$"2010")]),
+                 length(NBI_mothers$"2011"[!is.na(NBI_mothers$"2011")]),
+                 length(NBI_mothers$"2012"[!is.na(NBI_mothers$"2012")]),
+                 length(NBI_mothers$"2013"[!is.na(NBI_mothers$"2013")]),
+                 length(NBI_mothers$"2014"[!is.na(NBI_mothers$"2014")]),
+                 length(NBI_mothers$"2015"[!is.na(NBI_mothers$"2015")]),
+                 length(NBI_mothers$"2016"[!is.na(NBI_mothers$"2016")]),
+                 length(NBI_mothers$"2017"[!is.na(NBI_mothers$"2017")]),
+                 length(NBI_mothers$"2018"[!is.na(NBI_mothers$"2018")]),
+                 length(NBI_mothers$"2019"[!is.na(NBI_mothers$"2019")]))
+
+pot_mothers
+```
+
+
+## (BP) Chicks per year
+```{r}
+# List all mother IDs
+NBI_mothers$bird_id
+
+# List all chicks from the respective mother IDs
+NBI_chicks_allcol <- NBI[NBI$parent_f_id == 6 | NBI$parent_f_id == 8| 
+                         NBI$parent_f_id == 9| NBI$parent_f_id == 99098| 
+                         NBI$parent_f_id == 99113| NBI$parent_f_id == 17| 
+                         NBI$parent_f_id == 18| NBI$parent_f_id == 19| 
+                        NBI$parent_f_id == 32| NBI$parent_f_id == 35| 
+                        NBI$parent_f_id == 47| NBI$parent_f_id == 49| 
+                        NBI$parent_f_id == 53| NBI$parent_f_id == 57| 
+                        NBI$parent_f_id == 60| NBI$parent_f_id == 79| 
+                        NBI$parent_f_id == 87| NBI$parent_f_id == 88| 
+                        NBI$parent_f_id == 90| NBI$parent_f_id == 93| 
+                        NBI$parent_f_id == 94| NBI$parent_f_id == 99| 
+                        NBI$parent_f_id == 112| NBI$parent_f_id == 114| 
+                        NBI$parent_f_id == 117| NBI$parent_f_id == 120| 
+                        NBI$parent_f_id == 130| NBI$parent_f_id == 133| 
+                        NBI$parent_f_id == 136| NBI$parent_f_id == 144| 
+                        NBI$parent_f_id == 149, ]
+
+rownames(NBI_chicks_allcol) <- NULL
+NBI_chicks_allcol <- droplevels(NBI_chicks_allcol)
+```
+```{r}
+# all of them should have the raising type BP
+table(NBI_chicks_allcol$raising_type) # fine
+
+# table the colony
+table(NBI_chicks_allcol$breeding_area)
+```
+```{r}
+# Create a table only with the female chicks
+NBI_chicks_f <- subset(NBI_chicks_allcol, subset = NBI_chicks_allcol$sex == "f")
+NBI_chicks_f <- droplevels(NBI_chicks_f)
+table(NBI_chicks_f$sex) # 35 of 71 chicks are females
+table(NBI_chicks_f$hatch_year)
+```
+
+```{r}
+# calculate the number of female fledglings per year
+chicks <- c(length(NBI_chicks_f$bird_id[NBI_chicks_f$hatch_year == "2008"]), 
+            length(NBI_chicks_f$bird_id[NBI_chicks_f$hatch_year == "2009"]),
+            length(NBI_chicks_f$bird_id[NBI_chicks_f$hatch_year == "2010"]),
+            length(NBI_chicks_f$bird_id[NBI_chicks_f$hatch_year == "2011"]),
+            length(NBI_chicks_f$bird_id[NBI_chicks_f$hatch_year == "2012"]),
+            length(NBI_chicks_f$bird_id[NBI_chicks_f$hatch_year == "2013"]),
+            length(NBI_chicks_f$bird_id[NBI_chicks_f$hatch_year == "2014"]),
+            length(NBI_chicks_f$bird_id[NBI_chicks_f$hatch_year == "2015"]),
+            length(NBI_chicks_f$bird_id[NBI_chicks_f$hatch_year == "2016"]),
+            length(NBI_chicks_f$bird_id[NBI_chicks_f$hatch_year == "2017"]),
+            length(NBI_chicks_f$bird_id[NBI_chicks_f$hatch_year == "2018"]),
+            length(NBI_chicks_f$bird_id[NBI_chicks_f$hatch_year == "2019"]))
+chicks
+```
+```{r}
+# Insert one half of chicks of unknown sex
+# Because their sex is unknown, we inserted one half of unknown chicks. So there can be for example a half chick.
+
+U_chicks_tab<- subset(NBI, NBI$sex == "u")
+
+u_chicks <- c(length(U_chicks_tab$bird_id[U_chicks_tab$hatch_year == "2008"]), 
+              length(U_chicks_tab$bird_id[U_chicks_tab$hatch_year == "2009"]),
+              length(U_chicks_tab$bird_id[U_chicks_tab$hatch_year == "2010"]),
+              length(U_chicks_tab$bird_id[U_chicks_tab$hatch_year == "2011"]),
+              length(U_chicks_tab$bird_id[U_chicks_tab$hatch_year == "2012"]),
+              length(U_chicks_tab$bird_id[U_chicks_tab$hatch_year == "2013"]),
+              length(U_chicks_tab$bird_id[U_chicks_tab$hatch_year == "2014"]),
+              length(U_chicks_tab$bird_id[U_chicks_tab$hatch_year == "2015"]),
+              length(U_chicks_tab$bird_id[U_chicks_tab$hatch_year == "2016"]),
+              length(U_chicks_tab$bird_id[U_chicks_tab$hatch_year == "2017"]),
+              length(U_chicks_tab$bird_id[U_chicks_tab$hatch_year == "2018"]),
+              length(U_chicks_tab$bird_id[U_chicks_tab$hatch_year == "2019"]))
+
+u_f_chicks <- u_chicks/2
+u_chicks
+u_f_chicks
+```
+
+# Baseline reproductive rate (RR Baseline)
+```{r}
+# Create a table for the potential mothers and chicks per year
+Baseline_RR_table <- data.frame(Category = c("Potential mothers", "F Chicks", "Repro rate"), 2008,2009,2010,2011,2012,2013,2014,2015,2016,2017,2018,2019)
+Baseline_RR_table[1,2:13] <- pot_mothers
+Baseline_RR_table[2,2:13] <- chicks + u_f_chicks
+Baseline_RR_table[3,2:13] <- Baseline_RR_table[2,2:13]/Baseline_RR_table[1,2:13]
+
+# 2008 to 2011 are not necessary. 2008 to 2010 have no potential mothers and 2011 only 1 potential mother and no chicks.
+Baseline_RR_table[,2:5] <- NULL
+```
+
+## Calculate the Mean Fecundity
+```{r}
+RR_Baseline <- rowMeans(Baseline_RR_table[3,2:9])
+RR_Baseline <- round(RR_Baseline, digits = 2)
+RR_Baseline_SD <- round(sd(Baseline_RR_table[3,2:9]), digits = 2)
+
+RR_Baseline
+RR_Baseline_SD
+```
+Improve the value by 10%, 25% and 100%
+```{r}
+RR_10 <- round(RR_Baseline + (RR_Baseline / 10), digits = 2)
+RR_25 <- round(RR_Baseline + (RR_Baseline / 4), digits = 2)
+RR_100 <- round(RR_Baseline * 2, digits = 2)
+
+RR_Baseline
+RR_10
+RR_25
+RR_100 # 1.06 means 1.06 female chicks per female per year
+```
+## Plot
+Set up a matrix with 2 values per row: Potential mothers and female chicks per year. 
+The NA is for a white space between the values per year.
+This is basically for the plot
+```{r}
+Baseline_RR_mat <- matrix(data = c( 
+  Baseline_RR_table$X2012[1], Baseline_RR_table$X2012[2], NA,
+  Baseline_RR_table$X2013[1], Baseline_RR_table$X2013[2], NA,
+  Baseline_RR_table$X2014[1], Baseline_RR_table$X2014[2], NA,
+  Baseline_RR_table$X2015[1], Baseline_RR_table$X2015[2], NA,
+  Baseline_RR_table$X2016[1], Baseline_RR_table$X2016[2], NA,
+  Baseline_RR_table$X2017[1], Baseline_RR_table$X2017[2], NA,
+  Baseline_RR_table$X2018[1], Baseline_RR_table$X2018[2], NA,
+  Baseline_RR_table$X2019[1], Baseline_RR_table$X2019[2]))
+
+Baseline_RR_mat
+```
+
+Build a vector for the reproductive rate per year 
+```{r}
+Baseline_RR_year <- Baseline_RR_table[3,2:9]
+Baseline_RR_year
+```
+Build a vector for the place in the plot where the reproductive rate should be plotted
+```{r}
+time_RR <- c(2,5,8,11,14,17, 20, 23)
+```
+
+Plot the potential mothers and chicks per year
+Then add the lines for fecundity per year and mean fecundity to this plot.
+```{r}
+par(mar = c(5,4.5,2,5))
+
+barplot(Baseline_RR_mat, beside = T, border = NA, 
+        ylim = c(0,25), ylab = "Number of Individuals", xlab = "Years", cex.axis = 1.8, cex.lab = 2, 
+        col = c("#DE4968FF","#51127CFF", "white" ), 
+        legend = c("Potential Mothers", "Chicks", "Reproductive rate", "Mean Reproductive rate"), 
+        args.legend = list(x = "topleft", 
+                           fill = c("#DE4968FF","#51127CFF",magma(1, begin = 0.8),viridis(1,begin = 0.7)), 
+                           ncol = 2, cex = 1.5, border = NA, bty = "n"))
+
+axis(side = 1, at = c(2,5,8,11,14,17, 20, 23), labels = c(2012:2019), cex.axis = 1.8)
+
+par(new = T)
+plot(time_RR, Baseline_RR_year, type = "l", xaxt = "n", yaxt = "n", xlab = "", ylab = "", ylim = c(0,1), 
+     lwd = 4, col = magma(1, begin = 0.8), xlim = c(1,24))
+axis(side = 4, cex.axis = 1.8)
+mtext(text = "Reproductive rate", side = 4, line = 3, cex = 2)
+abline(h = RR_Baseline, lwd = 4, col = viridis(1,begin = 0.7), lty = 1)
+
+box()
+
+```
+
+Save the Plot
+```{r}
+# png(filename = here("plots", "03_fecundity", "RR_baseline.png"), width = 900, height = 600)
+# par(mar = c(5,4.5,2,5))
+# 
+#  barplot(Baseline_RR_mat, beside = T, border = NA,
+#          ylim = c(0,25), ylab = "Number of Individuals", xlab = "Years", cex.axis = 1.8, cex.lab = 2,
+#          col = c("#DE4968FF","#51127CFF", "white" ),
+#          legend = c("Potential Mothers", "Chicks", "Reproductive rate", "Mean Reproductive rate"),
+#          args.legend = list(x = "topleft",
+#                             fill = c("#DE4968FF","#51127CFF",magma(1, begin = 0.8),viridis(1,begin = 0.7)),
+#                             ncol = 2, cex = 1.5, border = NA, bty = "n"))
+# 
+#  axis(side = 1, at = c(2,5,8,11,14,17, 20, 23), labels = c(2012:2019), cex.axis = 1.8)
+# 
+#  par(new = T)
+#  plot(time_RR, Baseline_RR_year, type = "l", xaxt = "n", yaxt = "n", xlab = "", ylab = "", ylim = c(0,1),
+#       lwd = 4, col = magma(1, begin = 0.8), xlim = c(1,24))
+#  axis(side = 4, cex.axis = 1.8)
+#  mtext(text = "Reproductive rate", side = 4, line = 3, cex = 2)
+#  abline(h = RR_Baseline, lwd = 4, col = viridis(1,begin = 0.7), lty = 1)
+# 
+#  box()
+# 
+# 
+#  dev.off()
+```
+
+## Set up a table for a GLMM
+We want to build two GLMMs to detect if there are significant differences between the raising types or the colonies.
+AT first we set up a table with the chicks per year per mother
+
+### Only female fledglings
+```{r}
+f_fledg_mother <- NBI_chicks_f %>% count(parent_f, hatch_year)
+```
+
+Then we have to add the years where the potential mothers did not reproduce (number of chicks = 0)
+```{r}
+# Find rows with a 0 in the respective years
+which(NBI_mothers$"2011" == 0)
+which(NBI_mothers$"2012" == 0)
+which(NBI_mothers$"2013" == 0)
+which(NBI_mothers$"2014" == 0)
+which(NBI_mothers$"2015" == 0)
+which(NBI_mothers$"2016" == 0)
+which(NBI_mothers$"2017" == 0)
+which(NBI_mothers$"2018" == 0)
+which(NBI_mothers$"2019" == 0)
+
+# There are several values for these years. How many?
+length(which(NBI_mothers$"2017" == 0))
+length(which(NBI_mothers$"2018" == 0))
+length(which(NBI_mothers$"2019" == 0))
+```
+
+Now we assign the name of the potential mother, the respective year and the number of chicks (0) as additional rows
+```{r}
+# 2011
+f_fledg_mother[26,] <- as.list(c(NBI_mothers[1,2], colnames(NBI_mothers[,29]), NBI_mothers[1,29]))
+# 2012
+f_fledg_mother[27,] <- as.list(c(NBI_mothers[2,2], colnames(NBI_mothers[,30]), NBI_mothers[2,30]))
+# 2013
+f_fledg_mother[28:29,] <- as.list(c(NBI_mothers[c(3,5),2], colnames(NBI_mothers[,31]), NBI_mothers[c(3,5),31]))
+# 2014
+f_fledg_mother[30:31,] <- as.list(c(NBI_mothers[c(7,8),2], colnames(NBI_mothers[,32]), NBI_mothers[c(7,8),32]))
+# 2015
+f_fledg_mother[32:33,] <- as.list(c(NBI_mothers[c(7,8),2], colnames(NBI_mothers[,33]), NBI_mothers[c(7,8),33]))
+# 2016
+f_fledg_mother[34:35,] <- as.list(c(NBI_mothers[c(7,9),2], colnames(NBI_mothers[,34]), NBI_mothers[c(7,9),34]))
+# 2017
+f_fledg_mother[36:41,] <- as.list(c(NBI_mothers[c(9,10,12:15),2], colnames(NBI_mothers[,35]), NBI_mothers[c(9,10,12:15),35]))
+# 2018
+f_fledg_mother[42:51,] <- as.list(c(NBI_mothers[c(12,13,15,18,19,21:25),2], colnames(NBI_mothers[,36]), NBI_mothers[c(12,13,15,18,19,21:25),36]))
+# 2019
+f_fledg_mother[52:63,] <- as.list(c(NBI_mothers[c(13,15,18,19,23,25:31),2], colnames(NBI_mothers[,37]), NBI_mothers[c(13,15,18,19,23,25:31),37]))
+```
+
+The last step is to add the raising type and the colony of the potential mothers
+```{r}
+f_fledg_mother <- left_join(x = f_fledg_mother, y = NBI_mothers[c(2,7,8)], by = c("parent_f" = "name"))
+
+# Change the column name for "n"
+colnames(f_fledg_mother)[3] <- "nr_f_fledg"
+```
+
+```{r}
+table(f_fledg_mother$nr_f_fledg) # Sum = 63 breeding events, reproduction = 25 breeding events (40%), no reproduction = 38 breeding events (60%)
+table(f_fledg_mother$hatch_year, f_fledg_mother$nr_f_fledg)
+```
+
+### Female and male fledglings
+```{r}
+f_fledg_mother_all <- NBI_chicks_allcol %>% count(parent_f, hatch_year)
+# 2011
+f_fledg_mother_all[30,] <- as.list(c(NBI_mothers[1,2], colnames(NBI_mothers[,29]), NBI_mothers[1,29]))
+# 2012
+f_fledg_mother_all[31,] <- as.list(c(NBI_mothers[2,2], colnames(NBI_mothers[,30]), NBI_mothers[2,30]))
+# 2013
+f_fledg_mother_all[32:33,] <- as.list(c(NBI_mothers[c(3,5),2], colnames(NBI_mothers[,31]), NBI_mothers[c(3,5),31]))
+# 2014
+f_fledg_mother_all[34:35,] <- as.list(c(NBI_mothers[c(7,8),2], colnames(NBI_mothers[,32]), NBI_mothers[c(7,8),32]))
+# 2015
+f_fledg_mother_all[36:37,] <- as.list(c(NBI_mothers[c(7,8),2], colnames(NBI_mothers[,33]), NBI_mothers[c(7,8),33]))
+# 2016
+f_fledg_mother_all[38:39,] <- as.list(c(NBI_mothers[c(7,9),2], colnames(NBI_mothers[,34]), NBI_mothers[c(7,9),34]))
+# 2017
+f_fledg_mother_all[40:45,] <- as.list(c(NBI_mothers[c(9,10,12:15),2], colnames(NBI_mothers[,35]), NBI_mothers[c(9,10,12:15),35]))
+# 2018
+f_fledg_mother_all[46:55,] <- as.list(c(NBI_mothers[c(12,13,15,18,19,21:25),2], colnames(NBI_mothers[,36]), NBI_mothers[c(12,13,15,18,19,21:25),36]))
+# 2019
+f_fledg_mother_all[56:67,] <- as.list(c(NBI_mothers[c(13,15,18,19,23,25:31),2], colnames(NBI_mothers[,37]), NBI_mothers[c(13,15,18,19,23,25:31),37]))
+```
+
+The last step is to add the raising type and the colony of the potential mothers
+```{r}
+f_fledg_mother_all <- left_join(x = f_fledg_mother_all, y = NBI_mothers[c(2,7,8)], by = c("parent_f" = "name"))
+
+# Change the column name for "n"
+colnames(f_fledg_mother_all)[3] <- "nr_fm_fledg"
+```
+
+
+```{r}
+table(f_fledg_mother_all$nr_fm_fledg) # Sum = 67 breeding events, reproduction = 29 breeding events (43%), no reproduction = 38 breeding events (57%)
+table(f_fledg_mother_all$hatch_year, f_fledg_mother_all$nr_fm_fledg)
+```
+
+Save the table
+```{r}
+# saveRDS(object = f_fledg_mother, file = here::here("output", "data-proc", "f_fledg_mother.rds"))
+# saveRDS(object = f_fledg_mother_all, file = here::here("output", "data-proc", "f_fledg_mother_all.rds"))
+```
+
+
+# Status quo Reproductive rate
+All female BP raised chicks including chicks from temporally added individuals
+```{r}
+NBI_BP_chicks <- c(
+  length(NBI$bird_id[NBI$raising_type == "parent" & NBI$sex == "f" & NBI$hatch_year == "2008"]),
+  length(NBI$bird_id[NBI$raising_type == "parent" & NBI$sex == "f" & NBI$hatch_year == "2009"]),
+  length(NBI$bird_id[NBI$raising_type == "parent" & NBI$sex == "f" & NBI$hatch_year == "2010"]),
+  length(NBI$bird_id[NBI$raising_type == "parent" & NBI$sex == "f" & NBI$hatch_year == "2011"]),
+  length(NBI$bird_id[NBI$raising_type == "parent" & NBI$sex == "f" & NBI$hatch_year == "2012"]),
+  length(NBI$bird_id[NBI$raising_type == "parent" & NBI$sex == "f" & NBI$hatch_year == "2013"]),
+  length(NBI$bird_id[NBI$raising_type == "parent" & NBI$sex == "f" & NBI$hatch_year == "2014"]),
+  length(NBI$bird_id[NBI$raising_type == "parent" & NBI$sex == "f" & NBI$hatch_year == "2015"]),
+  length(NBI$bird_id[NBI$raising_type == "parent" & NBI$sex == "f" & NBI$hatch_year == "2016"]),
+  length(NBI$bird_id[NBI$raising_type == "parent" & NBI$sex == "f" & NBI$hatch_year == "2017"]),
+  length(NBI$bird_id[NBI$raising_type == "parent" & NBI$sex == "f" & NBI$hatch_year == "2018"]),
+  length(NBI$bird_id[NBI$raising_type == "parent" & NBI$sex == "f" & NBI$hatch_year == "2019"]))
+NBI_BP_chicks
+```
+
+Create a table for the potential mothers and chicks per year
+```{r}
+Statquo_RR_table <- data.frame(Category = c("Potential mothers", "Chicks", "Repro rate"), 2008,2009,2010,2011,2012,2013,2014,2015,2016,2017,2018,2019)
+Statquo_RR_table[1,2:13] <- pot_mothers
+Statquo_RR_table[2,2:13] <- NBI_BP_chicks + u_f_chicks
+Statquo_RR_table[3,2:13] <- Statquo_RR_table[2,2:13]/Statquo_RR_table[1,2:13]
+
+# 2008 to 2011 are not necessary. 2008 to 2010 have no potential mothers and 2011 only 1 potential mother and no chicks.
+Statquo_RR_table[,2:5] <- NULL
+Statquo_RR_table
+```
+
+
+## Calculate the Mean RR
+```{r}
+RR_Statquo <- rowMeans(Statquo_RR_table[3,2:9])
+RR_Statquo <- round(RR_Statquo, digits = 2)
+RR_Statquo
+SD_Statquo <- round(sd(Statquo_RR_table[3,2:9]), digits = 2)
+SD_Statquo
+```
+
+## Plot
+Set up a matrix with 2 values per row: Potential mothers and chicks per year. The NA is for a white space between the values per year.
+```{r}
+Statquo_RR_mat <- matrix(data = c( 
+  Statquo_RR_table$X2012[1], Statquo_RR_table$X2012[2], NA,
+  Statquo_RR_table$X2013[1], Statquo_RR_table$X2013[2], NA,
+  Statquo_RR_table$X2014[1], Statquo_RR_table$X2014[2], NA,
+  Statquo_RR_table$X2015[1], Statquo_RR_table$X2015[2], NA,
+  Statquo_RR_table$X2016[1], Statquo_RR_table$X2016[2], NA,
+  Statquo_RR_table$X2017[1], Statquo_RR_table$X2017[2], NA,
+  Statquo_RR_table$X2018[1], Statquo_RR_table$X2018[2], NA,
+  Statquo_RR_table$X2019[1], Statquo_RR_table$X2019[2]))
+```
+
+```{r}
+Statquo_RR_year <- Statquo_RR_table[3,2:9]
+Statquo_RR_year
+```
+
+Plot the potential mothers and chicks per year
+Then add the lines for fecundity per year and mean fecundity to this plot.
+```{r}
+par(mar = c(5,4.5,2,5))
+barplot(Statquo_RR_mat, beside = T, border = NA, ylim = c(0,25), ylab = "Number of Individuals", xlab = "Years",
+        cex.axis = 1.8, cex.lab = 2, col = c("#DE4968FF","#51127CFF", "white" ), 
+        legend = c("Potential Mothers", "Chicks", "Reproductive rate", "Mean reproductive rate"), 
+        args.legend = list(x = "topleft", fill = c("#DE4968FF","#51127CFF",magma(1, begin = 0.8),viridis(1,begin = 0.7)), 
+                           ncol = 2, cex = 1.5, border = NA, bty = "n"))
+axis(side = 1, at = c(2,5,8,11,14,17,20,23), labels = c(2012:2019), cex.axis = 1.8)
+
+par(new = T)
+plot(time_RR, Statquo_RR_year, type = "l", xaxt = "n", yaxt = "n", xlab = "", ylab = "", ylim = c(0,3.5), 
+     lwd = 4, col = magma(1, begin = 0.8), xlim = c(1,24))
+axis(side = 4, cex.axis = 1.8)
+mtext(text = "Reproductive rate", side = 4, line = 3, cex = 2)
+abline(h = RR_Statquo, lwd = 4, col = viridis(1,begin = 0.7), lty = 1)
+box()
+par(mar = c(5, 4, 4, 2) + 0.1)
+```
+
+Save the Plot
+```{r}
+# png(filename = here("plots", "03_fecundity", "RR_statquo.png"), width = 900, height = 600)
+# par(mar = c(5,4.5,2,5))
+# barplot(Statquo_RR_mat, beside = T, border = NA, ylim = c(0,25), ylab = "Number of Individuals", xlab = "Years",
+#         cex.axis = 1.8, cex.lab = 2, col = c("#DE4968FF","#51127CFF", "white" ), 
+#         legend = c("Potential Mothers", "Chicks", "Reproductive rate", "Mean reproductive rate"), 
+#         args.legend = list(x = "topleft", fill = c("#DE4968FF","#51127CFF",magma(1, begin = 0.8),viridis(1,begin = 0.7)), 
+#                            ncol = 2, cex = 1.5, border = NA, bty = "n"))
+# axis(side = 1, at = c(2,5,8,11,14,17,20,23), labels = c(2012:2019), cex.axis = 1.8)
+# 
+# par(new = T)
+# plot(time_RR, Statquo_RR_year, type = "l", xaxt = "n", yaxt = "n", xlab = "", ylab = "", ylim = c(0,3.5), 
+#      lwd = 4, col = magma(1, begin = 0.8), xlim = c(1,24))
+# axis(side = 4, cex.axis = 1.8)
+# mtext(text = "Reproductive rate", side = 4, line = 3, cex = 2)
+# abline(h = RR_Statquo, lwd = 4, col = viridis(1,begin = 0.7), lty = 1)
+# box()
+# par(mar = c(5, 4, 4, 2) + 0.1)
+# 
+# dev.off()
+```
+
+# All chicks Reproductive rate
+BP chicks per mother (Baseline Fecundity) and FP chicks per year
+
+Count the female FP chicks per year
+This is needed for the "All chicks" Scenario
+```{r}
+FP_chicks_tab <- subset(NBI, NBI$raising_type == "foster parent" & NBI$sex == "f")
+FP_chicks <- c(
+  length(FP_chicks_tab$bird_id[FP_chicks_tab$hatch_year == "2008"]),
+  length(FP_chicks_tab$bird_id[FP_chicks_tab$hatch_year == "2009"]),
+  length(FP_chicks_tab$bird_id[FP_chicks_tab$hatch_year == "2010"]),
+  length(FP_chicks_tab$bird_id[FP_chicks_tab$hatch_year == "2011"]),
+  length(FP_chicks_tab$bird_id[FP_chicks_tab$hatch_year == "2012"]),
+  length(FP_chicks_tab$bird_id[FP_chicks_tab$hatch_year == "2013"]),
+  length(FP_chicks_tab$bird_id[FP_chicks_tab$hatch_year == "2014"]),
+  length(FP_chicks_tab$bird_id[FP_chicks_tab$hatch_year == "2015"]),
+  length(FP_chicks_tab$bird_id[FP_chicks_tab$hatch_year == "2016"]),
+  length(FP_chicks_tab$bird_id[FP_chicks_tab$hatch_year == "2017"]),
+  length(FP_chicks_tab$bird_id[FP_chicks_tab$hatch_year == "2018"]),
+  length(FP_chicks_tab$bird_id[FP_chicks_tab$hatch_year == "2019"]))
+FP_chicks
+```
+Create a table for the potential mothers and chicks per year
+```{r}
+Allchicks_RR_table <- data.frame(Category = c("Potential mothers", "BP_Chicks", "FP_Chicks", "All_Chicks", "RR"), 2008,2009,2010,2011,2012,2013,2014,2015,2016,2017,2018,2019)
+Allchicks_RR_table[1,2:13] <- pot_mothers
+Allchicks_RR_table[2,2:13] <- NBI_BP_chicks + u_f_chicks # old version: chicks + u_f_chicks
+Allchicks_RR_table[3,2:13] <- FP_chicks
+Allchicks_RR_table[4,2:13] <- Allchicks_RR_table[2,2:13] + Allchicks_RR_table[3,2:13]
+Allchicks_RR_table[5,2:13] <- Allchicks_RR_table[4,2:13]/Allchicks_RR_table[1,2:13]
+```
+
+
+```{r}
+# 2008 to 2013 are not necessary. 2008 to 2010 have no potential mothers and 2011 only 1 potential mother and no chicks. And 2012-2013 have no FP chicks.
+Allchicks_RR_table[,2:7] <- NULL
+Allchicks_RR_table
+```
+
+## Calculate the Mean RR
+```{r}
+RR_Allchicks <- rowMeans(Allchicks_RR_table[5,2:7])
+RR_Allchicks <- round(RR_Allchicks, digits = 2)
+RR_Allchicks
+
+SD_Allchicks <- round(sd(Allchicks_RR_table[5,2:7]), digits = 2)
+SD_Allchicks
+```
+
+## Plot
+Set up a matrix with 2 values per row: Potential mothers and chicks per year. The NA is for a white space between the values per year.
+```{r}
+Allchicks_RR_mat <- matrix(data = c( 
+  Allchicks_RR_table$X2014[1], Allchicks_RR_table$X2014[4], NA,
+  Allchicks_RR_table$X2015[1], Allchicks_RR_table$X2015[4], NA,
+  Allchicks_RR_table$X2016[1], Allchicks_RR_table$X2016[4], NA,
+  Allchicks_RR_table$X2017[1], Allchicks_RR_table$X2017[4], NA,
+  Allchicks_RR_table$X2018[1], Allchicks_RR_table$X2018[4], NA,
+  Allchicks_RR_table$X2019[1], Allchicks_RR_table$X2019[4]))
+```
+
+All chicks RR per year
+```{r}
+Allchicks_RR_year <- Allchicks_RR_table[5,2:7]
+Allchicks_RR_year
+```
+
+Build a vector for the place in the plot where the Reproductive rate should be plotted
+```{r}
+Allchicks_time_RR <- c(2,5,8,11,14,17)
+```
+
+Plot the potential mothers and chicks per year
+Then add the lines for fecundity per year and mean fecundity to this plot.
+```{r}
+par(mar = c(5,4.5,2,5))
+barplot(Allchicks_RR_mat, beside = T, border = NA, ylim = c(0,50), ylab = "Number of Individuals", xlab = "Years",
+        cex.axis = 1.8, cex.lab = 2, col = c("#DE4968FF","#51127CFF", "white" ), 
+        legend = c("Potential Mothers", "Chicks", "Reproductive rate", "Mean reproductive rate"), 
+        args.legend = list(x = "topleft", fill = c("#DE4968FF","#51127CFF",magma(1, begin = 0.8),viridis(1,begin = 0.7)), 
+                           ncol = 2, cex = 1.5, border = NA, bty = "n"))
+axis(side = 1, at = c(2,5,8,11,14,17), labels = c(2014:2019), cex.axis = 1.8)
+
+par(new = T)
+plot(Allchicks_time_RR, Allchicks_RR_year, type = "l", xaxt = "n", yaxt = "n", xlab = "", ylab = "", ylim = c(0,8.5), 
+     lwd = 4, col = magma(1, begin = 0.8), xlim = c(1,18))
+axis(side = 4, cex.axis = 1.8)
+mtext(text = "Reproductive rate", side = 4, line = 3, cex = 2)
+abline(h = RR_Allchicks, lwd = 4, col = viridis(1,begin = 0.7), lty = 1)
+box()
+par(mar = c(5, 4, 4, 2) + 0.1)
+```
+
+Save the Plot
+```{r}
+# png(filename = here("plots", "03_fecundity", "RR_allchicks.png"), width = 900, height = 600)
+# par(mar = c(5,4.5,2,5))
+# barplot(Allchicks_RR_mat, beside = T, border = NA, ylim = c(0,50), ylab = "Number of Individuals", xlab = "Years",
+#         cex.axis = 1.8, cex.lab = 2, col = c("#DE4968FF","#51127CFF", "white" ), 
+#         legend = c("Potential Mothers", "Chicks", "Reproductive rate", "Mean reproductive rate"), 
+#         args.legend = list(x = "topleft", fill = c("#DE4968FF","#51127CFF",magma(1, begin = 0.8),viridis(1,begin = 0.7)), 
+#                            ncol = 2, cex = 1.5, border = NA, bty = "n"))
+# axis(side = 1, at = c(2,5,8,11,14,17), labels = c(2014:2019), cex.axis = 1.8)
+# 
+# par(new = T)
+# plot(Allchicks_time_RR, Allchicks_RR_year, type = "l", xaxt = "n", yaxt = "n", xlab = "", ylab = "", ylim = c(0,8.5), 
+#      lwd = 4, col = magma(1, begin = 0.8), xlim = c(1,18))
+# axis(side = 4, cex.axis = 1.8)
+# mtext(text = "Reproductive rate", side = 4, line = 3, cex = 2)
+# abline(h = RR_Allchicks, lwd = 4, col = viridis(1,begin = 0.7), lty = 1)
+# box()
+# par(mar = c(5, 4, 4, 2) + 0.1)
+# dev.off()
+```
+
+# Reproductive rate per colony
+Split the NBI_mothers table
+```{r}
+B_NBI_mothers <- subset(NBI_mothers, NBI_mothers$breeding_area == "Burghausen")
+K_NBI_mothers <- subset(NBI_mothers, NBI_mothers$breeding_area == "Kuchl")
+```
+
+## Potential mothers per year
+Count the number of potential mothers per year from the table.
+
+```{r}
+# Burghausen
+B_pot_mothers <- c(length(B_NBI_mothers$"2008"[!is.na(B_NBI_mothers$"2008")]),
+                 length(B_NBI_mothers$"2009"[!is.na(B_NBI_mothers$"2009")]),
+                 length(B_NBI_mothers$"2010"[!is.na(B_NBI_mothers$"2010")]),
+                 length(B_NBI_mothers$"2011"[!is.na(B_NBI_mothers$"2011")]),
+                 length(B_NBI_mothers$"2012"[!is.na(B_NBI_mothers$"2012")]),
+                 length(B_NBI_mothers$"2013"[!is.na(B_NBI_mothers$"2013")]),
+                 length(B_NBI_mothers$"2014"[!is.na(B_NBI_mothers$"2014")]),
+                 length(B_NBI_mothers$"2015"[!is.na(B_NBI_mothers$"2015")]),
+                 length(B_NBI_mothers$"2016"[!is.na(B_NBI_mothers$"2016")]),
+                 length(B_NBI_mothers$"2017"[!is.na(B_NBI_mothers$"2017")]),
+                 length(B_NBI_mothers$"2018"[!is.na(B_NBI_mothers$"2018")]),
+                 length(B_NBI_mothers$"2019"[!is.na(B_NBI_mothers$"2019")]))
+
+B_pot_mothers
+
+# Kuchl
+K_pot_mothers <- c(length(K_NBI_mothers$"2008"[!is.na(K_NBI_mothers$"2008")]),
+                 length(K_NBI_mothers$"2009"[!is.na(K_NBI_mothers$"2009")]),
+                 length(K_NBI_mothers$"2010"[!is.na(K_NBI_mothers$"2010")]),
+                 length(K_NBI_mothers$"2011"[!is.na(K_NBI_mothers$"2011")]),
+                 length(K_NBI_mothers$"2012"[!is.na(K_NBI_mothers$"2012")]),
+                 length(K_NBI_mothers$"2013"[!is.na(K_NBI_mothers$"2013")]),
+                 length(K_NBI_mothers$"2014"[!is.na(K_NBI_mothers$"2014")]),
+                 length(K_NBI_mothers$"2015"[!is.na(K_NBI_mothers$"2015")]),
+                 length(K_NBI_mothers$"2016"[!is.na(K_NBI_mothers$"2016")]),
+                 length(K_NBI_mothers$"2017"[!is.na(K_NBI_mothers$"2017")]),
+                 length(K_NBI_mothers$"2018"[!is.na(K_NBI_mothers$"2018")]),
+                 length(K_NBI_mothers$"2019"[!is.na(K_NBI_mothers$"2019")]))
+
+K_pot_mothers
+```
+
+## (BP) Chicks per year
+```{r}
+# table the colony
+table(NBI_chicks_allcol$breeding_area)
+
+# Subset the dataset
+B_NBI_chicks <- subset(NBI_chicks_allcol, NBI_chicks_allcol$breeding_area == "Burghausen")
+
+K_NBI_chicks <- subset(NBI_chicks_allcol, NBI_chicks_allcol$breeding_area == "Kuchl")
+
+# Only female chicks
+B_NBI_chicks_f <- subset(B_NBI_chicks, subset = B_NBI_chicks$sex == "f")
+B_NBI_chicks_f <- droplevels(B_NBI_chicks_f)
+table(B_NBI_chicks_f$sex) # 35 of 71 chicks are females
+table(B_NBI_chicks_f$hatch_year)
+
+K_NBI_chicks_f <- subset(K_NBI_chicks, subset = K_NBI_chicks$sex == "f")
+K_NBI_chicks_f <- droplevels(K_NBI_chicks_f)
+table(K_NBI_chicks_f$sex) # 35 of 71 chicks are females
+table(K_NBI_chicks_f$hatch_year)
+```
+
+```{r}
+# calculate the number of female fledglings per year
+B_chicks <- c(length(B_NBI_chicks_f$bird_id[B_NBI_chicks_f$hatch_year == "2008"]), 
+            length(B_NBI_chicks_f$bird_id[B_NBI_chicks_f$hatch_year == "2009"]),
+            length(B_NBI_chicks_f$bird_id[B_NBI_chicks_f$hatch_year == "2010"]),
+            length(B_NBI_chicks_f$bird_id[B_NBI_chicks_f$hatch_year == "2011"]),
+            length(B_NBI_chicks_f$bird_id[B_NBI_chicks_f$hatch_year == "2012"]),
+            length(B_NBI_chicks_f$bird_id[B_NBI_chicks_f$hatch_year == "2013"]),
+            length(B_NBI_chicks_f$bird_id[B_NBI_chicks_f$hatch_year == "2014"]),
+            length(B_NBI_chicks_f$bird_id[B_NBI_chicks_f$hatch_year == "2015"]),
+            length(B_NBI_chicks_f$bird_id[B_NBI_chicks_f$hatch_year == "2016"]),
+            length(B_NBI_chicks_f$bird_id[B_NBI_chicks_f$hatch_year == "2017"]),
+            length(B_NBI_chicks_f$bird_id[B_NBI_chicks_f$hatch_year == "2018"]),
+            length(B_NBI_chicks_f$bird_id[B_NBI_chicks_f$hatch_year == "2019"]))
+B_chicks
+
+K_chicks <- c(length(K_NBI_chicks_f$bird_id[K_NBI_chicks_f$hatch_year == "2008"]), 
+            length(K_NBI_chicks_f$bird_id[K_NBI_chicks_f$hatch_year == "2009"]),
+            length(K_NBI_chicks_f$bird_id[K_NBI_chicks_f$hatch_year == "2010"]),
+            length(K_NBI_chicks_f$bird_id[K_NBI_chicks_f$hatch_year == "2011"]),
+            length(K_NBI_chicks_f$bird_id[K_NBI_chicks_f$hatch_year == "2012"]),
+            length(K_NBI_chicks_f$bird_id[K_NBI_chicks_f$hatch_year == "2013"]),
+            length(K_NBI_chicks_f$bird_id[K_NBI_chicks_f$hatch_year == "2014"]),
+            length(K_NBI_chicks_f$bird_id[K_NBI_chicks_f$hatch_year == "2015"]),
+            length(K_NBI_chicks_f$bird_id[K_NBI_chicks_f$hatch_year == "2016"]),
+            length(K_NBI_chicks_f$bird_id[K_NBI_chicks_f$hatch_year == "2017"]),
+            length(K_NBI_chicks_f$bird_id[K_NBI_chicks_f$hatch_year == "2018"]),
+            length(K_NBI_chicks_f$bird_id[K_NBI_chicks_f$hatch_year == "2019"]))
+K_chicks
+```
+
+
+```{r}
+# Insert one half of chicks of unknown sex
+# Because their sex is unknown, we inserted one half of unknown chicks. So there can be for example a half chick.
+
+B_U_chicks_tab<- subset(NBI, NBI$sex == "u" & NBI$breeding_area == "Burghausen")
+
+B_u_chicks <- c(length(B_U_chicks_tab$bird_id[B_U_chicks_tab$hatch_year == "2008"]), 
+              length(B_U_chicks_tab$bird_id[B_U_chicks_tab$hatch_year == "2009"]),
+              length(B_U_chicks_tab$bird_id[B_U_chicks_tab$hatch_year == "2010"]),
+              length(B_U_chicks_tab$bird_id[B_U_chicks_tab$hatch_year == "2011"]),
+              length(B_U_chicks_tab$bird_id[B_U_chicks_tab$hatch_year == "2012"]),
+              length(B_U_chicks_tab$bird_id[B_U_chicks_tab$hatch_year == "2013"]),
+              length(B_U_chicks_tab$bird_id[B_U_chicks_tab$hatch_year == "2014"]),
+              length(B_U_chicks_tab$bird_id[B_U_chicks_tab$hatch_year == "2015"]),
+              length(B_U_chicks_tab$bird_id[B_U_chicks_tab$hatch_year == "2016"]),
+              length(B_U_chicks_tab$bird_id[B_U_chicks_tab$hatch_year == "2017"]),
+              length(B_U_chicks_tab$bird_id[B_U_chicks_tab$hatch_year == "2018"]),
+              length(B_U_chicks_tab$bird_id[B_U_chicks_tab$hatch_year == "2019"]))
+
+B_u_f_chicks <- B_u_chicks/2
+B_u_chicks
+B_u_f_chicks
+
+K_U_chicks_tab<- subset(NBI, NBI$sex == "u" & NBI$breeding_area == "Kuchl")
+
+K_u_chicks <- c(length(K_U_chicks_tab$bird_id[K_U_chicks_tab$hatch_year == "2008"]), 
+              length(K_U_chicks_tab$bird_id[K_U_chicks_tab$hatch_year == "2009"]),
+              length(K_U_chicks_tab$bird_id[K_U_chicks_tab$hatch_year == "2010"]),
+              length(K_U_chicks_tab$bird_id[K_U_chicks_tab$hatch_year == "2011"]),
+              length(K_U_chicks_tab$bird_id[K_U_chicks_tab$hatch_year == "2012"]),
+              length(K_U_chicks_tab$bird_id[K_U_chicks_tab$hatch_year == "2013"]),
+              length(K_U_chicks_tab$bird_id[K_U_chicks_tab$hatch_year == "2014"]),
+              length(K_U_chicks_tab$bird_id[K_U_chicks_tab$hatch_year == "2015"]),
+              length(K_U_chicks_tab$bird_id[K_U_chicks_tab$hatch_year == "2016"]),
+              length(K_U_chicks_tab$bird_id[K_U_chicks_tab$hatch_year == "2017"]),
+              length(K_U_chicks_tab$bird_id[K_U_chicks_tab$hatch_year == "2018"]),
+              length(K_U_chicks_tab$bird_id[K_U_chicks_tab$hatch_year == "2019"]))
+
+K_u_f_chicks <- K_u_chicks/2
+K_u_chicks
+K_u_f_chicks
+```
+
+## Reproductive rate
+```{r}
+# Create a table for the potential mothers and chicks per year
+B_RR_table <- data.frame(Category = c("Potential mothers", "F Chicks", "RR"), 2008,2009,2010,2011,2012,2013,2014,2015,2016,2017,2018,2019)
+B_RR_table[1,2:13] <- B_pot_mothers
+B_RR_table[2,2:13] <- B_chicks + B_u_f_chicks
+B_RR_table[3,2:13] <- B_RR_table[2,2:13]/B_RR_table[1,2:13]
+
+# 2008 to 2011 are not necessary. 2008 to 2010 have no potential mothers and 2011 only 1 potential mother and no chicks.
+B_RR_table[,2:5] <- NULL
+B_RR_table[3,5] <- 0 # There was no BP chick and no BP mother
+
+K_RR_table <- data.frame(Category = c("Potential mothers", "F Chicks", "RR"), 2008,2009,2010,2011,2012,2013,2014,2015,2016,2017,2018,2019)
+K_RR_table[1,2:13] <- K_pot_mothers
+K_RR_table[2,2:13] <- K_chicks + K_u_f_chicks
+K_RR_table[3,2:13] <- K_RR_table[2,2:13]/K_RR_table[1,2:13]
+
+K_RR_table[,2:7] <- NULL
+```
+
+### Calculate the Mean RR
+```{r}
+B_RR_Baseline <- rowMeans(B_RR_table[3,2:9])
+B_RR_Baseline <- round(B_RR_Baseline, digits = 2)
+B_RR_Baseline_SD <- round(sd(B_RR_table[3,2:9]), digits = 2)
+
+B_RR_Baseline
+B_RR_Baseline_SD
+
+
+
+K_RR_Baseline <- rowMeans(K_RR_table[3,2:7])
+K_RR_Baseline <- round(K_RR_Baseline, digits = 2)
+K_RR_Baseline_SD <- round(sd(K_RR_table[3,2:7]), digits = 2)
+
+K_RR_Baseline
+K_RR_Baseline_SD
+```
+
+
+# Reproductive rate per raising type
+Split the NBI_mothers table
+```{r}
+BP_NBI_mothers <- subset(NBI_mothers, NBI_mothers$raising_type == "parent")
+FP_NBI_mothers <- subset(NBI_mothers, NBI_mothers$raising_type == "foster parent")
+```
+
+## Potential mothers per year
+Count the number of potential mothers per year from the table.
+
+```{r}
+# Biological parents
+BP_pot_mothers <- c(length(BP_NBI_mothers$"2008"[!is.na(BP_NBI_mothers$"2008")]),
+                 length(BP_NBI_mothers$"2009"[!is.na(BP_NBI_mothers$"2009")]),
+                 length(BP_NBI_mothers$"2010"[!is.na(BP_NBI_mothers$"2010")]),
+                 length(BP_NBI_mothers$"2011"[!is.na(BP_NBI_mothers$"2011")]),
+                 length(BP_NBI_mothers$"2012"[!is.na(BP_NBI_mothers$"2012")]),
+                 length(BP_NBI_mothers$"2013"[!is.na(BP_NBI_mothers$"2013")]),
+                 length(BP_NBI_mothers$"2014"[!is.na(BP_NBI_mothers$"2014")]),
+                 length(BP_NBI_mothers$"2015"[!is.na(BP_NBI_mothers$"2015")]),
+                 length(BP_NBI_mothers$"2016"[!is.na(BP_NBI_mothers$"2016")]),
+                 length(BP_NBI_mothers$"2017"[!is.na(BP_NBI_mothers$"2017")]),
+                 length(BP_NBI_mothers$"2018"[!is.na(BP_NBI_mothers$"2018")]),
+                 length(BP_NBI_mothers$"2019"[!is.na(BP_NBI_mothers$"2019")]))
+
+BP_pot_mothers
+
+# Foster parents
+FP_pot_mothers <- c(length(FP_NBI_mothers$"2008"[!is.na(FP_NBI_mothers$"2008")]),
+                 length(FP_NBI_mothers$"2009"[!is.na(FP_NBI_mothers$"2009")]),
+                 length(FP_NBI_mothers$"2010"[!is.na(FP_NBI_mothers$"2010")]),
+                 length(FP_NBI_mothers$"2011"[!is.na(FP_NBI_mothers$"2011")]),
+                 length(FP_NBI_mothers$"2012"[!is.na(FP_NBI_mothers$"2012")]),
+                 length(FP_NBI_mothers$"2013"[!is.na(FP_NBI_mothers$"2013")]),
+                 length(FP_NBI_mothers$"2014"[!is.na(FP_NBI_mothers$"2014")]),
+                 length(FP_NBI_mothers$"2015"[!is.na(FP_NBI_mothers$"2015")]),
+                 length(FP_NBI_mothers$"2016"[!is.na(FP_NBI_mothers$"2016")]),
+                 length(FP_NBI_mothers$"2017"[!is.na(FP_NBI_mothers$"2017")]),
+                 length(FP_NBI_mothers$"2018"[!is.na(FP_NBI_mothers$"2018")]),
+                 length(FP_NBI_mothers$"2019"[!is.na(FP_NBI_mothers$"2019")]))
+
+FP_pot_mothers
+```
+
+## (BP) Chicks per year
+```{r}
+table(NBI_chicks_allcol$raising_type) # only "parent" - we want to consider the raising type of the parents
+BP_NBI_chicks <- NBI_chicks_allcol[NBI_chicks_allcol$parent_f %in% BP_NBI_mothers$name, ]
+FP_NBI_chicks <- NBI_chicks_allcol[NBI_chicks_allcol$parent_f %in% FP_NBI_mothers$name, ]
+
+# Only female chicks
+BP_NBI_chicks_f <- subset(BP_NBI_chicks, subset = BP_NBI_chicks$sex == "f")
+BP_NBI_chicks_f <- droplevels(BP_NBI_chicks_f)
+table(BP_NBI_chicks_f$sex) # 35 of 71 chicks are females
+table(BP_NBI_chicks_f$hatch_year)
+
+FP_NBI_chicks_f <- subset(FP_NBI_chicks, subset = FP_NBI_chicks$sex == "f")
+FP_NBI_chicks_f <- droplevels(FP_NBI_chicks_f)
+table(FP_NBI_chicks_f$sex) # 35 of 71 chicks are females
+table(FP_NBI_chicks_f$hatch_year)
+```
+
+
+
+```{r}
+# calculate the number of female fledglings per year
+BP_chicks <- c(length(BP_NBI_chicks_f$bird_id[BP_NBI_chicks_f$hatch_year == "2008"]), 
+            length(BP_NBI_chicks_f$bird_id[BP_NBI_chicks_f$hatch_year == "2009"]),
+            length(BP_NBI_chicks_f$bird_id[BP_NBI_chicks_f$hatch_year == "2010"]),
+            length(BP_NBI_chicks_f$bird_id[BP_NBI_chicks_f$hatch_year == "2011"]),
+            length(BP_NBI_chicks_f$bird_id[BP_NBI_chicks_f$hatch_year == "2012"]),
+            length(BP_NBI_chicks_f$bird_id[BP_NBI_chicks_f$hatch_year == "2013"]),
+            length(BP_NBI_chicks_f$bird_id[BP_NBI_chicks_f$hatch_year == "2014"]),
+            length(BP_NBI_chicks_f$bird_id[BP_NBI_chicks_f$hatch_year == "2015"]),
+            length(BP_NBI_chicks_f$bird_id[BP_NBI_chicks_f$hatch_year == "2016"]),
+            length(BP_NBI_chicks_f$bird_id[BP_NBI_chicks_f$hatch_year == "2017"]),
+            length(BP_NBI_chicks_f$bird_id[BP_NBI_chicks_f$hatch_year == "2018"]),
+            length(BP_NBI_chicks_f$bird_id[BP_NBI_chicks_f$hatch_year == "2019"]))
+BP_chicks
+
+FP_chicks <- c(length(FP_NBI_chicks_f$bird_id[FP_NBI_chicks_f$hatch_year == "2008"]), 
+            length(FP_NBI_chicks_f$bird_id[FP_NBI_chicks_f$hatch_year == "2009"]),
+            length(FP_NBI_chicks_f$bird_id[FP_NBI_chicks_f$hatch_year == "2010"]),
+            length(FP_NBI_chicks_f$bird_id[FP_NBI_chicks_f$hatch_year == "2011"]),
+            length(FP_NBI_chicks_f$bird_id[FP_NBI_chicks_f$hatch_year == "2012"]),
+            length(FP_NBI_chicks_f$bird_id[FP_NBI_chicks_f$hatch_year == "2013"]),
+            length(FP_NBI_chicks_f$bird_id[FP_NBI_chicks_f$hatch_year == "2014"]),
+            length(FP_NBI_chicks_f$bird_id[FP_NBI_chicks_f$hatch_year == "2015"]),
+            length(FP_NBI_chicks_f$bird_id[FP_NBI_chicks_f$hatch_year == "2016"]),
+            length(FP_NBI_chicks_f$bird_id[FP_NBI_chicks_f$hatch_year == "2017"]),
+            length(FP_NBI_chicks_f$bird_id[FP_NBI_chicks_f$hatch_year == "2018"]),
+            length(FP_NBI_chicks_f$bird_id[FP_NBI_chicks_f$hatch_year == "2019"]))
+FP_chicks
+```
+
+
+```{r}
+# Insert one half of chicks of unknown sex
+# Because their sex is unknown, we inserted one half of unknown chicks. So there can be for example a half chick.
+
+BP_U_chicks_tab<- subset(NBI, NBI$sex == "u" & NBI$raising_type == "parent")
+
+BP_u_chicks <- c(length(BP_U_chicks_tab$bird_id[BP_U_chicks_tab$hatch_year == "2008"]), 
+              length(BP_U_chicks_tab$bird_id[BP_U_chicks_tab$hatch_year == "2009"]),
+              length(BP_U_chicks_tab$bird_id[BP_U_chicks_tab$hatch_year == "2010"]),
+              length(BP_U_chicks_tab$bird_id[BP_U_chicks_tab$hatch_year == "2011"]),
+              length(BP_U_chicks_tab$bird_id[BP_U_chicks_tab$hatch_year == "2012"]),
+              length(BP_U_chicks_tab$bird_id[BP_U_chicks_tab$hatch_year == "2013"]),
+              length(BP_U_chicks_tab$bird_id[BP_U_chicks_tab$hatch_year == "2014"]),
+              length(BP_U_chicks_tab$bird_id[BP_U_chicks_tab$hatch_year == "2015"]),
+              length(BP_U_chicks_tab$bird_id[BP_U_chicks_tab$hatch_year == "2016"]),
+              length(BP_U_chicks_tab$bird_id[BP_U_chicks_tab$hatch_year == "2017"]),
+              length(BP_U_chicks_tab$bird_id[BP_U_chicks_tab$hatch_year == "2018"]),
+              length(BP_U_chicks_tab$bird_id[BP_U_chicks_tab$hatch_year == "2019"]))
+
+BP_u_f_chicks <- BP_u_chicks/2
+BP_u_chicks
+BP_u_f_chicks
+
+FP_U_chicks_tab<- subset(NBI, NBI$sex == "u" & NBI$raising_type == "foster parent")
+
+FP_u_chicks <- c(length(FP_U_chicks_tab$bird_id[FP_U_chicks_tab$hatch_year == "2008"]), 
+              length(FP_U_chicks_tab$bird_id[FP_U_chicks_tab$hatch_year == "2009"]),
+              length(FP_U_chicks_tab$bird_id[FP_U_chicks_tab$hatch_year == "2010"]),
+              length(FP_U_chicks_tab$bird_id[FP_U_chicks_tab$hatch_year == "2011"]),
+              length(FP_U_chicks_tab$bird_id[FP_U_chicks_tab$hatch_year == "2012"]),
+              length(FP_U_chicks_tab$bird_id[FP_U_chicks_tab$hatch_year == "2013"]),
+              length(FP_U_chicks_tab$bird_id[FP_U_chicks_tab$hatch_year == "2014"]),
+              length(FP_U_chicks_tab$bird_id[FP_U_chicks_tab$hatch_year == "2015"]),
+              length(FP_U_chicks_tab$bird_id[FP_U_chicks_tab$hatch_year == "2016"]),
+              length(FP_U_chicks_tab$bird_id[FP_U_chicks_tab$hatch_year == "2017"]),
+              length(FP_U_chicks_tab$bird_id[FP_U_chicks_tab$hatch_year == "2018"]),
+              length(FP_U_chicks_tab$bird_id[FP_U_chicks_tab$hatch_year == "2019"]))
+
+FP_u_f_chicks <- FP_u_chicks/2
+FP_u_chicks
+FP_u_f_chicks
+```
+
+## Reproductive rate
+```{r}
+# Create a table for the potential mothers and chicks per year
+BP_RR_table <- data.frame(Category = c("Potential mothers", "F Chicks", "RR"), 2008,2009,2010,2011,2012,2013,2014,2015,2016,2017,2018,2019)
+BP_RR_table[1,2:13] <- BP_pot_mothers
+BP_RR_table[2,2:13] <- BP_chicks + BP_u_f_chicks
+BP_RR_table[3,2:13] <- BP_RR_table[2,2:13]/BP_RR_table[1,2:13]
+# 2008 to 2016 are not necessary. Because there were no potential mothers or only 1 in 2016
+BP_RR_table[,2:10] <- NULL
+
+
+FP_RR_table <- data.frame(Category = c("Potential mothers", "F Chicks", "RR"), 2008,2009,2010,2011,2012,2013,2014,2015,2016,2017,2018,2019)
+FP_RR_table[1,2:13] <- FP_pot_mothers
+FP_RR_table[2,2:13] <- FP_chicks + FP_u_f_chicks
+FP_RR_table[3,2:13] <- FP_RR_table[2,2:13]/FP_RR_table[1,2:13]
+# 2008 to 2011 are not necessary. Because there were no potential mothers or only 1 in 2011
+FP_RR_table[,2:5] <- NULL
+```
+
+### Calculate the Mean RR
+```{r}
+BP_RR_Baseline <- rowMeans(BP_RR_table[3,2:4])
+BP_RR_Baseline <- round(BP_RR_Baseline, digits = 2)
+BP_RR_Baseline_SD <- round(sd(BP_RR_table[3,2:4]), digits = 2)
+
+BP_RR_Baseline
+BP_RR_Baseline_SD
+
+
+
+FP_RR_Baseline <- rowMeans(FP_RR_table[3,2:9])
+FP_RR_Baseline <- round(FP_RR_Baseline, digits = 2)
+FP_RR_Baseline_SD <- round(sd(FP_RR_table[3,2:9]), digits = 2)
+
+FP_RR_Baseline
+FP_RR_Baseline_SD
+```
+
+# Reproductive rate per Nest
+You can find this table in the script 04_survival_analysis.Rmd, we already needed this table for the survival rates
+
+# Questions: 
+Bei jahren in denen weibliche NBI keien Jungtiere kriegen: WIe kann man den Prozess zum Eintragen der NUllen automatisieren? Ich habe die Zahlen jetzt per Hand eingetragen
+
+***
+
+<details><summary>Session Info</summary>
+
+```{r sessionInfo}
+## DO NOT REMOVE!
+## We store the settings of your computer and the current versions of the
+## packages used to allow for reproducibility
+Sys.time()
+#git2r::repository() ## uncomment if you are using GitHub
+sessionInfo()
+```
+
+</details>
+

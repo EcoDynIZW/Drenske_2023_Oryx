@@ -1,0 +1,67 @@
+---
+title: "PVA of the NBI: Comparison of NBI reintroduction projects" ## name of your project
+author: "Sinah Drenske"                     ## your name(s)
+date: "`r Sys.Date()`"                  ## current date
+output:
+  rmdformats::readthedown:
+    code_folding: hide                  ## hide or show code by default?
+    toc_depth: 3                        ## 3-level TOC
+---
+
+```{r setup, include=FALSE}
+## You can ignore this chunk in most cases
+## If you want to modify chunk options, you can do it here for all chunks or
+## add the options in the repsective chunk header, e.g. `{r, message = FALSE}`
+knitr::opts_chunk$set(echo = TRUE, warning = TRUE, message = TRUE,
+                      fig.width = 9, fig.height = 6, dpi = 500, 
+                      retina = 1, fig.showtext = TRUE)
+```
+
+* **Research question:**
+* **Study area:**
+* **Data:** Numbers from Böhm et al. 2020 and Wang et al. 2017
+
+In this script we calculate mean number of fledglings per nest for different NBI and crested ibis reintroduction projects. We derived the numbers from the articles by Böhm et al. 2020 and Wang et al. 2017.
+
+BÖHM, C., BOWDEN, C.G.R., SEDDON, P.J., HATIPOĞLU, T., OUBROU, W., EL BEKKAY, M., ET AL. (2020) The northern bald ibis Geronticus eremita: history, current status and future perspectives. Oryx, 1–13.
+
+WANG, M., YE, X.P., LI, Y.F., HUO, Z.P., LI, X. & YU, X.P. (2017) On the sustainability of a reintroduced Crested Ibis population in Qinling Mountains, Shaanxi, Central China. Restoration Ecology, 25.
+
+# Setup
+
+```{r packages}
+## for non-CRAN packages please keep install instruction
+## but commented so it is not run each time, e.g.
+# devtools::install_github("EcoDynIZW/template")
+
+## libraries used in this script
+## please add ALL LIBRARIES NEEDED HERE
+## please remove libraries from the list that are not needed anymore 
+## at a later stage
+library()
+```
+
+
+# Data
+
+```{r data}
+#df <- readr::read_csv("your-data.csv")
+#sf <- sf::read_sf("your-geo-data.shp")
+```
+
+
+***
+
+<details><summary>Session Info</summary>
+
+```{r sessionInfo}
+## DO NOT REMOVE!
+## We store the settings of your computer and the current versions of the
+## packages used to allow for reproducibility
+Sys.time()
+#git2r::repository() ## uncomment if you are using GitHub
+sessionInfo()
+```
+
+</details>
+

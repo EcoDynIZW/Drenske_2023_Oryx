@@ -1,0 +1,577 @@
+---
+title: "PVA of the NBI: Demography - GLMM of the number of fledglings per potential mother and per nest" ## name of your project
+author: "Sinah Drenske, Viktoriia Radchuk, Stephanie Kramer-Schadt"                     ## your name(s)
+date: "`r Sys.Date()`"                  ## current date
+output:
+  rmdformats::readthedown:
+    code_folding: hide                  ## hide or show code by default?
+    toc_depth: 3                        ## 3-level TOC
+---
+
+```{r setup, include=FALSE}
+## You can ignore this chunk in most cases
+## If you want to modify chunk options, you can do it here for all chunks or
+## add the options in the repsective chunk header, e.g. `{r, message = FALSE}`
+knitr::opts_chunk$set(echo = TRUE, warning = TRUE, message = TRUE,
+                      fig.width = 9, fig.height = 6, dpi = 500, 
+                      retina = 1, fig.showtext = TRUE)
+```
+
+* **Research question:** (Q1) How will the NBI population develop in the next 50 years and what will be the extinction risk, given that the colonies will be either managed or left to themselves? (Q2) Will the developments in the two already established colonies Burghausen & Kuchl be different?
+* **Study area:** Austria, Germany and Italy
+* **Data:** Data of the number of fledglings per potential mother and per nest
+
+
+We create GLMMs to investigate whether the raising type or colony has an influence on a) the number of fledglings per potential mother (incl. breeding probability) and b) the number of fledglings per nest (only actual breeding events and incl. temporarily added females as mothers).
+
+# Setup
+
+```{r packages}
+## for non-CRAN packages please keep install instruction
+## but commented so it is not run each time, e.g.
+# devtools::install_github("EcoDynIZW/template")
+
+## libraries used in this script
+## please add ALL LIBRARIES NEEDED HERE
+## please remove libraries from the list that are not needed anymore 
+## at a later stage
+library("DHARMa")
+library("effects")
+#library("fields")
+#library("gam")
+library("ggeffects")
+library("ggplot2")
+library("here")
+library("lme4")
+#library("margins")
+#library("mgcv")
+#library("plot3D")
+library("pwr")
+```
+
+
+# Data
+
+```{r data} 
+f_fledg_mother <- readRDS(file = here("output", "data-proc", "f_fledg_mother.rds")) # from script "05a_Reproduction_analysis"          # chicks_year 
+f_fledg_mother <- droplevels(f_fledg_mother)
+nest_numbers_fm <- readRDS(file = here("output", "data-proc", "nest_numbers_fm.rds")) # from script "04_Survival_analysis"        # NBI_breeding_all
+nest_numbers_fm <- droplevels(nest_numbers_fm)
+```
+
+# Female fledglings per potential mother per year
+Based on the values used for RR Baseline
+
+```{r}
+names(f_fledg_mother)
+```
+
+## GLMM of the number of fledglings per potential mother per raising type
+### Data exploration
+```{r}
+# Plot the number of fledglings
+ggplot(data = f_fledg_mother, mapping = aes(x = nr_f_fledg)) + 
+  geom_histogram()
+
+# Plot of the number of fledglings per raising type per year
+f_fledg_mother %>%
+  group_by(raising_type, hatch_year) %>%
+  mutate(sum.fledg = sum(nr_f_fledg)) %>%
+  ggplot(mapping = aes(x = hatch_year, y = sum.fledg)) + 
+  geom_line(aes(group = raising_type, color = raising_type))
+
+# Sum of the breeding events per raising type
+table(f_fledg_mother$raising_type)
+
+# Mean per group
+RT_year <- aggregate(x = f_fledg_mother, by = list(Raising = f_fledg_mother$raising_type, Year = f_fledg_mother$hatch_year), 
+                     FUN = mean)
+RT_mean <- aggregate(x = RT_year, by = list(RT_year$Raising), 
+            FUN = mean)
+```
+
+### GLM
+```{r}
+null_model_f_fledg_raising <- glm(formula = nr_f_fledg ~ 1, 
+                                  data = f_fledg_mother, 
+                                  family = "poisson")
+summary(null_model_f_fledg_raising)
+
+f_fledg_raising_glm <- glm(formula = nr_f_fledg ~ raising_type,
+                           data = f_fledg_mother,
+                           family = "poisson")
+summary(f_fledg_raising_glm) # non significant
+```
+
+#### Plot
+```{r}
+#dredge(raising_mod)
+plot(allEffects(f_fledg_raising_glm),type='response')
+```
+### GLMM
+```{r}
+f_fledg_raising_glmm <- glmer(formula = nr_f_fledg ~ raising_type + (1|parent_f), 
+                              data = f_fledg_mother, 
+                              family = "poisson")
+summary(f_fledg_raising_glmm) # not significant
+```
+#### Plot
+```{r}
+f_fledg_raising_predi <- ggpredict(f_fledg_raising_glmm, terms = "raising_type")
+f_fledg_raising_predi
+```
+
+
+```{r}
+plot(x = f_fledg_raising_predi, 
+     show.title = F, 
+     limits = c(0,1)) + 
+  labs(x = "Raising type",
+       y = "Number of female fledglings per potential mother", 
+       tags = "") +
+  theme_classic() + 
+  theme( 
+    axis.line = element_line(colour = "black"),
+    axis.text = element_text(size=14),
+    panel.grid.major = element_blank(),
+    panel.grid.minor = element_blank(),
+    panel.border = element_blank(),
+    panel.background = element_blank(), 
+    plot.margin = unit(c(7.5, 12.5, 5.5, 15.5), "points"),
+    axis.title.x = element_text(colour="black", size = 15),
+    axis.title.y = element_text(colour="black",size=15, vjust = 5))
+```
+
+#### Testing the models
+Testing with the DHARMa package.
+
+Prepare it
+```{r}
+f_fledg_raising_simu <- simulateResiduals(fittedModel = f_fledg_raising_glmm)
+plot(f_fledg_raising_simu)
+```
+
+Dispersion
+```{r}
+testDispersion(f_fledg_raising_simu)
+```
+
+Zero-inflation
+```{r}
+testZeroInflation(f_fledg_raising_simu)
+```
+
+Temporal Autocorrelation
+```{r}
+testTemporalAutocorrelation(f_fledg_raising_simu)
+```
+
+
+## GLMM of the number of fledglings per potential mother per colony
+### Data exploration
+```{r}
+# Plot the number of fledglings
+ggplot(data = f_fledg_mother, mapping = aes(x = nr_f_fledg)) + 
+  geom_histogram()
+
+# Plot of the number of fledglings per colony per year
+f_fledg_mother %>%
+  group_by(breeding_area, hatch_year) %>%
+  mutate(sum.fledg = sum(nr_f_fledg)) %>%
+  ggplot(mapping = aes(x = hatch_year, y = sum.fledg)) + 
+  geom_line(aes(group = breeding_area, color = breeding_area))
+
+# Sum of the breeding events per colony
+table(f_fledg_mother$breeding_area)
+```
+
+Remove individuals with colony "allocation"
+```{r}
+f_fledg_mother <- f_fledg_mother[f_fledg_mother$breeding_area != "allocation", ]
+f_fledg_mother <- droplevels(f_fledg_mother)
+table(f_fledg_mother$breeding_area) # half half
+```
+
+### GLM
+```{r}
+null_model_f_fledg_col <- glm(formula = nr_f_fledg ~ 1, 
+                              data = f_fledg_mother, 
+                              family = "poisson")
+summary(null_model_f_fledg_col)
+
+f_fledg_colony_glm <- glm(formula = nr_f_fledg ~ breeding_area,
+                          data = f_fledg_mother,
+                          family = "poisson")
+summary(f_fledg_colony_glm) # not significant
+```
+
+#### Plot
+```{r}
+#dredge(raising_mod)
+plot(allEffects(f_fledg_colony_glm),type='response')
+```
+
+
+### GLMM
+```{r}
+f_fledg_colony_glmm <- glmer(formula = nr_f_fledg ~ breeding_area + (1|parent_f), 
+                             data = f_fledg_mother,  
+                             family = "poisson")
+summary(f_fledg_colony_glmm)
+```
+
+#### Plot
+```{r}
+f_fledg_colony_predi <- ggpredict(f_fledg_colony_glmm, terms = "breeding_area")
+f_fledg_colony_predi
+```
+
+
+```{r}
+plot(x = f_fledg_colony_predi, 
+     show.title = F, 
+     limits = c(0,1.15)) + 
+  labs(x = "Colony",
+       y = "Number of female fledglings per potential mother", 
+       tags = "") +
+  theme_classic() + 
+  theme( 
+    axis.line = element_line(colour = "black"),
+    axis.text = element_text(size=14),
+    panel.grid.major = element_blank(),
+    panel.grid.minor = element_blank(),
+    panel.border = element_blank(),
+    panel.background = element_blank(), 
+    plot.margin = unit(c(7.5, 12.5, 5.5, 15.5), "points"),
+    axis.title.x = element_text(colour="black", size = 15),
+    axis.title.y = element_text(colour="black",size=15, vjust = 5))
+```
+
+#### Testing the models
+Testing with the DHARMa package.
+
+Prepare it
+```{r}
+f_fledg_colony_simu <- simulateResiduals(fittedModel = f_fledg_colony_glmm)
+plot(f_fledg_colony_simu)
+```
+
+Dispersion
+```{r}
+testDispersion(f_fledg_colony_simu)
+```
+
+Zero-inflation
+```{r}
+testZeroInflation(f_fledg_colony_simu)
+```
+
+Temporal Autocorrelation
+```{r}
+testTemporalAutocorrelation(f_fledg_colony_simu)
+```
+
+# Female and male fledglings per nest per year
+Based on the values for RRNest
+## GLMM of the number of fledglings per nest per raising type
+```{r}
+names(nest_numbers_fm)
+```
+
+## Data exploration
+```{r}
+# Plot the number of fledglings
+ggplot(data = nest_numbers_fm, mapping = aes(x = b_count_fledgling)) + 
+  geom_histogram()
+
+# Plot of the number of fledglings per raising type per year
+nest_numbers_fm %>% 
+  group_by(raising_type, breed_year) %>%
+  mutate(sum.fledg = sum(b_count_fledgling)) %>%
+  ggplot(mapping = aes(x = breed_year, y = sum.fledg)) + 
+  geom_line(aes(group = raising_type, color = raising_type))
+
+# Sum of the breeding events with reproduction per nest and per raising type
+table(nest_numbers_fm$raising_type)
+```
+
+## Analysis with temporarily added females as mothers
+### GLM
+```{r}
+null_model_fm_nest_raising_full <- glm(formula = b_count_fledgling ~ 1, 
+                                       data = nest_numbers_fm, 
+                                       family = "poisson")
+summary(null_model_fm_nest_raising_full)
+
+fm_nest_raising_full_glm <- glm(formula = b_count_fledgling ~ raising_type,
+                                data = nest_numbers_fm,
+                                family = "poisson")
+summary(fm_nest_raising_full_glm) # non significant
+```
+
+#### Plot
+```{r}
+#dredge(raising_mod)
+plot(allEffects(fm_nest_raising_full_glm), type='response')
+```
+
+### GLMM
+```{r}
+fm_nest_raising_full_glmm <- glmer(formula = b_count_fledgling ~ raising_type + (1|b_parent_f), 
+                                   data = nest_numbers_fm, 
+                                   family = "poisson")
+summary(fm_nest_raising_full_glmm) # not significant
+```
+
+#### Plot
+```{r}
+fm_nest_raising_full_predi <- ggpredict(fm_nest_raising_full_glmm, terms = "raising_type")
+fm_nest_raising_full_predi
+```
+
+
+```{r}
+plot(x = fm_nest_raising_full_predi, 
+     show.title = F, 
+     limits = c(0,6)) + 
+  labs(x = "Raising type",
+       y = "Number of fledglings per nest (m + f)", 
+       tags = "") +
+  theme_classic() + 
+  theme( 
+    axis.line = element_line(colour = "black"),
+    axis.text = element_text(size=14),
+    panel.grid.major = element_blank(),
+    panel.grid.minor = element_blank(),
+    panel.border = element_blank(),
+    panel.background = element_blank(), 
+    plot.margin = unit(c(7.5, 12.5, 5.5, 15.5), "points"),
+    axis.title.x = element_text(colour="black", size = 15),
+    axis.title.y = element_text(colour="black",size=15, vjust = 5))
+```
+
+#### Testing the models
+Testing with the DHARMa package.
+
+Prepare it
+```{r}
+fm_nest_raising_full_simu <- simulateResiduals(fittedModel = fm_nest_raising_full_glmm)
+plot(fm_nest_raising_full_simu)
+```
+
+Dispersion
+```{r}
+testDispersion(fm_nest_raising_full_simu)
+```
+
+Zero-inflation
+```{r}
+testZeroInflation(fm_nest_raising_full_simu)
+```
+
+Temporal Autocorrelation
+```{r}
+testTemporalAutocorrelation(fm_nest_raising_full_simu)
+```
+
+
+## Analysis without temporarily added females as mothers
+Here we consider only the raising types foster parent and biological parent
+
+```{r}
+nest_numbers_fm_bpfp <- nest_numbers_fm[nest_numbers_fm$raising_type != "added",]
+```
+
+
+### GLM
+```{r}
+null_model_fm_nest_raising <- glm(formula = b_count_fledgling ~ 1, 
+                                  data = nest_numbers_fm_bpfp, 
+                                  family = "poisson")
+summary(null_model_fm_nest_raising)
+
+fm_nest_raising_glm <- glm(formula = b_count_fledgling ~ raising_type,
+                           data = nest_numbers_fm_bpfp,
+                           family = "poisson")
+summary(fm_nest_raising_glm) # not significant
+```
+
+#### Plot
+```{r}
+#dredge(raising_mod)
+plot(allEffects(fm_nest_raising_glm), type='response')
+```
+
+### GLMM
+```{r}
+fm_nest_raising_glmm <- glmer(formula = b_count_fledgling ~ raising_type + (1|b_parent_f), 
+                                   data = nest_numbers_fm_bpfp, 
+                                   family = "poisson")
+summary(fm_nest_raising_glmm) # not significant
+```
+
+#### Plot
+```{r}
+fm_nest_raising_predi <- ggpredict(fm_nest_raising_glmm, terms = "raising_type")
+fm_nest_raising_predi
+```
+
+
+```{r}
+plot(x = fm_nest_raising_predi, 
+     show.title = F, 
+     limits = c(0,6)) + 
+  labs(x = "Raising type",
+       y = "Number of fledglings per nest (m + f)", 
+       tags = "") +
+  theme_classic() + 
+  theme( 
+    axis.line = element_line(colour = "black"),
+    axis.text = element_text(size=14),
+    panel.grid.major = element_blank(),
+    panel.grid.minor = element_blank(),
+    panel.border = element_blank(),
+    panel.background = element_blank(), 
+    plot.margin = unit(c(7.5, 12.5, 5.5, 15.5), "points"),
+    axis.title.x = element_text(colour="black", size = 15),
+    axis.title.y = element_text(colour="black",size=15, vjust = 5))
+```
+
+#### Testing the models
+Testing with the DHARMa package.
+
+Prepare it
+```{r}
+fm_nest_raising_simu <- simulateResiduals(fittedModel = fm_nest_raising_glmm)
+plot(fm_nest_raising_full_simu)
+```
+
+Dispersion
+```{r}
+testDispersion(fm_nest_raising_simu)
+```
+
+Zero-inflation
+```{r}
+testZeroInflation(fm_nest_raising_simu)
+```
+
+Temporal Autocorrelation
+```{r}
+testTemporalAutocorrelation(fm_nest_raising_simu)
+```
+
+
+# GLMM of the number of fledglings per nest per colony
+
+## Data exploration
+```{r}
+# Plot the number of fledglings
+ggplot(data = nest_numbers_fm, mapping = aes(x = b_count_fledgling)) + 
+  geom_histogram()
+
+# Plot of the number of fledglings per raising type per year
+nest_numbers_fm %>% 
+  group_by(b_breeding_colony, breed_year) %>%
+  mutate(sum.fledg = sum(b_count_fledgling)) %>%
+  ggplot(mapping = aes(x = breed_year, y = sum.fledg)) + 
+  geom_line(aes(group = b_breeding_colony, color = b_breeding_colony))
+
+# Sum of the breeding events with reproduction per nest and per raising type
+table(nest_numbers_fm$b_breeding_colony)
+```
+
+## GLM
+```{r}
+null_model_fm_nest_colony <- glm(formula = b_count_fledgling ~ 1, 
+                                 data = nest_numbers_fm, 
+                                 family = "poisson")
+summary(null_model_fm_nest_colony)
+
+fm_nest_colony_glm <- glm(formula = b_count_fledgling ~ b_breeding_colony,
+                          data = nest_numbers_fm,
+                          family = "poisson")
+summary(fm_nest_colony_glm) # non significant
+```
+
+### Plot
+```{r}
+#dredge(raising_mod)
+plot(allEffects(fm_nest_colony_glm), type='response')
+```
+
+## GLMM
+```{r}
+fm_nest_colony_glmm <- glmer(formula = b_count_fledgling ~ b_breeding_colony + (1|b_parent_f), 
+                             data = nest_numbers_fm, 
+                             family = "poisson")
+summary(fm_nest_colony_glmm) # not significant
+```
+
+### Plot
+```{r}
+fm_nest_colony_predi <- ggpredict(fm_nest_colony_glmm, terms = "b_breeding_colony")
+fm_nest_colony_predi
+```
+
+
+```{r}
+plot(x = fm_nest_colony_predi, 
+     show.title = F, 
+     limits = c(0,3)) + 
+  labs(x = "Breeding colony",
+       y = "Number of fledglings per nest (m + f)", 
+       tags = "") +
+  theme_classic() + 
+  theme( 
+    axis.line = element_line(colour = "black"),
+    axis.text = element_text(size=14),
+    panel.grid.major = element_blank(),
+    panel.grid.minor = element_blank(),
+    panel.border = element_blank(),
+    panel.background = element_blank(), 
+    plot.margin = unit(c(7.5, 12.5, 5.5, 15.5), "points"),
+    axis.title.x = element_text(colour="black", size = 15),
+    axis.title.y = element_text(colour="black",size=15, vjust = 5))
+```
+
+### Testing the models
+Testing with the DHARMa package.
+
+Prepare it
+```{r}
+fm_nest_colony_simu <- simulateResiduals(fittedModel = fm_nest_colony_glmm)
+plot(fm_nest_colony_simu)
+```
+
+Dispersion
+```{r}
+testDispersion(fm_nest_colony_simu)
+```
+
+Zero-inflation
+```{r}
+testZeroInflation(fm_nest_colony_simu)
+```
+
+Temporal Autocorrelation
+```{r}
+testTemporalAutocorrelation(fm_nest_colony_simu)
+```
+
+
+***
+
+<details><summary>Session Info</summary>
+
+```{r sessionInfo}
+## DO NOT REMOVE!
+## We store the settings of your computer and the current versions of the
+## packages used to allow for reproducibility
+Sys.time()
+#git2r::repository() ## uncomment if you are using GitHub
+sessionInfo()
+```
+
+</details>
+
