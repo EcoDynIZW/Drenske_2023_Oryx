@@ -27,17 +27,9 @@ In this script we created different plots for the description of the NBI populat
 # Setup
 
 ```{r packages}
-## for non-CRAN packages please keep install instruction
-## but commented so it is not run each time, e.g.
-# devtools::install_github("EcoDynIZW/template")
-
 ## libraries used in this script
-## please add ALL LIBRARIES NEEDED HERE
-## please remove libraries from the list that are not needed anymore 
-## at a later stage
 library("here")
 library("tidyverse")
-#library("knitr")
 library("viridisLite")
 ```
 
@@ -57,7 +49,7 @@ zero_line <- rep(0, 12)
 
 
 # Population size per year
-Plot the whole Population size and the number of individuals per sex, per raising type and per colony per year.
+Plot the whole Population size per year
 ```{r}
 # Calculate the number of living individuals per year
 popsize_NBI <- tibble(
@@ -160,32 +152,29 @@ Save the plot
 # 
 # dev.off()
 ```
+
 # Customized barplots
 ## Overall population
-Show the values for each category
-Build a matrix with them. The NAs between some values are there for some space between the categories 
+Show the values for each category and build a matrix with them. The NAs between some values are there for some space between the categories 
 
 ```{r}
+# Comparison between delivered individuals and all other individuals
+NBI_deliv <- NBI[NBI$mortality_cause == "delivered",] # 9 delivered individuals (delivered to a colony outside the project)
+NBI_proj <- NBI[NBI$mortality_cause != "delivered",] # 375 not delivered individuals
+
+# Comparison of the reached stages and the life status (alive or dead)
+table(NBI_proj$life_status, NBI_proj$reached_stage)
+
+table(NBI_deliv$life_status, NBI_deliv$reached_stage) # all alive at the time they were delivered 
+```
+
+```{r}
+# List the number of individuals for different characteristics
 table(NBI$reached_stage)
 table(NBI$sex)
 table(NBI$breeding_area)
 table(NBI$raising_type)
 table(NBI$mortality_cause)
-```
-
-```{r}
-NBI_deliv <- NBI[NBI$mortality_cause == "delivered",]
-NBI_proj <- NBI[NBI$mortality_cause != "delivered",]
-
-# Here we consider the status delivered
-table(NBI_proj$life_status, NBI_proj$reached_stage)
-# 123/232
-# 45/232
-# 33/232
-# 31/232
-
-table(NBI_deliv$reached_stage)
-
 ```
 
 ```{r}
@@ -244,6 +233,7 @@ Save the Plot
 # 
 # dev.off()
 ```
+
 Legend
 ```{r, fig.height=6, fig.width=4}
 par(mar = mar_small)
@@ -291,6 +281,7 @@ Save the Legend
 # 
 # dev.off()
 ```
+
 ## Alive female individuals
 ```{r}
 table(NBI$sex, NBI$project_status) # 74 alive females, 69 alive males = 143 alive individuals
@@ -353,6 +344,7 @@ Save the Plot
 # 
 # dev.off()
 ```
+
 Legend
 ```{r, fig.height=4, fig.width=4}
 par(mar = mar_small)
@@ -365,6 +357,7 @@ legend("center", legend = c("Stage","Juveniles","1 Year Old","2 Year Old","Adult
                 "white",viridis(3, begin = 0.65, end = 0.85)), border = NA, cex = 1)
 par(mar = mar_default)
 ```
+
 Save the legend
 ```{r}
 # png(filename = here("plots", "01_description", "Barplot_alive_f_legend.png"), res = 130) # width = 300, height = 400

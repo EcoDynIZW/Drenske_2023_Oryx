@@ -21,6 +21,7 @@ knitr::opts_chunk$set(echo = TRUE, warning = TRUE, message = TRUE,
 * **Study area:** Austria, Germany and Italy
 * **Data:** Life History data of the NBI
 
+In this script we prepare the data for analysis. We format columns, add new columns or change the order of the columns.
 
 # Setup
 ```{r packages}

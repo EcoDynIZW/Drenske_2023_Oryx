@@ -17,7 +17,7 @@ knitr::opts_chunk$set(echo = TRUE, warning = TRUE, message = TRUE,
                       retina = 1, fig.showtext = TRUE)
 ```
 
-* **Research question:** (Q1) How will the NBI population develop in the next 50 years and what will be the extinction risk, given that the colonies will be either managed or left to themselves? (Q2) Will the developments in the two already established colonies Burghausen & Kuchl be different? 
+* **Hypothesis:** We hypothesize that at the given stage the northern bald ibis population can survive without further management and release. We predict that observed demographic rates will ensure population growth and do not differ between the colonies 
 * **Study area:** Austria, Germany and Italy
 * **Data:** Life History data of the NBI
 
@@ -52,7 +52,7 @@ NBI_breeding_all <- readRDS(file = here("output", "data-proc", "NBI_breeding.rds
 ## The status has to be a number not a factor, otherwise the calculations are not correct
 NBI$life_status_num <- as.numeric(NBI$life_status)
 NBI$project_status_num <- as.numeric(NBI$project_status)
-# for the paper we will consider only the life status
+# for the paper we will consider only the **life status**
 ```
 
 # Estimating survival probabilities
@@ -74,11 +74,12 @@ Survival of the whole population, without further differences
 
 Survival object
 ```{r overall surv obj}
-# Surv creates a survival object with the follow-up time (days of life, dof) for right-censored data and the event (life status: dead or alive). The event has to be a numeric variable, otherwise the calculation is not correct
+# Surv() creates a survival object with the follow-up time (days of life, dof) for right-censored data and the event (life status: dead or alive). The event has to be a numeric variable, otherwise the calculation is not correct
 
 # Life status
 s_days <- Surv(time = NBI$dof, event = NBI$life_status_num)
-# Project status
+
+## Project status
 #s_days2 <- Surv(time = NBI$dof, event = NBI$project_status_num)
 ```
 
@@ -111,32 +112,41 @@ sum_cox_overall
 
 Survival plot
 ```{r overall surv plot, fig.height=7, fig.width=10}
-ggsurvplot(sfit_days, data = NBI, palette = "black", xlab = "Years", 
-           font.x = 35, font.tickslab = 34, font.y = 35, font.legend = 35,
-           risk.table = F, break.time.by = 365.25, xscale = 365.25, legend = "none",
-           ggtheme = theme_bw() + theme(panel.grid.major = element_blank(), panel.grid.minor = element_blank()))
-
-# ggsurvplot(sfit_days2, data = NBI, palette = "black", xlab = "Years", 
-#            font.x = 18, font.tickslab = 18, font.y = 18, font.legend = 18,
-#            risk.table = F, break.time.by = 365.25, xscale = 365.25, legend = "none",
-#            ggtheme = theme_bw() + theme(panel.grid.major = element_blank(), panel.grid.minor = element_blank()))
+ggsurvplot(sfit_days, 
+           data = NBI, 
+           palette = "black", 
+           xlab = "Years", 
+           font.x = 35, 
+           font.tickslab = 34, 
+           font.y = 35, 
+           font.legend = 35,
+           risk.table = F, 
+           break.time.by = 365.25, 
+           xscale = 365.25, 
+           legend = "none",
+           ggtheme = theme_bw() + theme(panel.grid.major = element_blank(), 
+                                        panel.grid.minor = element_blank()))
 ```
 
 
 Save the Plot
 ```{r overall save plot}
-# png(filename = here("plots", "02_survival", "survplot_life_overall.png"), width = 1200, height = 772)
-# ggsurvplot(sfit_days, data = NBI, palette = "black", xlab = "Years",
-#            font.x = 35, font.tickslab = 34, font.y = 35,font.legend = 35,
-#            risk.table = F, break.time.by = 365.25, xscale = 365.25, legend = "none",
-#            ggtheme = theme_bw() + theme(panel.grid.major = element_blank(), panel.grid.minor = element_blank()))
-# dev.off()
-# 
-# png(filename = here("plots", "02_survival", "survplot_project_overall.png"), width = 1200, height = 772)
-# ggsurvplot(sfit_days2, data = NBI, palette = "black", xlab = "Years",
-#            font.x = 18, font.tickslab = 18, font.y = 18,font.legend = 18,
-#            risk.table = F, break.time.by = 365.25, xscale = 365.25, legend = "none",
-#            ggtheme = theme_bw() + theme(panel.grid.major = element_blank(), panel.grid.minor = element_blank()))
+# png(filename = here("plots", "02_survival", "survplot_life_overall.png"), 
+#     width = 1200, height = 772)
+# ggsurvplot(sfit_days, 
+#            data = NBI, 
+#            palette = "black", 
+#            xlab = "Years", 
+#            font.x = 35, 
+#            font.tickslab = 34, 
+#            font.y = 35, 
+#            font.legend = 35,
+#            risk.table = F, 
+#            break.time.by = 365.25, 
+#            xscale = 365.25, 
+#            legend = "none",
+#            ggtheme = theme_bw() + theme(panel.grid.major = element_blank(), 
+#                                         panel.grid.minor = element_blank()))
 # dev.off()
 ```
 
@@ -165,25 +175,18 @@ Then create a start and end time per stage for the individuals.
 ```{r stage prep obj}
 # life status
 ## TimeStart is 0 for all rows, so that all stages start at the same time
+## With this, all stages start at the same time. Otherwise, we would definitely discover significant differences, as the stages already start at different times by themselves, as one stage follows the other.
 NBI_timesplit$TimeStart <- 0
-NBI_timesplit$TimeStop <- NBI_timesplit$tstop
+## TimeStop is the difference of tstop - tstart. We take into account that the start time for all stages is 0 and not 365, 730 or 1095.  
+NBI_timesplit$TimeStop <- NBI_timesplit$tstop - NBI_timesplit$tstart
 NBI_timesplit$STAGE_F <- as.factor(NBI_timesplit$STAGE)
 
-## for another type of comparison. The stages overlap at the start
-NBI_timesplit$TimeStart2 <- 0
-## TimeStop2 is the difference of tstop - tstart. With this we take into account that the start time is 0 for all lines
-NBI_timesplit$TimeStop2 <- NBI_timesplit$tstop - NBI_timesplit$tstart
 
 # # project status
-# ## TimeStart is 0 for all rows, so that all stages start at the same time
-# NBI_timesplit2$TimeStart <- 0
-# NBI_timesplit2$TimeStop <- NBI_timesplit2$tstop
 # NBI_timesplit2$STAGE_F <- as.factor(NBI_timesplit2$STAGE)
-# 
-# ## for another type of comparison. The stages overlap at the start
-# NBI_timesplit2$TimeStart2 <- 0
-# ## TimeStop2 is the difference of tstop - tstart. With this we take into account that the start time is 0 for all lines
-# NBI_timesplit2$TimeStop2 <- NBI_timesplit2$tstop - NBI_timesplit2$tstart
+# NBI_timesplit2$TimeStart <- 0
+# ## TimeStop is the difference of tstop - tstart. With this we take into account that the start time is 0 for all lines
+# NBI_timesplit2$TimeStop <- NBI_timesplit2$tstop - NBI_timesplit2$tstart
 ```
 
 Survival curve
@@ -191,8 +194,8 @@ We use the curves where the survival probabilities overlap right from the start,
 
 ```{r stage surv curve life}
 # life status
-sfit_stage <- survfit(formula = Surv(time = NBI_timesplit$TimeStart2,
-                                      time2 = NBI_timesplit$TimeStop2, 
+sfit_stage <- survfit(formula = Surv(time = NBI_timesplit$TimeStart,
+                                      time2 = NBI_timesplit$TimeStop, 
                                       event = NBI_timesplit$event) ~ NBI_timesplit$STAGE_F, 
                        data = NBI_timesplit)
 sum_sfit_stage <- summary(sfit_stage, times = c(0, 365, 730, 1095, 1460, 1825, 2190, 2555, 2920, 3285))
@@ -202,8 +205,8 @@ sum_sfit_stage
 
 ```{r surv curve proj}
 # # project status
-# sfit_stage2 <- survfit(formula = Surv(time = NBI_timesplit2$TimeStart2,
-#                                       time2 = NBI_timesplit2$TimeStop2, 
+# sfit_stage2 <- survfit(formula = Surv(time = NBI_timesplit2$TimeStart,
+#                                       time2 = NBI_timesplit2$TimeStop, 
 #                                       event = NBI_timesplit2$event) ~ NBI_timesplit2$STAGE_F, 
 #                        data = NBI_timesplit2)
 # sum_sfit_stage2 <- summary(sfit_stage2, times = c(0, 365, 730, 1095, 1460, 1825, 2190, 2555, 2920, 3285))
@@ -247,7 +250,7 @@ Cox proportional hazards model
 ```{r stage cox ph}
 # Life status
 ## Use the values where the start times and end times overlap. We do not want to take time differences into account only the survival
-cox_stage <- coxph(Surv(NBI_timesplit$TimeStart2, NBI_timesplit$TimeStop2, NBI_timesplit$event) ~ NBI_timesplit$STAGE_F, data = NBI_timesplit)
+cox_stage <- coxph(Surv(NBI_timesplit$TimeStart, NBI_timesplit$TimeStop, NBI_timesplit$event) ~ NBI_timesplit$STAGE_F, data = NBI_timesplit)
 sum_cox_stage <- summary(cox_stage)
 sum_cox_stage
 
@@ -318,18 +321,12 @@ NBI_timesplit_sex <- survSplit(formula = Surv(NBI$dof, NBI$life_status_num) ~ .,
                                episode = "MATURITY")
 ```
 
-
 ```{r}
 # life status
-## TimeStart is 0 for all rows, so that all stages start at the same time
+## TimeStart is 0 for all rows, so that all stages start at the same time. (Explanation see line 177 ff)
 NBI_timesplit_sex$TimeStart <- 0
-NBI_timesplit_sex$TimeStop <- NBI_timesplit_sex$tstop
+NBI_timesplit_sex$TimeStop <- NBI_timesplit_sex$tstop - NBI_timesplit_sex$tstart
 NBI_timesplit_sex$MATURITY_F <- as.factor(NBI_timesplit_sex$MATURITY)
-
-## for another type of comparison. The stages overlap at the start
-NBI_timesplit_sex$TimeStart2 <- 0
-## TimeStop2 is the difference of tstop - tstart. With this we take into account that the start time is 0 for all lines
-NBI_timesplit_sex$TimeStop2 <- NBI_timesplit_sex$tstop - NBI_timesplit_sex$tstart
 ```
 
 Survival curve
@@ -337,8 +334,8 @@ We use the curves where the survival probabilities overlap right from the start,
 
 ```{r stage surv curve life}
 # life status
-sfit_matu <- survfit(formula = Surv(time = NBI_timesplit_sex$TimeStart2,
-                                      time2 = NBI_timesplit_sex$TimeStop2, 
+sfit_matu <- survfit(formula = Surv(time = NBI_timesplit_sex$TimeStart,
+                                      time2 = NBI_timesplit_sex$TimeStop, 
                                       event = NBI_timesplit_sex$event) ~ NBI_timesplit_sex$MATURITY_F, 
                        data = NBI_timesplit_sex)
 
@@ -358,44 +355,32 @@ round(sum_sfit_matu$std.err[2]*sqrt(sum_sfit_matu$n.risk[2]), digits = 2)
 
 
 ## 3. Colonies
-We will only use three colonies. The colony in Rosegg consists only of 22 NBI and was funded 2 years ago (2018). And we do not want to calculate here the survival for individuals that do not belong to a colony yet. 
+We will only use two colonies. The colony in Rosegg consists only of 22 NBI and was funded 2 years ago (2018). And we do not want to calculate here the survival for individuals that do not belong to a colony yet. 
 ```{r col sub}
-NBI_3col <- subset(NBI, NBI$breeding_area == "Burghausen" | NBI$breeding_area == "Kuchl")
-NBI_3col <- droplevels(NBI_3col)
+NBI_2col <- subset(NBI, NBI$breeding_area == "Burghausen" | NBI$breeding_area == "Kuchl")
+NBI_2col <- droplevels(NBI_2col)
 ```
 
 Survival object
 ```{r col surv obj}
 # Life status
-s_days_3col <- Surv(time = NBI_3col$dof, event = NBI_3col$life_status_num)
-
-# # Project status
-# s_days_3col2 <- Surv(time = NBI_3col$dof, event = NBI_3col$project_status_num)
+s_days_2col <- Surv(time = NBI_2col$dof, event = NBI_2col$life_status_num)
 ```
 
 Survival curve
 ```{r col surv curve}
 # Life status
-sfit_3col <- survfit(s_days_3col ~ NBI_3col$breeding_area, data = NBI_3col)
-sfit_3col
-
-# # Project status
-# sfit_3col2 <- survfit(s_days_3col2 ~ NBI_3col$breeding_area, data = NBI_3col)
-# sfit_3col2
+sfit_2col <- survfit(s_days_2col ~ NBI_2col$breeding_area, data = NBI_2col)
+sfit_2col
 ```
 
 
 Cox proportional hazards model
 ```{r col cox ph}
 # Life status
-cox_3col <- coxph(Surv(time = NBI_3col$dof, event = NBI_3col$life_status_num) ~ NBI_3col$breeding_area, data = NBI_3col)
-sum_cox_col <- summary(cox_3col)
+cox_2col <- coxph(Surv(time = NBI_2col$dof, event = NBI_2col$life_status_num) ~ NBI_2col$breeding_area, data = NBI_2col)
+sum_cox_col <- summary(cox_2col)
 sum_cox_col
-
-# # Project status
-# cox_3col2 <- coxph(Surv(time = NBI_3col$dof, event = NBI_3col$project_status_num) ~ NBI_3col$breeding_area, data = NBI_3col)
-# sum_cox_col2 <- summary(cox_3col2)
-# sum_cox_col2
 ```
 
 
@@ -403,20 +388,12 @@ sum_cox_col
 Survival plot
 ```{r col surv plot}
 # Life status
-ggsurvplot(sfit_3col, data = NBI_3col, conf.int = T, risk.table = F, xlab = "Years", xlim = c(0,8*365.25),
+ggsurvplot(sfit_2col, data = NBI_3col, conf.int = T, risk.table = F, xlab = "Years", xlim = c(0,8*365.25),
            font.x = 23, font.tickslab = 22, font.y = 23,font.legend = 22,
            ggtheme = theme_bw()+ theme(panel.grid.major = element_blank(), panel.grid.minor = element_blank()),
            break.time.by = 365.25, xscale = 365.25, pval = 0.2, pval.coord = c(x = 6.95*365.25, y = 0.85), pval.size = 7,
            legend = c(0.9,0.91), legend.title = "Colony", legend.labs = c("Burghausen", "Kuchl"), 
            palette = inferno(5,begin =0.65,  end = 0.95, direction = -1))
-
-# # Project status
-# ggsurvplot(sfit_3col2, data = NBI_3col, conf.int = T, risk.table = F, xlab = "Years", xlim = c(0,8*365.25),
-#            font.x = 23, font.tickslab = 22, font.y = 23,font.legend = 22,
-#            ggtheme = theme_bw()+ theme(panel.grid.major = element_blank(), panel.grid.minor = element_blank()),
-#            break.time.by = 365.25, xscale = 365.25, pval = T, pval.coord = c(x = 6.95*365.25, y = 0.85), pval.size = 7,
-#            legend = c(0.9,0.91), legend.title = "Colony", legend.labs = c("Burghausen", "Kuchl", "Überlingen"), 
-#            palette = inferno(5,begin =0.65,  end = 0.95, direction = -1))
 ```
 
 Save the Plot
@@ -428,16 +405,6 @@ Save the Plot
 #            ggtheme = theme_bw()+ theme(panel.grid.major = element_blank(), panel.grid.minor = element_blank()),
 #            break.time.by = 365.25, xscale = 365.25, pval = 0.2, pval.coord = c(x = 6.55*365.25, y = 0.80), pval.size = 12,
 #            legend = c(0.89,0.90), legend.title = "Colony", legend.labs = c("Burghausen", "Kuchl"),
-#            palette = inferno(5,begin =0.65,  end = 0.95, direction = -1))
-# dev.off()
-# 
-# # Project status
-# png(filename = here("plots","02_survival", "survplot_project_colonies.png"), width = 1200, height = 772)
-# ggsurvplot(sfit_3col2, data = NBI_3col, conf.int = T, risk.table = F, xlab = "Years", xlim = c(0,8*365.25),
-#            font.x = 23, font.tickslab = 22, font.y = 23,font.legend = 22,
-#            ggtheme = theme_bw()+ theme(panel.grid.major = element_blank(), panel.grid.minor = element_blank()),
-#            break.time.by = 365.25, xscale = 365.25, pval = 0.2, pval.coord = c(x = 6.95*365.25, y = 0.85), pval.size = 7,
-#            legend = c(0.9,0.91), legend.title = "Colony", legend.labs = c("Burghausen", "Kuchl", "Überlingen"), 
 #            palette = inferno(5,begin =0.65,  end = 0.95, direction = -1))
 # dev.off()
 ```
@@ -595,13 +562,6 @@ sd_s1_K
 sd_s2_K
 sd_s3_K
 sd_s4_K
-
-## Überlingen
-# sd_s1_U <- round(sum_sfit_sc$std.err[6]*sqrt(sum_sfit_sc$n.risk[6]), digits = 2)
-# sd_s2_U <- round(sum_sfit_sc$std.err[12]*sqrt(sum_sfit_sc$n.risk[12]), digits = 2)
-# 
-# sd_s1_U
-# sd_s2_U
 ```
 
 
@@ -989,8 +949,7 @@ dev.off()
 ```
 
 
-# Calculate survival improvements 
-## Life status
+# Calculate survival improvements of values for life status
 Build a Vector for the Baseline survival
 ```{r setup baseline life}
 survival_Baseline <- round(c(
@@ -1030,48 +989,6 @@ Calculate the mortality  for NetLogo
 ```{r baseline mort table life}
 mortality_life <- 1-survival_life
 mortality_life
-```
-
-## Project status
-Build a Vector for the Baseline survival
-```{r setup baseline proj}
-# survival_Baseline <- round(c(
-#                               sum_sfit_stage2$surv[2], # Juveniles
-#                               sum_sfit_stage2$surv[4], # 1-Year-old NBI
-#                               sum_sfit_stage2$surv[6], # 2-Year-old NBI
-#                               s4), digits = 2)         # Adults, calculated above
-# survival_Baseline
-```
-
-Calculate the improvements of the survival
-```{r calc impro proj}
-# # 10%
-# ## survival probability + (survival probability / 10)
-# survival_10 <- round(survival_Baseline + (survival_Baseline / 10), digits = 2)
-# survival_10
-# 
-# # 25%
-# ## survival probability + (survival probability / 4)
-# survival_25 <- round(survival_Baseline + (survival_Baseline / 4), digits = 2)
-# survival_25
-```
-
-Set up a table for the survival probabilities
-```{r baseline surv table proj}
-# survival_proj <- data.frame(s1 = NA, s2 = NA, s3=NA, s4=NA)
-# survival_proj[1,1:4] <- c(survival_Baseline)
-# survival_proj[2,1:4] <- c(survival_10)  
-# survival_proj[3,1:4] <- c(survival_25)
-# 
-# colnames(survival_proj) <- c("s1","s2","s3","s4")
-# row.names(survival_proj) <- c("Baseline","Percent_10","Percent_25")
-# survival_proj
-```
-
-Calculate the mortality  for NetLogo
-```{r baseline mort table proj}
-# mortality_proj <- 1-survival_proj
-# mortality_proj
 ```
 
 
@@ -1246,8 +1163,6 @@ nest_numbers_fm$raising_type <- replace_na(data = nest_numbers_fm$raising_type, 
 # remove unneeded factor levels (here supplementation)
 nest_numbers_fm$raising_type <- droplevels(nest_numbers_fm$raising_type)
 levels(nest_numbers_fm$raising_type)
-
-# Correct a typo in the original data
 ```
 
 
@@ -1329,6 +1244,7 @@ sd(NBI_breeding_year$surv_egg_fledg)
 sd(NBI_breeding_year$surv_chick_fledg)
 
 ```
+
 ## Per raising type
 ```{r}
 N_nests_raising <- nest_numbers_fm %>% count(raising_type, breed_year)
@@ -1367,15 +1283,6 @@ round(sd(c(NBI_breeding_raising$fledg_nest[10:15])), digits = 2) # Kuchl +- 1.63
 # saveRDS(object = nest_numbers_fm, file = here::here("output", "data-proc", "nest_numbers_fm.rds"))
 # saveRDS(object = NBI_breeding_year, file = here::here("output", "data-proc", "NBI_breeding_year.rds"))
 ```
-
-
-# Questions/To DO
-
-Die summary für die survival curves funktioniert jetzt anders? Ich hoffe alles ist so richtig
-
-Alles auskommentieren
-
-
 
 ***
 
