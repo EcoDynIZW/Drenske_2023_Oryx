@@ -28,3 +28,6 @@
 # Folder
 plots/
 docs/
+
+# large DEM file
+dem_3035_crop.tif
