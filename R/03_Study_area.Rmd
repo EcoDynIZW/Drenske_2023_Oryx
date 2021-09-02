@@ -22,28 +22,290 @@ knitr::opts_chunk$set(echo = TRUE, warning = TRUE, message = TRUE,
 * **Data:** 
 
 
-# Setup
+```{r prep}
+## packages
+library(tidyverse)
+library(raster)
+library(sf)
+library(RStoolbox)
+library(lwgeom)
+library(rnaturalearth)
+library(rworldmap)
+library(rmapshaper)
+library(shadowtext)
+library(patchwork)
+library(pdftools)
+library(systemfonts)
 
-```{r packages}
-## for non-CRAN packages please keep install instruction
-## but commented so it is not run each time, e.g.
-# devtools::install_github("EcoDynIZW/template")
-
-## libraries used in this script
-## please add ALL LIBRARIES NEEDED HERE
-## please remove libraries from the list that are not needed anymore 
-## at a later stage
-library()
+theme_set(theme_minimal(base_family = "Roboto"))
+theme_update(
+  axis.ticks = element_line(color = "grey10"),
+  axis.text.x = element_text(family = "Roboto Mono",
+                             size = 16, 
+                             margin = margin(t = 3)),
+  axis.text.y = element_text(family = "Roboto Mono",
+                             size = 16, 
+                             margin = margin(r = 3)),
+  panel.border = element_rect(color = "grey10", fill = NA, size = 1), 
+  panel.background = element_rect(color = "white", fill = "white"),
+  plot.margin = margin(20, 20, 20, 20),
+  plot.tag = element_text(size = 20, face = "bold"),
+  legend.position = "top",
+  legend.text = element_text(family = "Roboto",
+                             face = "bold",
+                             size = 18,
+                             margin = margin(r = 15, b = 0))
+)
 ```
 
 
-# Data
+## Data
 
 ```{r data}
-#df <- readr::read_csv("your-data.csv")
-#sf <- sf::read_sf("your-geo-data.shp")
+## elevation data
+path_dem <- here::here("output", "geo-proc", "df_dem_alps.Rds")
+path_hills <- here::here("output", "geo-proc", "df_hills.Rds")
+path_slope <- here::here("output", "geo-proc", "df_slope.Rds")
+
+if(!file.exists(path_hills)) {
+  dem <- raster(here::here("data-raw", "geo-raw", "dem_3035_crop.tif"))
+  dem_alps <- aggregate(dem, fact = 4)
+  
+  saveRDS(dem_alps, path_dem)
+} else {
+  dem_alps <- readRDS(path_dem)
+}
+
+## breeding and wintering locations
+locations <- 
+  tibble(
+    location = c("B", "U", "K", "R", "L"),
+    type = c("Breeding ground", "Breeding ground", "Breeding ground", "Breeding ground", "Wintering ground"),
+    label = c("Burghausen\n(Germany)", "Überlingen\n(Germany)", 
+              "Kuchl\n(Austria)", "Rosegg\n(Austria)", "Laguna di\nOrbetello\n(Italy)"),
+    side = c("r", "l", "r", "r", "r"),
+    x = c(4531605, 4258768, 4557635, 4629096, 4419572),
+    y = c(2788488, 2739526, 2728565, 2616771, 2148807),
+    from_x = c(4531605, 4258768, 4557635, 4629096, NA_real_),
+    to_x = c(4419572, 4419572, 4419572, 4419572, NA_real_),
+    from_y = c(2788488, 2739526, 2739526, 2616771, NA_real_),
+    to_y = c(2148807, 2148807, 2148807, 2148807, NA_real_)
+  ) 
 ```
 
+
+## Overview Map
+
+```{r overview-map, fig.width = 8.5, fig.height = 10}
+sf_world <- 
+  st_as_sf(rworldmap::getMap(resolution = "low")) %>% 
+  st_transform(crs = st_crs(dem_alps)) %>% 
+  st_buffer(dist = 0) %>% 
+  dplyr::select(ISO_A2, SOVEREIGNT, LON, continent) %>% 
+  mutate(area = st_area(.))
+
+overview <- 
+  ggplot(sf_world) +
+    geom_sf(fill = "grey60",
+            color = "grey80",
+            lwd = 0.3) +
+    geom_rect(xmin = 4000600, xmax = 4840000,
+              ymin = 2000600, ymax = 2990000,
+              color = "#212121",
+              fill = NA) +
+    geom_sf_text(data = sf_world %>% 
+                   filter(ISO_A2 %in% c("DE", "IT", "AT")) %>% 
+                   group_by(ISO_A2) %>% slice(1),
+                 aes(label = ISO_A2),
+                 family = "Open Sans",
+                 color = "white",
+                 fontface = "bold",
+                 size = 5.7,
+                 nudge_x = 20000) +
+    geom_point(data = locations,
+               aes(x, y),
+               shape = 21,
+               color = "#212121",
+               fill = "white",
+               size = 3,
+               stroke = .8) +
+    coord_sf(xlim = c(2000000, 6600000), 
+             ylim = c(1000000, 5600000)) +
+    scale_x_continuous(expand = c(0, 0), breaks = seq(-10, 30, by = 10)) +
+    theme(panel.ontop = F,
+          panel.grid.major = element_line(color = "grey85", linetype = "dashed", size = .4)) +
+    labs(x = NULL, y = NULL, tag = "A.")
+
+overview
+
+## save map
+ggsave(here::here("plots", "NBIPVA_A_europe_countries.pdf"),
+       width = 8.95, height = 10, device = cairo_pdf)
+
+pdf_convert(pdf = here::here("plots", "NBIPVA_A_europe_countries.pdf"), 
+            format = "png", dpi = 750)
+```
+
+
+## Hillshade map 
+
+```{r hillshade-map, fig.width = 8.5, fig.height = 10}
+dem_alps@data@values <- dem_alps@data@values * 10
+
+if(!file.exists(path_hills)) {
+  ## hillshade and slopeshade
+  slope <- terrain(dem_alps, opt = "slope", unit = "radians")
+  aspect <- terrain(dem_alps, opt = "aspect", unit = "radians")
+  hill <- hillShade(slope, aspect, 40, 270)
+  
+  ## ggplot makes me turn the raster into points
+  df_hills <- rasterToPoints(hill)
+  df_hills <- data.frame(df_hills)
+  colnames(df_hills) <- c("lon", "lat", "hills")
+  
+  ## the key to a pretty map is merging the slope shade with the hillshade
+  df_slope <- rasterToPoints(slope)
+  df_slope <-  data.frame(df_slope)
+  colnames(df_slope) <- c("lon", "lat", "slope")
+  df_slope$slope <- 1 - df_slope$slope ## invert the scale so that more slope is darker
+  
+  saveRDS(df_hills, path_hills)
+  saveRDS(df_slope, path_slope)
+} else {
+  df_hills <- readRDS(path_hills)
+  df_slope <- readRDS(path_slope)
+}
+
+## naturalearth data
+oceans_raw <- 
+  rnaturalearth::ne_download(scale = 10, 
+                             category = "physical", 
+                             type = "ocean",
+                             returnclass = "sf")
+
+bbox <- as(extent(3, 17, 38, 51), 'SpatialPolygons')
+crs(bbox) <- crs(oceans_raw)
+
+oceans <-
+  oceans_raw %>% 
+  st_transform(crs = st_crs(bbox)) %>% 
+  st_make_valid() %>% 
+  st_crop(., bbox) %>% 
+  ## transformation leads to inveresed oceans - fix it with ms_erase
+  rmapshaper::ms_erase(st_as_sf(bbox), .) %>%
+  st_transform(crs = st_crs(dem_alps))
+
+lakes <- 
+  rnaturalearth::ne_download(scale = 10, 
+                             category = "physical", 
+                             type = "lakes",
+                             returnclass = "sf") %>% 
+  st_transform(crs = st_crs(dem_alps)) 
+
+## map
+alps <- 
+  ggplot(df_hills) +
+    geom_raster(data = df_hills, aes(lon, lat, fill = hills, group = 1)) +
+    geom_raster(data = df_slope, aes(lon, lat, fill = slope, group = 2), alpha = .6) +
+    geom_sf(data = oceans,
+            fill = "#627696",
+            color = "#627696") +
+    geom_sf(data = lakes,
+            linetype = "dashed",
+            fill = "#627696",
+            color = "#627696") +
+    # geom_curve(data = filter(locations, location %in% c("B", "K", "R")),
+    #            aes(x = from_x, xend = to_x,
+    #                y = from_y, yend = to_y),
+    #            curvature = .12,
+    #            size = 1.8,
+    #            color = "#fefefe") +
+    # geom_curve(data = filter(locations, location == "U"),
+    #            aes(x = from_x, xend = to_x,
+    #                y = from_y, yend = to_y),
+    #            curvature = -.12,
+    #            size = 1.8,
+    #            color = "#fefefe") +
+    geom_curve(data = filter(locations, location %in% c("B", "K", "R")),
+               aes(x = from_x, xend = to_x,
+                   y = from_y, yend = to_y),
+               curvature = .12,
+               size = .8,
+               color = "#212121") +
+    geom_curve(data = filter(locations, location == "U"),
+               aes(x = from_x, xend = to_x,
+                   y = from_y, yend = to_y),
+               curvature = -.12,
+               size = .8,
+               color = "#212121") +
+    ## outer ring
+    geom_point(data = locations,
+               aes(x, y,
+                   color = type),
+               shape = 21,
+               fill = "#fefefe",
+               size = 7,
+               stroke = .8) +
+    ## inner point
+    geom_point(data = locations,
+               aes(x, y,
+                   color = type),
+               size = 3) +
+    ## location labels
+    geom_shadowtext(data = filter(locations, side == "r"),
+                    aes(x, y, label = label),
+                    nudge_x = 20000,
+                    size = 4.4,
+                    color = "#fefefe",
+                    family = "Roboto",
+                    fontface = "bold",
+                    lineheight = .8,
+                    hjust = 0,
+                    bg.color = "#212121") +
+    geom_shadowtext(data = filter(locations, side == "l"),
+                    aes(x, y, label = label),
+                    nudge_x = -20000,
+                    size = 4.4,
+                    color = "#fefefe",
+                    family = "Roboto",
+                    fontface = "bold",
+                    lineheight = .8,
+                    hjust = 1,
+                    bg.color = "#212121") +
+    scale_color_manual(values = c("#d10173", "#21bffe"),
+                       name = "") +
+    rcartocolor::scale_fill_carto_c(palette = "ag_GrnYl", direction = -1, guide = "none") +
+    #rcartocolor::scale_fill_carto_c(palette = "Fall", direction = -1, guide = "none") +
+    scale_x_continuous(expand = c(0, 0), limits = c(4000600, 4840000)) +
+    scale_y_continuous(expand = c(0, 0), limits = c(2000600, 2990000)) +
+    guides(color = guide_legend(title.position = "left", 
+                                title.hjust = 0.5, 
+                                nrow = 1,
+                                label.position = "right")) +
+    labs(x = NULL, y = NULL, tag = "B.")
+
+alps
+
+## save map
+ggsave(here::here("plots", "NBIPVA_B_alps_GrnYl.pdf"),
+       width = 8.5, height = 10, device = cairo_pdf)
+
+pdf_convert(pdf = here::here("plots", "NBIPVA_B_alps_GrnYl.pdf"), 
+            format = "png", dpi = 750)
+```
+
+```{r panel, fig.width = 17, fig.height = 10}
+p <- overview + alps
+
+p
+
+## save panel
+ggsave(here::here("plots", "NBIPVA_panel_GrnYl.pdf"),
+       width = 17, height = 10, device = cairo_pdf)
+
+pdf_convert(pdf = here::here("plots", "NBIPVA_panel_GrnYl.pdf"), 
+            format = "png", dpi = 750)
+```
 
 ***
 
