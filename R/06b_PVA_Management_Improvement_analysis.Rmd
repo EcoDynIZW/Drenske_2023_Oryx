@@ -17,7 +17,7 @@ knitr::opts_chunk$set(echo = TRUE, warning = TRUE, message = TRUE,
                       retina = 1, fig.showtext = TRUE)
 ```
 
-* **Research question:** (Q1) How will the NBI population develop in the next 50 years and what will be the extinction risk, given that the colonies will be either managed or left to themselves? (Q2) Will the developments in the two already established colonies Burghausen & Kuchl be different? 
+* **Hypothesis:** We hypothesize that at the given stage the northern bald ibis population can survive without further management and release. We predict that observed demographic rates will ensure population growth and do not differ between the colonies 
 * **Study area:** Austria, Germany and Italy
 * **Data:** Results of the first NetLogo Model
 
@@ -42,9 +42,9 @@ library("magrittr")
 # Data
 
 ```{r data}
-df_Basic <- readRDS(file = here("output", "data-proc", "NetLogo-proc", "df_Basic.rds"))
+df_Basic <- readRDS(file = here("output", "data-proc", "model-proc", "df_Basic.rds"))
 
-df_Basic_100 <- readRDS(file = here("output", "data-proc", "NetLogo-proc", "df_Baseline_100.rds"))
+df_Basic_100 <- readRDS(file = here("output", "data-proc", "model-proc", "df_Baseline_100.rds"))
 ```
 
 
@@ -154,7 +154,7 @@ df_Basic <- df_Basic %>%  group_by(Run) %>% mutate(Lambda_sto = Quot + 1)
 
 ```{r}
 range(df_Basic$Lambda_sto, na.rm = T) # 0 2
-df_Basic <- df_Basic[, -c(35,36)] # remove the first columns for the Lambda calculation
+df_Basic <- df_Basic[, -c(25,26)] # remove the first columns (Diff, Quot) for the Lambda calculation
 ```
 
 
@@ -338,7 +338,7 @@ df_scen$Scenario_name <- c("Baseline","10RR", "25RR","100RR",
 
 delete & reorder columns
 ```{r}
-df_scen <- df_scen[,-c(2,3,25:32)] # Run, Year, Catastrophe settings (not used yet), settings for the starting population
+df_scen <- df_scen[,-c(2,3,15:22)] # Run, Year, stochastic event settings (not used yet), settings for the starting population
 df_scen <- droplevels(df_scen)
 
 # Which columns are still there?
@@ -349,15 +349,14 @@ Reorder the columns
 ```{r}
 df_scen %<>%
   select(Scenario_name,Scenario, Lambda_sto,SD_Lambda,Extinct,
-         IndAll,IndB,IndK,IndUb,IndFP,IndP,                
-         IndBFP,IndBP,IndKFP,IndKP,IndUbFP,IndUbP,
+         IndAll,IndP,                
          IndJuv,IndSub1,IndSub2,IndAdu,         
          Mortality_Juveniles,Mortality_Subadults1,Mortality_Subadults2,Mortality_Adults,Repro)
 ```
 
 ## Save data
 ```{r}
-#saveRDS(object = df_scen, file = here("output", "data-proc", "NetLogo-proc", "df_scen.rds"))
+#saveRDS(object = df_scen, file = here("output", "data-proc", "model-proc", "df_scen.rds"))
 ```
 
 
@@ -409,8 +408,8 @@ table(df_mean$Year)
 
 ### Save data
 ```{r}
-# saveRDS(object = df_mean, file = here("output", "data-proc", "NetLogo-proc", "df_mean.rds"))
-# saveRDS(object = df_Basic_scen, file = here("output", "data-proc", "NetLogo-proc", "df_Basic_scen.rds"))
+# saveRDS(object = df_mean, file = here("output", "data-proc", "model-proc", "df_mean.rds"))
+# saveRDS(object = df_Basic_scen, file = here("output", "data-proc", "model-proc", "df_Basic_scen.rds"))
 ```
 
 

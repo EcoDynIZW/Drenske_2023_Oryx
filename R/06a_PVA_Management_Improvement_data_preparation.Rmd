@@ -17,7 +17,7 @@ knitr::opts_chunk$set(echo = TRUE, warning = TRUE, message = TRUE,
                       retina = 1, fig.showtext = TRUE)
 ```
 
-* **Research question:** (Q1) How will the NBI population develop in the next 50 years and what will be the extinction risk, given that the colonies will be either managed or left to themselves? (Q2) Will the developments in the two already established colonies Burghausen & Kuchl be different? 
+* **Hypothesis:** We hypothesize that at the given stage the northern bald ibis population can survive without further management and release. We predict that observed demographic rates will ensure population growth and do not differ between the colonies 
 * **Study area:** Austria, Germany and Italy
 * **Data:** Results of the first NetLogo Model
 
@@ -50,12 +50,12 @@ df_Baseline_100 is a model where the running time was for 100 years not 50 years
 ```{r data}
 # Baseline without SD and improvements of survival and reproduction
 df_Basic <- 
-  df_Basic_raw <- fread(file = here("output", "NetLogo_raw", "NBI_Baseline_and_Improvements.csv"),
+  df_Basic_raw <- fread(file = here("data-raw", "model-raw", "NBI_Baseline_and_Improvements.csv"),
                         skip = 6)
 
 # Baseline with SD
 df_Baseline_SD <- 
-  df_Baseline_SD_raw <- fread(file = here("output", "NetLogo_raw", "NBI_Baseline_SD.csv"),
+  df_Baseline_SD_raw <- fread(file = here("data-raw", "model-raw", "NBI_Baseline_SD.csv"),
                               skip = 6)
 
 ## Increase the run number so we have each run number only once
@@ -65,7 +65,7 @@ df_Baseline_SD$`[run number]` <- df_Baseline_SD$`[run number]` + 50000
 
 # Status quo & All chicks
 df_All_Chicks <- 
-  df_All_Chicks_raw <- fread(file = here("output", "NetLogo_raw", "NBI_All_chicks_Statquo.csv"), 
+  df_All_Chicks_raw <- fread(file = here("data-raw", "model-raw", "NBI_All_chicks_Statquo.csv"), 
                              skip = 6)
 
 ## Increase the run number so we have each run number only once
@@ -74,7 +74,7 @@ df_All_Chicks$`[run number]` <- df_All_Chicks$`[run number]` + 60000
 
 # Baseline for 100 years
 df_Baseline_100 <- 
-  df_Baseline_SD_raw <- fread(file = here("output", "NetLogo_raw", "NBI_Baseline_SD_100years.csv"),
+  df_Baseline_SD_raw <- fread(file = here("data-raw", "model-raw", "NBI_Baseline_SD_100years.csv"),
                               skip = 6)
 ```
 
@@ -258,8 +258,7 @@ df_Baseline_100  %<>%
 ```{r}
 df_Basic %<>% 
   select(Run, Scenario, Year, 
-         IndAll,IndB,IndK,IndUb,IndFP,IndP,
-         IndBFP,IndBP,IndKFP,IndKP,IndUbFP,IndUbP,
+         IndAll,IndP,
          IndJuv,IndSub1,IndSub2,IndAdu,
          Mortality_Juveniles,Mortality_Subadults1,Mortality_Subadults2,Mortality_Adults,Repro,
          Supplemented,N_Supplements,Supplement_Time, Stoch_events, Stoch_Frequency, Stoch_Severity,
@@ -268,8 +267,7 @@ df_Basic %<>%
 # For 100 years
 df_Baseline_100 %<>% 
   select(Run, Scenario, Year, 
-         IndAll,IndB,IndK,IndUb,IndFP,IndP,
-         IndBFP,IndBP,IndKFP,IndKP,IndUbFP,IndUbP,
+         IndAll,IndP,
          IndJuv,IndSub1,IndSub2,IndAdu,
          Mortality_Juveniles,Mortality_Subadults1,Mortality_Subadults2,Mortality_Adults,Repro,
          Supplemented,N_Supplements,Supplement_Time, Stoch_events, Stoch_Frequency, Stoch_Severity,
@@ -279,12 +277,9 @@ df_Baseline_100 %<>%
 
 # Save data
 ```{r}
-# saveRDS(object = df_Basic, file = here("output", "data-proc", "NetLogo-proc", "df_Basic.rds"))
-# saveRDS(object = df_Baseline_100, file = here("output", "data-proc", "NetLogo-proc", "df_Baseline_100.rds"))
+# saveRDS(object = df_Basic, file = here("output", "data-proc", "model-proc", "df_Basic.rds"))
+# saveRDS(object = df_Baseline_100, file = here("output", "data-proc", "model-proc", "df_Baseline_100.rds"))
 ```
-
-# Questions/To Do
-EIgentlich sollten die SPalten für die Kolonien usw entfernt werden oder in Netlogo muss boch Rosegg hinzugefügt werden
 
 
 ***

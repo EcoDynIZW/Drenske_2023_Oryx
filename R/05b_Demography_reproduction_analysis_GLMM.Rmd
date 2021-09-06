@@ -17,7 +17,7 @@ knitr::opts_chunk$set(echo = TRUE, warning = TRUE, message = TRUE,
                       retina = 1, fig.showtext = TRUE)
 ```
 
-* **Research question:** (Q1) How will the NBI population develop in the next 50 years and what will be the extinction risk, given that the colonies will be either managed or left to themselves? (Q2) Will the developments in the two already established colonies Burghausen & Kuchl be different?
+* **Hypothesis:** We hypothesize that at the given stage the northern bald ibis population can survive without further management and release. We predict that observed demographic rates will ensure population growth and do not differ between the colonies
 * **Study area:** Austria, Germany and Italy
 * **Data:** Data of the number of fledglings per potential mother and per nest
 
@@ -37,16 +37,12 @@ We create GLMMs to investigate whether the raising type or colony has an influen
 ## at a later stage
 library("DHARMa")
 library("effects")
-#library("fields")
-#library("gam")
 library("ggeffects")
 library("ggplot2")
 library("here")
 library("lme4")
-#library("margins")
-#library("mgcv")
-#library("plot3D")
 library("pwr")
+library("tidyverse")
 ```
 
 
@@ -108,6 +104,7 @@ summary(f_fledg_raising_glm) # non significant
 #dredge(raising_mod)
 plot(allEffects(f_fledg_raising_glm),type='response')
 ```
+
 ### GLMM
 ```{r}
 f_fledg_raising_glmm <- glmer(formula = nr_f_fledg ~ raising_type + (1|parent_f), 
@@ -115,6 +112,7 @@ f_fledg_raising_glmm <- glmer(formula = nr_f_fledg ~ raising_type + (1|parent_f)
                               family = "poisson")
 summary(f_fledg_raising_glmm) # not significant
 ```
+
 #### Plot
 ```{r}
 f_fledg_raising_predi <- ggpredict(f_fledg_raising_glmm, terms = "raising_type")
@@ -143,7 +141,7 @@ plot(x = f_fledg_raising_predi,
 ```
 
 #### Testing the models
-Testing with the DHARMa package.
+We use the DHARMa package.
 
 Prepare it
 ```{r}
@@ -248,7 +246,7 @@ plot(x = f_fledg_colony_predi,
 ```
 
 #### Testing the models
-Testing with the DHARMa package.
+We use the DHARMa package.
 
 Prepare it
 ```{r}
@@ -351,7 +349,7 @@ plot(x = fm_nest_raising_full_predi,
 ```
 
 #### Testing the models
-Testing with the DHARMa package.
+We use the DHARMa package.
 
 Prepare it
 ```{r}

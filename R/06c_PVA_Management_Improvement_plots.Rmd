@@ -17,7 +17,7 @@ knitr::opts_chunk$set(echo = TRUE, warning = TRUE, message = TRUE,
                       retina = 1, fig.showtext = TRUE)
 ```
 
-* **Research question:** (Q1) How will the NBI population develop in the next 50 years and what will be the extinction risk, given that the colonies will be either managed or left to themselves? (Q2) Will the developments in the two already established colonies Burghausen & Kuchl be different? 
+* **Hypothesis:** We hypothesize that at the given stage the northern bald ibis population can survive without further management and release. We predict that observed demographic rates will ensure population growth and do not differ between the colonies 
 * **Study area:** Austria, Germany and Italy
 * **Data:** Results of the first NetLogo Model and the tables created in script 06b
 
@@ -42,11 +42,11 @@ library("viridisLite")
 # Data
 
 ```{r data}
-df_Basic_scen <- readRDS(file = here("output", "data-proc", "NetLogo-proc", "df_Basic_scen.rds"))
-df_lambda_pos <- readRDS(file = here("output", "data-proc", "NetLogo-proc", "df_lambda_pos.rds"))
-df_mean <- readRDS(file = here("output", "data-proc", "NetLogo-proc", "df_mean.rds"))
-df_sc_mean <- readRDS(file = here("output", "data-proc", "NetLogo-proc", "df_sc_mean.rds"))
-df_scen <- readRDS(file = here("output", "data-proc", "NetLogo-proc", "df_scen.rds"))
+df_Basic_scen <- readRDS(file = here("output", "data-proc", "model-proc", "df_Basic_scen.rds"))
+df_lambda_pos <- readRDS(file = here("output", "data-proc", "model-proc", "df_lambda_pos.rds"))
+df_mean <- readRDS(file = here("output", "data-proc", "model-proc", "df_mean.rds"))
+df_sc_mean <- readRDS(file = here("output", "data-proc", "model-proc", "df_sc_mean.rds"))
+df_scen <- readRDS(file = here("output", "data-proc", "model-proc", "df_scen.rds"))
 ```
 
 # Barplot of scenarios with positive population development

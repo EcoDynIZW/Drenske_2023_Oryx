@@ -17,7 +17,7 @@ knitr::opts_chunk$set(echo = TRUE, warning = TRUE, message = TRUE,
                       retina = 1, fig.showtext = TRUE)
 ```
 
-* **Research question:** (Q1) How will the NBI population develop in the next 50 years and what will be the extinction risk, given that the colonies will be either managed or left to themselves? (Q2) Will the developments in the two already established colonies Burghausen & Kuchl be different? 
+* **Hypothesis:** We hypothesize that at the given stage the northern bald ibis population can survive without further management and release. We predict that observed demographic rates will ensure population growth and do not differ between the colonies 
 * **Study area:** Austria, Germany and Italy
 * **Data:** Results of the second NetLogo model
 
@@ -45,12 +45,12 @@ Load data tables, increase run numbers of the other partial models and combine t
 ```{r data}
 # Improvements of survival and reproduction
 df_StevS <- df_StevS_raw <- fread(
-                              file = here("output", "NetLogo_raw", "NBI_StevS_Improvements.csv"),
+                              file = here("data-raw", "model-raw", "NBI_StevS_Improvements.csv"),
                               skip = 6)
 
 # Baseline with SD 
 df_StevS_Baseline <- fread(
-                       file = here("output", "NetLogo_raw", "NBI_StevS_Baseline_SD.csv"),
+                       file = here("data-raw", "model-raw", "NBI_StevS_Baseline_SD.csv"),
                        skip = 6)
 
 df_StevS_Baseline$`[run number]` <- as.numeric(as.character(df_StevS_Baseline$`[run number]`))
@@ -59,7 +59,7 @@ df_StevS_Baseline$`[run number]` <- as.character(df_StevS_Baseline$`[run number]
 
 # All chicks
 df_StevS_All_chicks <- fread(
-                        file = here("output", "NetLogo_raw", "NBI_StevS_All_chicks.csv"), 
+                        file = here("data-raw", "model-raw", "NBI_StevS_All_chicks.csv"), 
                         skip = 6)
 
 df_StevS_All_chicks$`[run number]` <- as.numeric(as.character(df_StevS_All_chicks$`[run number]`))
@@ -68,7 +68,7 @@ df_StevS_All_chicks$`[run number]` <- as.character(df_StevS_All_chicks$`[run num
 
 # All chicks without supplements
 df_Stev_All_chicks <- fread(
-                        file = here("output", "NetLogo_raw", "NBI_Stev_All_chicks_without_Supp.csv"), 
+                        file = here("data-raw", "model-raw", "NBI_Stev_All_chicks_without_Supp.csv"), 
                         skip = 6)
 
 df_Stev_All_chicks$`[run number]` <- as.numeric(as.character(df_Stev_All_chicks$`[run number]`))
@@ -197,8 +197,7 @@ df_StevS  %<>%
 ```{r}
 df_StevS %<>% 
   select(Run, Scenario, Year, 
-         IndAll,IndB,IndK,IndUb,IndFP,IndP,
-         IndBFP,IndBP,IndKFP,IndKP,IndUbFP,IndUbP,
+         IndAll,IndP,
          IndJuv,IndSub1,IndSub2,IndAdu,
          Mortality_Juveniles,Mortality_Subadults1,Mortality_Subadults2,Mortality_Adults,Repro,
          Supplemented,N_Supplements,Supplement_Time, Stoch_events, Stoch_Frequency, Stoch_Severity,
@@ -208,7 +207,7 @@ df_StevS <- droplevels(df_StevS)
 
 # Save data
 ```{r}
-#saveRDS(object = df_StevS, file = here("output", "data-proc", "NetLogo-proc", "df_StevS.rds"))
+#saveRDS(object = df_StevS, file = here("output", "data-proc", "model-proc", "df_StevS.rds"))
 ```
 
 

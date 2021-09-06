@@ -17,7 +17,7 @@ knitr::opts_chunk$set(echo = TRUE, warning = TRUE, message = TRUE,
                       retina = 1, fig.showtext = TRUE)
 ```
 
-* **Research question:** (Q1) How will the NBI population develop in the next 50 years and what will be the extinction risk, given that the colonies will be either managed or left to themselves? (Q2) Will the developments in the two already established colonies Burghausen & Kuchl be different? 
+* **Hypothesis:** We hypothesize that at the given stage the northern bald ibis population can survive without further management and release. We predict that observed demographic rates will ensure population growth and do not differ between the colonies 
 * **Study area:** Austria, Germany and Italy
 * **Data:** Results of the second NetLogo Model
 
@@ -41,7 +41,7 @@ library("magrittr")
 
 # Data
 ```{r data}
-df_StevS <- readRDS(file = here("output", "data-proc", "NetLogo-proc", "df_StevS.rds"))
+df_StevS <- readRDS(file = here("output", "data-proc", "model-proc", "df_StevS.rds"))
 ```
 
 # Data overview
@@ -116,8 +116,8 @@ range(df_max_StevS_sc$IndAll) # 89 7386
 
 ## Save data
 ```{r}
-# saveRDS(object = df_ext_StevS, file = here("output", "data-proc", "NetLogo-proc", "df_ext_StevS.rds"))
-# saveRDS(object = df_max_StevS_sc, file = here("output", "data-proc", "NetLogo-proc", "df_max_StevS_sc.rds"))
+# saveRDS(object = df_ext_StevS, file = here("output", "data-proc", "model-proc", "df_ext_StevS.rds"))
+# saveRDS(object = df_max_StevS_sc, file = here("output", "data-proc", "model-proc", "df_max_StevS_sc.rds"))
 ```
 
 # Calculation of Lambda
@@ -138,12 +138,12 @@ df_StevS <- df_StevS %>%  group_by(Run) %>% mutate(Lambda_sto = Quot + 1)
 
 ```{r}
 range(df_StevS$Lambda_sto, na.rm = T) # 0 2 
-df_StevS <- df_StevS[, -c(37,38)]
+df_StevS <- df_StevS[, -c(26,27)] # Remove Diff, Quot
 ```
 
 ## Save data
 ```{r}
-#saveRDS(object = df_StevS, file = here("output", "data-proc", "NetLogo-proc", "df_StevS.rds"))
+#saveRDS(object = df_StevS, file = here("output", "data-proc", "model-proc", "df_StevS.rds"))
 ```
 
 # Mean per scenario
@@ -197,7 +197,7 @@ table(df_sc_StevS_mean$Stoch_Frequency, df_sc_StevS_mean$Stoch_Severity, df_sc_S
 
 ## Save data
 ```{r}
-#saveRDS(object = df_sc_StevS_mean, file = here("output", "data-proc", "NetLogo-proc", "df_sc_StevS_mean.rds"))
+#saveRDS(object = df_sc_StevS_mean, file = here("output", "data-proc", "model-proc", "df_sc_StevS_mean.rds"))
 ```
 
 # Analysis I: Scenarios with positive population growth
@@ -248,7 +248,7 @@ table(df_StevS_lambda_pos$Repro)
 
 ## Save Data
 ```{r}
-#saveRDS(object = df_StevS_lambda_pos, file = here("output", "data-proc", "NetLogo-proc", "df_StevS_lambda_pos.rds"))
+#saveRDS(object = df_StevS_lambda_pos, file = here("output", "data-proc", "model-proc", "df_StevS_lambda_pos.rds"))
 ```
 
 # Analysis II: Only Baseline values and Improvements
