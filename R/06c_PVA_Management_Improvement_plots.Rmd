@@ -160,7 +160,7 @@ Save the plot
 
 
 # Population trajectories
-A plot of the population trajectories of the XX scnarios of special interest
+A plot of the population trajectories of the 14 scnarios of special interest
 It will be a spaghetti plot with facets per scenario to show all runs per scenario and the mean of all runs per scenario
 
 ```{r}
@@ -261,38 +261,38 @@ ggplot(df_Basic_scen, aes(x = Year, y = IndAll)) +
   theme(legend.position = "none", panel.grid = element_blank(), 
         strip.background =element_rect(fill="grey50")) + 
   labs(x = "Years after simulation start", y = "Female individuals") + 
-  geom_text(data = df_scen, mapping = aes(x = 45, y = 170),  
-            label = paste(sprintf("%.2f", round(df_scen$Lambda_sto, digits = 2)), # sprintf ensures that two decimal places are actually displayed.
+  geom_text(data = df_scen, mapping = aes(x = 43, y = 170),  
+            label = paste(sprintf("%.2f", round(df_scen$Lambda_sto, digits = 2)), # sprintf ensures that two (or three) decimal places are actually displayed.
                           "\u00b1", # +- sign
-                          sprintf("%.2f", round(df_scen$SD_Lambda, digits = 2)), sep = " "), 
+                          sprintf("%.3f", round(df_scen$SD_Lambda, digits = 3)), sep = " "), 
             size = 3) + 
   scale_colour_viridis_d(option = "plasma", begin = 0.4)
 
 
 # Version 1 y-lim 0-500
-ggplot(df_Basic_scen, aes(x = Year, y = IndAll)) + 
-  geom_line(aes(group = Run, colour = Scenario)) + 
-  facet_wrap( ~Scenario, 
-              nrow = 7, ncol = 2, 
-              labeller = labeller(Scenario = scenario_names)) + 
-  geom_line(data = df_mean, aes(x = Year, y = IndAll, group = Scenario), size = 1) +
-  scale_y_continuous(limits = c(0, 500)) +
-  theme_light() +
-  theme(legend.position = "none", panel.grid = element_blank(), 
-        strip.background =element_rect(fill="grey50")) + 
-  labs(x = "Years after simulation start", y = "Female individuals") + 
-  geom_text(data = df_scen, mapping = aes(x = 45, y = 170),  
-            label = paste(sprintf("%.2f", round(df_scen$Lambda_sto, digits = 2)), # sprintf ensures that two decimal places are actually displayed.
-                          "\u00b1", # +- sign
-                          sprintf("%.2f", round(df_scen$SD_Lambda, digits = 2)), sep = " "), 
-            size = 3) + 
-  scale_colour_viridis_d(option = "plasma", begin = 0.4)
+# ggplot(df_Basic_scen, aes(x = Year, y = IndAll)) + 
+#   geom_line(aes(group = Run, colour = Scenario)) + 
+#   facet_wrap( ~Scenario, 
+#               nrow = 7, ncol = 2, 
+#               labeller = labeller(Scenario = scenario_names)) + 
+#   geom_line(data = df_mean, aes(x = Year, y = IndAll, group = Scenario), size = 1) +
+#   scale_y_continuous(limits = c(0, 500)) +
+#   theme_light() +
+#   theme(legend.position = "none", panel.grid = element_blank(), 
+#         strip.background =element_rect(fill="grey50")) + 
+#   labs(x = "Years after simulation start", y = "Female individuals") + 
+#   geom_text(data = df_scen, mapping = aes(x = 45, y = 170),  
+#             label = paste(sprintf("%.2f", round(df_scen$Lambda_sto, digits = 2)), # sprintf ensures that two decimal places are actually displayed.
+#                           "\u00b1", # +- sign
+#                           sprintf("%.2f", round(df_scen$SD_Lambda, digits = 2)), sep = " "), 
+#             size = 3) + 
+#   scale_colour_viridis_d(option = "plasma", begin = 0.4)
 ```
 
 Save the plot
 ```{r}
- # ggsave(filename = here("plots", "04_PVA", "pop_trajectories_500.png"),
- #        width = 15, height = 20, units = "cm")
+ ggsave(filename = here("plots", "04_PVA", "20211123_pop_trajectories_200.png"),
+        width = 15, height = 20, units = "cm")
 ```
 
 ***
