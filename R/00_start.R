@@ -6,7 +6,7 @@ d6::fill_desc(
   pkg_description = "Analysis of the survival, fecundity and population viability of reintroduced Northern Bald Ibises in Germany and Austria",   ## The Description of Your Project
   author_first_name = "Sinah", ## Your First Name
   author_last_name = "Drenske",  ## Your Last Name
-  author_email = "sinah.drenske@campus.tu-berlin.de",      ## Your Email
+  author_email = "drenske@izw-berlin.de",      ## Your Email
   repo_url = "https://github.com/SinahDre/Drenske_2020_PVA_NBI"         ## The URL of the GitHub Repo (optional)
 )
 

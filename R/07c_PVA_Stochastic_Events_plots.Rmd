@@ -17,10 +17,11 @@ knitr::opts_chunk$set(echo = TRUE, warning = TRUE, message = TRUE,
                       retina = 1, fig.showtext = TRUE)
 ```
 
-* **Hypothesis:** We hypothesize that at the given stage the northern bald ibis population can survive without further management and release. We predict that observed demographic rates will ensure population growth and do not differ between the colonies 
+* **Hypothesis:** We hypothesize that at the present time the northern bald ibis population can survive without further management and release. We predict that the observed demographic rates will ensure population growth and do not differ between the breeding colonies. 
 * **Study area:** Austria, Germany and Italy
-* **Data:** Results of the second NetLogo model and tables created in script 7b
+* **Data:** Results of the second NetLogo model and tables created in script 07b
 
+In this script we create barplots to show the distribution of survival and reproduction values between the scenarios per combination of stochastic event frequency and severity and we show the distribution between the number of supplements and the years of supplementation for scenarios with positive population growth.
 
 # Setup
 
@@ -163,7 +164,7 @@ text(x = -2.8, y = -5, labels = "b)", xpd=NA, cex = 3)
 # dev.off()
 ```
 
-A combinded figure of the barplots for the Baseline and Improvement scenarios and the catastrophe and supplement scenarios
+A combinded figure of the barplots for the Baseline and Improvement scenarios and the stochastic event and supplement scenarios
 ```{r}
 # Before this you have to run Script 06c until row 128
 ```
@@ -195,7 +196,7 @@ A combinded figure of the barplots for the Baseline and Improvement scenarios an
 # dev.off()
 ```
 
-# Catastrophe frequency and severity
+# Stochastic event frequency and severity
 ```{r}
 df_StevS_summ <- df_StevS_lambda_pos %>% 
   group_by(Stoch_Frequency, Stoch_Severity) %>% 
@@ -262,9 +263,9 @@ ggplot(data = df_StevS_summ, aes(x = Stoch_Severity,
              colour = "white", 
              size = 1) + 
   # Axis breaks
-  scale_x_continuous(#name = "Catastrophe severity",  
+  scale_x_continuous(#name = "Stochastic event severity",  
                      breaks = c(0.05, 0.10, 0.15, 0.20, 0.25), expand = c(0, 0)) + 
-  scale_y_continuous(#name = "Catastrophe frequency", 
+  scale_y_continuous(#name = "Stochastic event frequency", 
                      breaks = c(0.05, 0.10, 0.15, 0.20), expand = c(0, 0)) + 
   # Theme
   theme(rect = element_blank(), 

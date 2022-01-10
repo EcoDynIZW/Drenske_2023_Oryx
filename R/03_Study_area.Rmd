@@ -17,26 +17,29 @@ knitr::opts_chunk$set(echo = TRUE, warning = TRUE, message = TRUE,
                       retina = 1, fig.showtext = TRUE)
 ```
 
-* **Hypothesis:** We hypothesize that at the given stage the northern bald ibis population can survive without further management and release. We predict that observed demographic rates will ensure population growth and do not differ between the colonies 
+* **Hypothesis:** We hypothesize that at the present time the northern bald ibis population can survive without further management and release. We predict that the observed demographic rates will ensure population growth and do not differ between the breeding colonies. 
 * **Study area:** Austria, Germany and Italy
-* **Data:** 
+* **Data:** Elevation data and the breeding and wintering locations of the NBI population
 
+In this script we create the map for the study area.
 
+# Setup
 ```{r prep}
 ## packages
-library(tidyverse)
-library(raster)
-library(sf)
-library(RStoolbox)
-library(lwgeom)
-library(rnaturalearth)
-library(rworldmap)
-library(rmapshaper)
-library(shadowtext)
-library(patchwork)
-library(pdftools)
-library(systemfonts)
+library("tidyverse")
+library("raster")
+library("sf")
+library("RStoolbox")
+library("lwgeom")
+library("rnaturalearth")
+library("rworldmap")
+library("rmapshaper")
+library("shadowtext")
+library("patchwork")
+library("pdftools")
+library("systemfonts")
 
+## set the theme
 theme_set(theme_minimal(base_family = "Roboto"))
 theme_update(
   axis.ticks = element_line(color = "grey10"),
@@ -59,7 +62,7 @@ theme_update(
 ```
 
 
-## Data
+# Data
 
 ```{r data}
 ## elevation data
@@ -94,7 +97,7 @@ locations <-
 ```
 
 
-## Overview Map
+# Overview Map
 
 ```{r overview-map, fig.width = 8.5, fig.height = 10}
 sf_world <- 
@@ -137,17 +140,20 @@ overview <-
     labs(x = NULL, y = NULL, tag = "A.")
 
 overview
-
-## save map
-ggsave(here::here("plots", "NBIPVA_A_europe_countries.pdf"),
-       width = 8.95, height = 10, device = cairo_pdf)
-
-pdf_convert(pdf = here::here("plots", "NBIPVA_A_europe_countries.pdf"), 
-            format = "png", dpi = 750)
 ```
 
 
-## Hillshade map 
+```{r save overview-map, fig.width = 8.5, fig.height = 10}
+## save map
+# ggsave(here::here("plots", "NBIPVA_A_europe_countries.pdf"),
+#        width = 8.95, height = 10, device = cairo_pdf)
+# 
+# pdf_convert(pdf = here::here("plots", "NBIPVA_A_europe_countries.pdf"), 
+#             format = "png", dpi = 750)
+```
+
+
+# Hillshade map 
 
 ```{r hillshade-map, fig.width = 8.5, fig.height = 10}
 dem_alps@data@values <- dem_alps@data@values * 10
@@ -285,26 +291,31 @@ alps <-
     labs(x = NULL, y = NULL, tag = "B.")
 
 alps
+```
 
+
+```{r save hillshade-map, fig.width = 8.5, fig.height = 10}
 ## save map
-ggsave(here::here("plots", "NBIPVA_B_alps_GrnYl.pdf"),
-       width = 8.5, height = 10, device = cairo_pdf)
-
-pdf_convert(pdf = here::here("plots", "NBIPVA_B_alps_GrnYl.pdf"), 
-            format = "png", dpi = 750)
+# ggsave(here::here("plots", "NBIPVA_B_alps_GrnYl.pdf"),
+#        width = 8.5, height = 10, device = cairo_pdf)
+# 
+# pdf_convert(pdf = here::here("plots", "NBIPVA_B_alps_GrnYl.pdf"), 
+#             format = "png", dpi = 750)
 ```
 
 ```{r panel, fig.width = 17, fig.height = 10}
 p <- overview + alps
 
 p
+```
 
+```{r save panel, fig.width = 17, fig.height = 10}
 ## save panel
-ggsave(here::here("plots", "NBIPVA_panel_GrnYl.pdf"),
-       width = 17, height = 10, device = cairo_pdf)
-
-pdf_convert(pdf = here::here("plots", "NBIPVA_panel_GrnYl.pdf"), 
-            format = "png", dpi = 750)
+# ggsave(here::here("plots", "NBIPVA_panel_GrnYl.pdf"),
+#        width = 17, height = 10, device = cairo_pdf)
+# 
+# pdf_convert(pdf = here::here("plots", "NBIPVA_panel_GrnYl.pdf"), 
+#             format = "png", dpi = 750)
 ```
 
 ***

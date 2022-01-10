@@ -17,19 +17,19 @@ knitr::opts_chunk$set(echo = TRUE, warning = TRUE, message = TRUE,
                       retina = 1, fig.showtext = TRUE)
 ```
 
--   **Hypothesis:** We hypothesize that at the given stage the northern bald ibis population can survive without further management and release. We predict that observed demographic rates will ensure population growth and do not differ between the colonies
--   **Study area:** Austria, Germany and Italy
--   **Data:** Life History data and Breeding data of the NBI
+* **Hypothesis:** We hypothesize that at the present time the northern bald ibis population can survive without further management and release. We predict that the observed demographic rates will ensure population growth and do not differ between the breeding colonies.
+* **Study area:** Austria, Germany and Italy
+* **Data:** Life History data and Breeding data of the NBI
 
-In this script we calculated the fecundity for the population.
-The fecundity is calculated is the number of fledged female chicks per year divided by the number of potential mothers per year.
+In this script we calculated the reproductive rates for the population.
+The reproductive rate is calculated as the number of fledged female chicks per year divided by the number of potential mothers per year.
 As potential mothers we used only females in stage 4, the adults.
-We calculated the fecundity in 3 ways: "Baseline", "Status quo" and "All chicks".
-For the "Baseline" Fecundity we used only female fledged chicks which are born in the population from mothers who lived/lives in the population.
+We calculated the reproductive rate in 3 ways: "Baseline", "Status quo" and "All chicks".
+For the "Baseline" RR we used only female fledged chicks which are born in the population from mothers who lived/lives in the population.
 We did not include chicks from temporarily added females and we did not include these temporarily added females as mothers.
 So we did not include some chicks which are part of the population.
-For the "Status quo" Fecundity we included also the parent raised chicks from the temporarily added females.
-In the third way "All chicks" we included the chicks which were raised by the human foster parents.
+For the "Status quo" RR we included also the parent raised chicks from the temporarily added females.
+In the third option "All chicks" we included the chicks which were raised by the human foster parents.
 
 # Setup
 
