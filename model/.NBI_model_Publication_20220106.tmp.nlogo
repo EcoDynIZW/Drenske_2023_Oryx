@@ -930,39 +930,77 @@ HORIZONTAL
 @#$#@#$#@
 ## WHAT IS IT?
 
-The model is intended to represent the survival of a Northern Bald Ibis (NBI) population, considering mortality probabilities per stage (age class), reproductive probabilities, the addition of supplements and the occurrence of catastrophic stochastic events.
+The model is intended to represent the survival of a Northern Bald Ibis (NBI; _Geronticus eremita_) population, considering mortality probabilities per stage (age class), reproductive probabilities, the addition of supplements and the occurrence of catastrophic stochastic events.
 
 ## HOW IT WORKS
 
-(what rules the agents use to create the overall behavior of the model)
+As many agents per age class are created as are set with the sliders _Number_Juveniles, Number_Subadults_Age1, Number_Subadults_Age2 and Number_Adults_ (_to setup_). 
+The NBI breed (_to breeding_) with the probability set in the slider _Repro_Rate_ 
+and die (_to death_) with a certain probability per year (sliders _Mortality_Juveniles, Mortality_Subadults_Age1, Mortality_Subadults_Age2, Mortality_Adults_). 
+If they do not die, they age (_to aging_) and possibly move up to the next age class. 
+
+If individuals are added (_to supplement_), a certain number of juvenile NBI (Slider _Number_Supplements_) is added once per year. You can also set the number of years over which the animals are to be added (Slider _Supplement_Time_). 
+
+If stochastic events occur (_to stoch_event_), they occur with a certain probability (Slider _Frequency_) once a year with a certain severity (Slider _Severity_, additional mortality). 
+
+
+In addition, we carried out simulations of various scenarios with the behaviour space, which are recorded in _"to prep"_. The survival and reproduction probabilities and the duration of the simulation are specified there.
 
 ## HOW TO USE IT
 
-(how to use the model, including a description of each of the items in the Interface tab)
+  * Number of individuals
+    * Number_Juveniles: Number of NBI Juveniles
+    * Number_Subadults_Age1: Number of 1-year-old subadults
+    * Number_Subadults_Age2: Number of 2-year-old Subadults
+    * Number_Adults: Number of adults
+
+  * Mortality
+    * Mortality_Juveniles: Mortality of juveniles
+    * Mortality_Subadults_Age1: Mortality of 1-year-old subadults
+    * Mortality_Subadults_Age2: Mortality of 2-year-old subadults 
+    * Mortality_Adults: Mortality of adults
+
+  * Reproductive Rate
+    * Repro_Rate: Reproductive rate, the number of female juveniles per female per year.
+
+  * Supplements
+    * Supplements? : Should supplements (juvenile NBI) be added?
+    * Number_Supplements: How many supplements should be added annually?
+    * Supplement_Time: For how many years should supplements be added annually?
+  * Stochastic events
+    * Stoch_events?: Should stochastic events occur?
+    * Frequency: With what probability per year should the stochastic events occur?
+    * Severity: How severe should these stochastic events be; i.e. how much additional mortality do they lead to?
+
 
 ## THINGS TO NOTICE
 
-(suggested things for the user to notice while running the model)
+  * If you run the model with updates, it can become very slow and possibly crash. At least when a lot of agents are created.
+  * There are still examples in the code if you want to consider the raising type or the colony. We have discarded this part for our manuscript.
+  * In a second model, we took the standard deviation into account for the baseline scenario. This is not taken into account in this model.
 
 ## THINGS TO TRY
 
-(suggested things for the user to try to do (move sliders, switches, etc.) with the model)
+  1. You should test different mortality and reproductive values. But also leave these values the same and look at the difference when you add catastrophic stochastic events and supplements.
+  2. One could also examine the development per colony or per raising type. Examples are still available in the code (but as comments)
 
 ## EXTENDING THE MODEL
 
-(suggested things to add or change in the Code tab to make the model more complicated, detailed, accurate, etc.)
+  * It would be interesting to include the landscape and movement. Or, for example, to allow mortality to fluctuate throughout the year. Currently, animals only die at one point per tick/year, but of course deaths can occur throughout the year, especially during autumn or spring migration.
+  * It would also be interesting to analyse the development per raising type or per colony in more detail.
 
 ## NETLOGO FEATURES
 
-(interesting or unusual features of NetLogo that the model uses, particularly in the Code tab; or where workarounds were needed for missing features)
+We used the Behaviour Space to test different scenarios.
 
 ## RELATED MODELS
 
-(models in the NetLogo Models Library and elsewhere which are of related interest)
+NA
 
 ## CREDITS AND REFERENCES
 
-(a reference to the model's URL on the web if it has one, as well as any other necessary credits, citations, and links)
+  1. The model is used for the manuscript of Drenske et al. 2022: On the road to self-sustainability: Reintroduced migratory Northern Bald Ibis (_Geronticus eremita_) still need management measures for population viability, submitted to Oryx.
+  2. The model is also available online on: **XXX and YYY**.
 @#$#@#$#@
 default
 true

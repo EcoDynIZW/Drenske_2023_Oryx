@@ -2,10 +2,17 @@ globals [
        ;; monitors
           deaths
           births
+       ;; Mortality & reproductive rates per Step
+          step_mortality_juveniles
+          step_mortality_oneyear
+          step_mortality_twoyear
+          step_mortality_adults
+          step_RR
        ;; Years for supplements
           supple_year
        ;; Scenario names
-          scenario]
+          scenario
+        ]
 
 turtles-own [age colony raising]
 
@@ -16,7 +23,7 @@ turtles-own [age colony raising]
 to setup
    clear-all                                  ; clear everything (Monitors, Plot, World) before you start a new simulation
 
-;; create the population
+;; create the Population
  ; create juvenile NBI
    create-turtles Number_Juveniles            ; create Turtles/Agents
      [
@@ -30,19 +37,6 @@ to setup
 ;       ask n-of 3 turtles with [colony = 0 and raising = 0 and age = 0]  [set colony "Burghausen" set raising "P" set color green]
 ;       ask n-of 2 turtles with [colony = 0 and raising = 0 and age = 0]  [set colony "Kuchl" set raising "P" set color yellow]
 ;       ask n-of 11 turtles with [colony = 0 and raising = 0 and age = 0] [set colony "Ueberlingen" set raising "FP" set color blue]
-
-;       ask turtles with [age = 0 and colony = 0 and raising = 0]
-;       [
-;         let cr random-float 1
-;         ifelse cr < 0.1875
-;           [set colony "Burghausen" set raising "P" set color green]
-;           [ifelse cr < 0.3125    ; 0.125 + 0.1875
-;             [set colony "Kuchl" set raising "P" set color yellow]
-;             [set colony "Ueberlingen" set raising "FP" set color blue]
-;           ]
-;       ]
-
-
 
  ; create 1-Year-Old NBI
    create-turtles Number_Subadults_Age1
@@ -58,17 +52,6 @@ to setup
 ;       ask n-of 2 turtles with [colony = 0 and raising = 0 and age = 1] [set colony "Kuchl" set raising "FP" set color yellow]
 ;       ask n-of 2 turtles with [colony = 0 and raising = 0 and age = 1] [set colony "Ueberlingen" set raising "FP" set color blue]
 
-;       ask turtles with [age = 1 and colony = 0 and raising = 0]
-;       [
-;         let cr random-float 1
-;         ifelse cr < 0.333
-;           [set colony "Burghausen" set raising "FP" set color green]
-;           [ifelse cr < 0.666    ; 0.333 + 0.333
-;             [set colony "Kuchl" set raising "FP" set color yellow]
-;             [set colony "Ueberlingen" set raising "FP" set color blue]
-;           ]
-;       ]
-
  ; create 2-Year-Old NBI
    create-turtles Number_Subadults_Age2
      [
@@ -83,20 +66,6 @@ to setup
 ;       ask n-of 3 turtles with [colony = 0 and raising = 0 and age = 2] [set colony "Kuchl" set raising "FP" set color yellow]
 ;       ask n-of 3 turtles with [colony = 0 and raising = 0 and age = 2] [set colony "Kuchl" set raising "P" set color blue]
 
-;       ask turtles with [age = 2 and colony = 0 and raising = 0]
-;       [
-;         let cr random-float 1
-;         ifelse cr < 0.233
-;           [set colony "Burghausen" set raising "FP" set color green]
-;           [ifelse cr < 0.466    ; 0.233 + 0.233
-;             [set colony "Kuchl" set raising "FP" set color yellow]
-;             [ifelse cr < 0.766    ; 0.233 + 0.233 + 0.3
-;             [set colony "Kuchl" set raising "P" set color yellow]
-;             [set colony "Ueberlingen" set raising "FP" set color blue]
-;             ]
-;           ]
-;       ]
-
  ; create adult NBI
    create-turtles Number_Adults
      [
@@ -110,13 +79,6 @@ to setup
 ;       ask n-of 3 turtles with [colony = 0 and raising = 0 and age = 3] [set colony "Burghausen" set raising "P" set color green]
 ;       ask n-of 5 turtles with [colony = 0 and raising = 0 and age = 3] [set colony "Kuchl" set raising "FP" set color yellow]
 
-;       ask turtles with [age = 3 and colony = 0 and raising = 0]
-;       [
-;         let cr random-float 1
-;         ifelse cr < 0.375
-;           [set colony "Burghausen" set raising "P" set color green]
-;           [set colony "Kuchl" set raising "FP" set color yellow]
-;       ]
 
 ;; reset monitors and ticks
    set deaths 0                              ; set deaths (Monitor) to 0
@@ -131,34 +93,48 @@ end
 ;;
 
 to go
-   breeding
+   breeding_sd
    supplement
-   death
+   death_juveniles
+   death_one_year_olds
+   death_two_year_olds
+   death_adults
    stoch_event
    aging
    tick
 end
 
-;; Breeding with Reproductive rate
-to breeding
+;; Breeding with reproductive rate
+to breeding_sd
    if Repro_Rate < 1                                             ; if the reproductive rate is smaller than 1
      [
-       ask turtles with [age >= 3]                              ; ask turtles with age 3 or more
+       ask turtles with [age >= 3]                               ; ask turtles with age 3 or more
          [
-           if random-float 1 < Repro_Rate                        ; test if the random number is smaller than a random number
-             [                                                  ; if it is, then
-               hatch 1                                          ; hatch 1 chick (turtle)
-                 [                                              ; this chick has the following properties
-                   set births births + 1                        ; increase the births (Monitor) by 1 per new turtle
-                   setxy random-pxcor random-pycor              ; with random xy coordinates
-                   set heading random 360                       ; with random direction
-                   set age 0                                   ; set age to -1, because these chicks age in the same tick again, but that should not be, only in the next step
-                   set raising "P"                              ; set the raising type to "P" because their parents are birds of the population
-                   set label ""                                 ; they are not supplemented, so they need no label
+           let fk 0                                              ; its a random variable vor the while loop, set it to 0
+           ;print fk
+           while [fk = 0]                                        ; start the while loop: if the random variable is 0 then ....
+             [
+               set step_RR random-normal Repro_Rate 0.18   ; set the variable step_RR to a random normal number between Reproductive Rate +- SD
+               if step_RR > Repro_Rate - 0.18 and step_RR < Repro_Rate + 0.18 and step_RR > 0            ; if step_RR is between the range of 1 SD and not less than 0 go ahaead, otherwise start again the loop
+                 [
+                   print step_RR
+                   set fk 1 ; set the random variable to 1
+                   print fk
+                   if random-float 1 < step_RR            ; test if the random number is smaller stan step RR
+                     [                                           ; if it is, then
+                       hatch 1                                   ; hatch 1 chick (turtle)
+                         [                                       ; this chick has the following properties
+                           set births births + 1                 ; increase the births (Monitor) by 1 per new turtle
+                           setxy random-pxcor random-pycor       ; with random xy coordinates
+                           set heading random 360                ; with random direction
+                           set age 0                            ; set age to -1, because these chicks age in the same tick again, but that should not be, only in the next step
+                           set raising "P"                       ; set the raising type to "P" because their parents are birds of the population
+                           set label ""                          ; they are not supplemented, so they need no label
+                         ]
+                     ]
                  ]
-
-            ;; testing birth procedure
-             ; print "I gave birth"
+                    ;; testing birth procedure
+                     ; print "I gave birth"
              ]
          ]
      ]
@@ -169,19 +145,19 @@ to breeding
        ask turtles with[age >= 3]
          [
            ifelse random-float 1 + 1 < Repro_Rate                ; increase the random number by 1 because the reproductive rate is higher
-             [ ;if
+             [ ; if
                hatch 2                                          ; hatch 2 chicks (turtles)
                  [
-                   set births births + 1
+                   set births births + 2
                    setxy random-pxcor random-pycor
                    set heading random 360
                    set age 0
                    set raising "P"
                    set label ""
-                  ; print "I hatch 2"
+                   print "I hatch 2"
                  ]
              ]
-             [ ;else
+             [ ; else
                hatch 1
                  [
                    set births births + 1
@@ -195,45 +171,16 @@ to breeding
          ]
      ]
 
-  if (Repro_Rate >= 2) and (Repro_Rate < 3)                      ; if the reproductive rate is at least 2 and smaller than 3
+
+   if Repro_Rate >= 3
      [
        ask turtles with[age >= 3]
          [
-           ifelse random-float 1 + 2 < Repro_Rate                ; increase the random number by 1 because the reproductive rate is higher
-             [ ;if
-               hatch 3                                          ; hatch 3 chicks (turtles)
-                 [
-                   set births births + 1
-                   setxy random-pxcor random-pycor
-                   set heading random 360
-                   set age 0
-                   set raising "P"
-                   set label ""
-                 ;  print "I hatch 3"
-                 ]
-             ]
-             [ ;else
-               hatch 2
-                 [
-                   set births births + 1
-                   setxy random-pxcor random-pycor
-                   set heading random 360
-                   set age 0
-                   set raising "P"
-                   set label ""
-                 ]
-             ]
-         ]
-     ]
-
-
-   if (Repro_Rate >= 3) and (Repro_Rate < 4)
-     [
-       ask turtles with[age >= 3]
-         [
-           ifelse random-float 1 + 3 < Repro_Rate
+           let myfec random-float 1 + 3
+           print myfec
+           ifelse myfec   < Repro_Rate
              [ ; if
-            ;r   print "I hatch 4"
+               print "I hatch 4"
                hatch 4
                  [
                    set births births + 1
@@ -259,59 +206,116 @@ to breeding
      ]
 end
 
-to death
-   ask turtles with [age = 0]                                  ; death probabilities per step for stage 1, the juveniles
-     [
-       if random-float 1 < Mortality_Juveniles                 ; test if the random number is smaller than the mortality probability for Juveniles
-         [                                                     ; if it is, then
-           set deaths deaths + 1                               ; increase Deaths (Monitor) by 1 per death individual
-          ; print "Juvenile dies"                              ; print "Juvenile dies"
-           die                                                 ; die
-         ]
-     ]
 
-   ask turtles with [age = 1]                                  ; death probabilities per step for stage 2, the 1-Year-Olds
+to death_juveniles                                             ; death probabilities per step for stage 1, the juveniles
+   ask turtles with [age = 0]
      [
-       if random-float 1 < Mortality_Subadults_Age1
-         [
-           set deaths deaths + 1
-          ; print "Subadult 1 dies"
-           die
-         ]
-     ]
-
-   ask turtles with [age = 2]                                  ; death probabilities per step for stage 3, the 2-Year-Olds
-     [
-       if random-float 1 < Mortality_Subadults_Age2
-         [
-           set deaths deaths + 1
-          ; print "Subadult 2 dies"
-           die
-         ]
-     ]
-
-   ask turtles with [age >= 3]                                 ; death probabilities per step for stage 4, the adults
-     [
-       if random-float 1 < Mortality_Adults
-         [
-           set deaths deaths + 1
-          ; print "Adult dies"
-           die
+       let kk 0                                                ; this is a random number for the while loop
+      ;print kk
+       while [kk = 0]                                          ; while kk is 0
+         [                                                     ; do that
+           set step_mortality_juveniles random-normal Mortality_Juveniles 0.36                      ; set step_mortality_juveniles to a random number between the Mortality probability for Juveniles +- 1 SD
+           if step_mortality_juveniles > Mortality_Juveniles - 0.36 and step_mortality_juveniles < Mortality_Juveniles + 0.36 and step_mortality_juveniles > 0 and step_mortality_juveniles < 1
+           ; if it is between the range of 1 SD and is not lower than 0 or higher than 1 go ahead otherwise start the loop again
+             [
+              ;print step_mortality_juveniles
+               set kk 1                                          ; set the random variable to 1 so the while loop will not start again
+              ;print kk
+               if random-float 1 < step_mortality_juveniles      ; test if the random number is smaller than the mortality probability for the time step
+                 [                                               ; if it is, then
+                   set deaths deaths + 1                         ; increase Deaths (Monitor) by 1 per death individual
+                  ;print "Juvenile dies"                         ; print "Juvenile dies"
+                   die                                           ; die
+                 ]
+             ]
          ]
      ]
 end
 
-to aging
-   ask turtles                                                 ; ask every turtle
+to death_one_year_olds                                             ; death probabilities per step for stage 2, the 1-Year-Olds
+   ask turtles with [age = 1]
      [
-       set age age + 1                                         ; increase age by 1
-       forward 0.3                                             ; move by 0.3 patches forward
-       if age > 25                                             ; if a turtle is older than 25
+       let kk 0
+      ;print kk
+       while [kk = 0]
          [
-           set deaths deaths + 1                               ; increase deaths (Monitor) by 1
-           print "I am old"                                    ; print "I am old"
-           die                                                 ; die
+           set step_mortality_oneyear random-normal Mortality_Subadults_Age1 0.35
+           if step_mortality_oneyear > Mortality_Subadults_Age1 - 0.35 and step_mortality_oneyear < Mortality_Subadults_Age1 + 0.35 and step_mortality_oneyear > 0 and step_mortality_oneyear < 1
+             [
+              ;print step_mortality_oneyear
+               set kk 1
+              ;print kk
+               if random-float 1 < step_mortality_oneyear
+                 [
+                   set deaths deaths + 1
+                  ;print "1 Year Old dies"
+                   die
+                 ]
+             ]
          ]
+     ]
+end
+
+to death_two_year_olds                                             ; death probabilities per step for stage 3, the 2-Year-Olds
+   ask turtles with [age = 2]
+     [
+       let kk 0
+       ;print kk
+       while [kk = 0]
+         [
+           set step_mortality_twoyear random-normal Mortality_Subadults_Age2 0.33
+           if step_mortality_twoyear > Mortality_Subadults_Age2 - 0.33 and step_mortality_twoyear < Mortality_Subadults_Age2 + 0.33 and step_mortality_twoyear > 0 and step_mortality_twoyear < 1
+             [
+              ;print step_mortality_twoyear
+               set kk 1
+              ;print kk
+               if random-float 1 < step_mortality_twoyear
+                 [
+                   set deaths deaths + 1
+                   ;print "2 Year Old dies"
+                   die
+                 ]
+             ]
+         ]
+     ]
+end
+
+to death_adults                                                   ; death probabilities per step for stage 4, the adults
+   ask turtles with [age >= 3]
+     [
+       let kk 0
+      ;print kk
+       while [kk = 0]
+         [
+           set step_mortality_adults random-normal Mortality_Adults 0.16
+           if step_mortality_adults > Mortality_Adults - 0.16 and step_mortality_adults < Mortality_Adults + 0.16 and step_mortality_adults > 0 and step_mortality_adults < 1
+             [
+              ;print step_mortality_adults
+               set kk 1
+              ;print kk
+               if random-float 1 < step_mortality_adults
+                 [
+                   set deaths deaths + 1
+                  ;print "Adult dies"
+                   die
+                 ]
+             ]
+         ]
+     ]
+end
+
+
+to aging
+   ask turtles                                            ; ask every turtle
+     [
+       set age age + 1                                    ; increase age by 1
+       forward 0.3                                        ; move by 0.3 patches forward
+       if age > 25                                        ; if a turtle is older than 25
+         [
+           set deaths deaths + 1                          ; increase deaths (Monitor) by 1
+           print "I am old"                               ; print "I am old"
+           die                                            ; die
+        ]
      ]
 end
 
@@ -320,12 +324,12 @@ end
 ;;
 
 to supplement
-   if Supplements? = true                                      ; test if the switch "Supplements?" is "On"
-     [                                                         ; if it is, then ...
-       set supple_year 0                                       ; set the year for supplements to 0
-       if ticks < Supplement_Time                           ; as long as the ticks are smaller than the Supplement time do the following:
+   if Supplements? = true                                 ; test if the switch "Supplements?" is "On"
+     [                                                    ; if it is, then ...
+       set supple_year 0                                  ; set the year for supplements to 0
+       if ticks < Supplement_Time                      ; as long as the ticks are smaller than the Supplement time do the following:
          [
-           create-turtles Number_Supplements                   ; create as many turtles as defined with the Number_Supplements-Slider
+           create-turtles Number_Supplements              ; create as many turtles as defined with the Number_Supplements-Slider
              [
                setxy random-pxcor random-pycor
                set heading random 360
@@ -359,23 +363,22 @@ end
 ;;
 
 to stoch_event
-   if Stoch_events?                                            ; test if the switch "Stoch_events?" is "On"
-     [                                                         ; if it is, then ...
-       if random-float 1 < Frequency                           ; is the random number between 0 and 1 smaller than the Frequency?
-         [                                                     ; if it is, then ...
+   if Stoch_events?                                       ; test if the switch "Stoch_events?" is "On"
+     [                                                    ; if it is, then ...
+       if random-float 1 < Frequency                      ; is the random number between 0 and 1 smaller than the Frequency?
+         [                                                ; if it is, then ...
            print "Stochastic event"
-           ask turtles                                         ; ask Turtles
+           ask turtles                                    ; ask Turtles
              [
-               if random-float 1 < Severity                    ; is the random number between 0 and 1 smaller than the Severity?
-                 [                                             ; if it is, then ...
-                   set deaths deaths + 1                       ; increase Deaths (Monitor) by 1
-                   die                                         ; die
+               if random-float 1 < Severity               ; is the random number between 0 and 1 smaller than the Severity?
+                 [                                        ; if it is, then ...
+                   set deaths deaths + 1                  ; increase Deaths (Monitor) by 1
+                   die                                    ; die
                  ]
              ]
          ]
      ]
 end
-
 
 ;;
 ;; SCENARIOS
@@ -384,93 +387,14 @@ end
 ; these are scenarios for the stochastic event & supplement simulations
 to prep
 
-  if scenario = "100RR"
+  if scenario = "Baseline"
     [
      set Mortality_Juveniles 0.36
      set Mortality_Subadults_Age1 0.26
      set Mortality_Subadults_Age2 0.31
      set Mortality_Adults 0.22
-     set Repro_Rate 1.06
-    ]
-
-  if scenario = "10adu"
-    [
-     set Mortality_Juveniles 0.36
-     set Mortality_Subadults_Age1 0.26
-     set Mortality_Subadults_Age2 0.31
-     set Mortality_Adults 0.14
      set Repro_Rate 0.53
     ]
-
-  if scenario = "25adu"
-    [
-     set Mortality_Juveniles 0.36
-     set Mortality_Subadults_Age1 0.26
-     set Mortality_Subadults_Age2 0.31
-     set Mortality_Adults 0.02
-     set Repro_Rate 0.53
-    ]
-
-  if scenario = "10all"
-    [
-     set Mortality_Juveniles 0.30
-     set Mortality_Subadults_Age1 0.19
-     set Mortality_Subadults_Age2 0.24
-     set Mortality_Adults 0.14
-     set Repro_Rate 0.53
-    ]
-
-  if scenario = "25all"
-    [
-     set Mortality_Juveniles 0.20
-     set Mortality_Subadults_Age1 0.08
-     set Mortality_Subadults_Age2 0.14
-     set Mortality_Adults 0.02
-     set Repro_Rate 0.53
-    ]
-
-  if scenario = "10all10RR"
-    [
-     set Mortality_Juveniles 0.30
-     set Mortality_Subadults_Age1 0.19
-     set Mortality_Subadults_Age2 0.24
-     set Mortality_Adults 0.14
-     set Repro_Rate 0.58
-    ]
-
-  if scenario = "25all25RR"
-    [
-     set Mortality_Juveniles 0.20
-     set Mortality_Subadults_Age1 0.08
-     set Mortality_Subadults_Age2 0.14
-     set Mortality_Adults 0.02
-     set Repro_Rate 0.66
-    ]
-  if scenario = "Statusquo"
-    [
-     set Mortality_Juveniles 0.36
-     set Mortality_Subadults_Age1 0.26
-     set Mortality_Subadults_Age2 0.31
-     set Mortality_Adults 0.22
-     set Repro_Rate 1.41
-    ]
-  if scenario = "All_chicks"
-    [
-     set Mortality_Juveniles 0.36
-     set Mortality_Subadults_Age1 0.26
-     set Mortality_Subadults_Age2 0.31
-     set Mortality_Adults 0.22
-     set Repro_Rate 3.97
-    ]
-  if scenario = "All_chicks_Cata"
-    [
-     set Mortality_Juveniles 0.36
-     set Mortality_Subadults_Age1 0.26
-     set Mortality_Subadults_Age2 0.31
-     set Mortality_Adults 0.22
-     set Repro_Rate 3.97
-    ]
-
 end
 @#$#@#$#@
 GRAPHICS-WINDOW
@@ -519,14 +443,14 @@ NIL
 
 SLIDER
 113
-293
+277
 287
-326
+310
 Repro_Rate
 Repro_Rate
 0
 4
-3.97
+0.53
 0.01
 1
 NIL
@@ -625,9 +549,9 @@ count turtles
 11
 
 MONITOR
-1115
+1234
 13
-1172
+1291
 58
 Births
 births
@@ -636,9 +560,9 @@ births
 11
 
 MONITOR
-1179
+1298
 13
-1236
+1355
 58
 Deaths
 deaths
@@ -729,8 +653,8 @@ BUTTON
 228
 47
 run
-while [any? turtles and ticks < 50][ go ]\n;go\n;while [ticks < 50][ go ]\n;while [ any? turtles ] [ go ]
-NIL
+while [any? turtles and ticks < 100][ go ]\n;go\n;while [ticks < 50][ go ]\n;while [ any? turtles ] [ go ]
+T
 1
 T
 OBSERVER
@@ -741,26 +665,26 @@ NIL
 0
 
 SWITCH
-16
-402
-169
-435
+29
+373
+182
+406
 Supplements?
 Supplements?
-1
+0
 1
 -1000
 
 SLIDER
-16
-435
-169
-468
+29
+406
+182
+439
 Number_Supplements
 Number_Supplements
 0
 50
-30.0
+0.0
 1
 1
 NIL
@@ -822,10 +746,10 @@ supple_year
 11
 
 SWITCH
-249
+262
+371
 400
-387
-433
+404
 Stoch_events?
 Stoch_events?
 0
@@ -833,30 +757,30 @@ Stoch_events?
 -1000
 
 SLIDER
-249
-433
-385
-466
+262
+404
+398
+437
 Frequency
 Frequency
 0
 1
-0.9
+0.0
 0.1
 1
 NIL
 HORIZONTAL
 
 SLIDER
-249
-466
-385
-499
+262
+437
+398
+470
 Severity
 Severity
 0
 1
-0.88
+0.25
 0.01
 1
 NIL
@@ -883,86 +807,134 @@ Mortality
 1
 
 TEXTBOX
-142
-267
-259
-289
+141
+251
+270
+272
 Reproductive Rate
 14
 0.0
 1
 
 TEXTBOX
-50
-375
-139
-393
+63
+346
+152
+364
 Supplements
 14
 0.0
 1
 
 TEXTBOX
-260
-372
-374
-393
+277
+341
+394
+359
 Stochastic events
 14
 0.0
 1
 
 SLIDER
-16
-468
-169
-501
+29
+439
+182
+472
 Supplement_Time
 Supplement_Time
 0
 10
-7.0
+4.0
 1
 1
 NIL
 HORIZONTAL
 
+MONITOR
+1124
+12
+1181
+57
+Adults
+Count turtles with [age >= 3]
+3
+1
+11
+
 @#$#@#$#@
 ## WHAT IS IT?
 
-The model is intended to represent the survival of a Northern Bald Ibis (NBI) population, considering mortality probabilities per stage (age class), reproductive probabilities, the addition of supplements and the occurrence of catastrophic stochastic events.
+The model is intended to represent the survival of a Northern Bald Ibis (NBI; _Geronticus eremita_) population, considering mortality probabilities per stage (age class), reproductive probabilities, the addition of supplements and the occurrence of catastrophic stochastic events.
+The model also includes the standard deviation for mortality and reproduction.
 
 ## HOW IT WORKS
 
-(what rules the agents use to create the overall behavior of the model)
+As many agents per age class are created as are set with the sliders _Number_Juveniles, Number_Subadults_Age1, Number_Subadults_Age2 and Number_Adults_ (_to setup_). 
+The NBI breed (_to breeding_) with the probability set in the slider _Repro_Rate_ 
+and die (_to death_) with a certain probability per year (sliders _Mortality_Juveniles, Mortality_Subadults_Age1, Mortality_Subadults_Age2, Mortality_Adults_). 
+If they do not die, they age (_to aging_) and possibly move up to the next age class. 
+
+If individuals are added (_to supplement_), a certain number of juvenile NBI (Slider _Number_Supplements_) is added once per year. You can also set the number of years over which the animals are to be added (Slider _Supplement_Time_). 
+
+If stochastic events occur (_to stoch_event_), they occur with a certain probability (Slider _Frequency_) once a year with a certain severity (Slider _Severity_, additional mortality). 
+
+In addition, we carried out simulations of various scenarios with the behaviour space, which are recorded in _"to prep"_. The survival and reproduction probabilities and the duration of the simulation are specified there.
 
 ## HOW TO USE IT
 
-(how to use the model, including a description of each of the items in the Interface tab)
+  * Number of individuals
+    * Number_Juveniles: Number of NBI Juveniles
+    * Number_Subadults_Age1: Number of 1-year-old subadults
+    * Number_Subadults_Age2: Number of 2-year-old Subadults
+    * Number_Adults: Number of adults
+
+  * Mortality
+    * Mortality_Juveniles: Mortality of juveniles
+    * Mortality_Subadults_Age1: Mortality of 1-year-old subadults
+    * Mortality_Subadults_Age2: Mortality of 2-year-old subadults 
+    * Mortality_Adults: Mortality of adults
+
+  * Reproductive Rate
+    * Repro_Rate: Reproductive rate, the number of female juveniles per female per year.
+
+  * Supplements
+    * Supplements? : Should supplements (juvenile NBI) be added?
+    * Number_Supplements: How many supplements should be added annually?
+    * Supplement_Time: For how many years should supplements be added annually?
+  * Stochastic events
+    * Stoch_events?: Should stochastic events occur?
+    * Frequency: With what probability per year should the stochastic events occur?
+    * Severity: How severe should these stochastic events be; i.e. how much additional mortality do they lead to?
+
 
 ## THINGS TO NOTICE
 
-(suggested things for the user to notice while running the model)
+  * If you run the model with updates, it can become very slow and possibly crash. At least when a lot of agents are created.
+  * There are still examples in the code if you want to consider the raising type or the colony. We have discarded this part for our manuscript.
 
 ## THINGS TO TRY
 
-(suggested things for the user to try to do (move sliders, switches, etc.) with the model)
+  1. You should test different mortality and reproductive values. But also leave these values the same and look at the difference when you add catastrophic stochastic events and supplements.
+  2. One could also examine the development per colony or per raising type. Examples are still available in the code (but as comments)
 
 ## EXTENDING THE MODEL
 
-(suggested things to add or change in the Code tab to make the model more complicated, detailed, accurate, etc.)
+  * It would be interesting to include the landscape and movement. Or, for example, to allow mortality to fluctuate throughout the year. Currently, animals only die at one point per tick/year, but of course deaths can occur throughout the year, especially during autumn or spring migration.
+  * It would also be interesting to analyse the development per raising type or per colony in more detail.
 
 ## NETLOGO FEATURES
 
-(interesting or unusual features of NetLogo that the model uses, particularly in the Code tab; or where workarounds were needed for missing features)
+We used the Behaviour Space to test different scenarios.
 
 ## RELATED MODELS
 
-(models in the NetLogo Models Library and elsewhere which are of related interest)
+NA
 
 ## CREDITS AND REFERENCES
 
-(a reference to the model's URL on the web if it has one, as well as any other necessary credits, citations, and links)
+  1. The model is used for the manuscript of Drenske et al. 2022: On the road to self-sustainability: Reintroduced migratory Northern Bald Ibis (_Geronticus eremita_) still need management measures for population viability, submitted to Oryx.
+  2. The model is also available online on: **XXX and YYY**.
 @#$#@#$#@
 default
 true
@@ -1296,145 +1268,7 @@ NetLogo 6.2.0
 @#$#@#$#@
 @#$#@#$#@
 <experiments>
-  <experiment name="Baseline_Start_Pop20" repetitions="100" runMetricsEveryStep="true">
-    <setup>setup</setup>
-    <go>go</go>
-    <timeLimit steps="50"/>
-    <exitCondition>count turtles &gt; 5000  or 
-count turtles &lt; 1</exitCondition>
-    <metric>(word Mortality_Juveniles Mortality_Subadults_Age1 Mortality_Subadults_Age2 Mortality_Adults Repro_Rate Supplements? Number_Supplements Supplement_Time Stoch_events? Frequency Severity)</metric>
-    <metric>count turtles</metric>
-    <metric>count turtles with [colony = "Burghausen"]</metric>
-    <metric>count turtles with [colony = "Kuchl"]</metric>
-    <metric>count turtles with [colony = "Ueberlingen"]</metric>
-    <metric>count turtles with [raising = "FP"]</metric>
-    <metric>count turtles with [raising = "P"]</metric>
-    <metric>count turtles with [colony = "Burghausen" and raising = "FP"]</metric>
-    <metric>count turtles with [colony = "Kuchl" and raising = "FP"]</metric>
-    <metric>count turtles with [colony = "Ueberlingen" and raising = "FP"]</metric>
-    <metric>count turtles with [colony = "Burghausen" and raising = "P"]</metric>
-    <metric>count turtles with [colony = "Kuchl" and raising = "P"]</metric>
-    <metric>count turtles with [colony = "Ueberlingen" and raising = "P"]</metric>
-    <metric>count turtles with [age = 0]</metric>
-    <metric>count turtles with [age = 1]</metric>
-    <metric>count turtles with [age = 2]</metric>
-    <metric>count turtles with [age &gt;= 3]</metric>
-    <enumeratedValueSet variable="Number_Juveniles">
-      <value value="16"/>
-    </enumeratedValueSet>
-    <enumeratedValueSet variable="Number_Subadults_Age1">
-      <value value="7"/>
-    </enumeratedValueSet>
-    <enumeratedValueSet variable="Number_Subadults_Age2">
-      <value value="10"/>
-    </enumeratedValueSet>
-    <enumeratedValueSet variable="Number_Adults">
-      <value value="8"/>
-    </enumeratedValueSet>
-    <enumeratedValueSet variable="Mortality_Juveniles">
-      <value value="0.22"/>
-    </enumeratedValueSet>
-    <enumeratedValueSet variable="Mortality_Subadults_Age1">
-      <value value="0.08"/>
-    </enumeratedValueSet>
-    <enumeratedValueSet variable="Mortality_Subadults_Age2">
-      <value value="0.15"/>
-    </enumeratedValueSet>
-    <enumeratedValueSet variable="Mortality_Adults">
-      <value value="0.14"/>
-    </enumeratedValueSet>
-    <enumeratedValueSet variable="Repro_Rate">
-      <value value="1"/>
-    </enumeratedValueSet>
-    <enumeratedValueSet variable="Supplements?">
-      <value value="true"/>
-    </enumeratedValueSet>
-    <enumeratedValueSet variable="Number_Supplements">
-      <value value="0"/>
-    </enumeratedValueSet>
-    <enumeratedValueSet variable="Supplement_Time">
-      <value value="4"/>
-    </enumeratedValueSet>
-    <enumeratedValueSet variable="Stoch_events?">
-      <value value="true"/>
-    </enumeratedValueSet>
-    <enumeratedValueSet variable="Frequency">
-      <value value="0"/>
-    </enumeratedValueSet>
-    <enumeratedValueSet variable="Severity">
-      <value value="0.25"/>
-    </enumeratedValueSet>
-  </experiment>
-  <experiment name="Baseline_Start_Pop120" repetitions="100" runMetricsEveryStep="true">
-    <setup>setup</setup>
-    <go>go</go>
-    <timeLimit steps="50"/>
-    <exitCondition>count turtles &gt; 5000  or 
-count turtles &lt; 1</exitCondition>
-    <metric>(word Mortality_Juveniles Mortality_Subadults_Age1 Mortality_Subadults_Age2 Mortality_Adults Repro_Rate Supplements? Number_Supplements Supplement_Time Stoch_events? Frequency Severity)</metric>
-    <metric>count turtles</metric>
-    <metric>count turtles with [colony = "Burghausen"]</metric>
-    <metric>count turtles with [colony = "Kuchl"]</metric>
-    <metric>count turtles with [colony = "Ueberlingen"]</metric>
-    <metric>count turtles with [raising = "FP"]</metric>
-    <metric>count turtles with [raising = "P"]</metric>
-    <metric>count turtles with [colony = "Burghausen" and raising = "FP"]</metric>
-    <metric>count turtles with [colony = "Kuchl" and raising = "FP"]</metric>
-    <metric>count turtles with [colony = "Ueberlingen" and raising = "FP"]</metric>
-    <metric>count turtles with [colony = "Burghausen" and raising = "P"]</metric>
-    <metric>count turtles with [colony = "Kuchl" and raising = "P"]</metric>
-    <metric>count turtles with [colony = "Ueberlingen" and raising = "P"]</metric>
-    <metric>count turtles with [age = 0]</metric>
-    <metric>count turtles with [age = 1]</metric>
-    <metric>count turtles with [age = 2]</metric>
-    <metric>count turtles with [age &gt;= 3]</metric>
-    <enumeratedValueSet variable="Number_Juveniles">
-      <value value="30"/>
-    </enumeratedValueSet>
-    <enumeratedValueSet variable="Number_Subadults_Age1">
-      <value value="30"/>
-    </enumeratedValueSet>
-    <enumeratedValueSet variable="Number_Subadults_Age2">
-      <value value="30"/>
-    </enumeratedValueSet>
-    <enumeratedValueSet variable="Number_Adults">
-      <value value="30"/>
-    </enumeratedValueSet>
-    <enumeratedValueSet variable="Mortality_Juveniles">
-      <value value="0.22"/>
-    </enumeratedValueSet>
-    <enumeratedValueSet variable="Mortality_Subadults_Age1">
-      <value value="0.08"/>
-    </enumeratedValueSet>
-    <enumeratedValueSet variable="Mortality_Subadults_Age2">
-      <value value="0.15"/>
-    </enumeratedValueSet>
-    <enumeratedValueSet variable="Mortality_Adults">
-      <value value="0.14"/>
-    </enumeratedValueSet>
-    <enumeratedValueSet variable="Repro_Rate">
-      <value value="1"/>
-    </enumeratedValueSet>
-    <enumeratedValueSet variable="Supplements?">
-      <value value="true"/>
-    </enumeratedValueSet>
-    <enumeratedValueSet variable="Number_Supplements">
-      <value value="0"/>
-    </enumeratedValueSet>
-    <enumeratedValueSet variable="Supplement_Time">
-      <value value="4"/>
-    </enumeratedValueSet>
-    <enumeratedValueSet variable="Stoch_events?">
-      <value value="true"/>
-    </enumeratedValueSet>
-    <enumeratedValueSet variable="Frequency">
-      <value value="0"/>
-    </enumeratedValueSet>
-    <enumeratedValueSet variable="Severity">
-      <value value="0.25"/>
-    </enumeratedValueSet>
-  </experiment>
-  <experiment name="Baseline_and_Improvements_2020" repetitions="100" runMetricsEveryStep="true">
+  <experiment name="Baseline_SD_2020" repetitions="100" runMetricsEveryStep="true">
     <setup>setup</setup>
     <go>go</go>
     <timeLimit steps="50"/>
@@ -1470,30 +1304,19 @@ count turtles &lt; 1</exitCondition>
       <value value="18"/>
     </enumeratedValueSet>
     <enumeratedValueSet variable="Mortality_Juveniles">
-      <value value="0.2"/>
-      <value value="0.3"/>
       <value value="0.36"/>
     </enumeratedValueSet>
     <enumeratedValueSet variable="Mortality_Subadults_Age1">
-      <value value="0.08"/>
-      <value value="0.19"/>
       <value value="0.26"/>
     </enumeratedValueSet>
     <enumeratedValueSet variable="Mortality_Subadults_Age2">
-      <value value="0.14"/>
-      <value value="0.24"/>
       <value value="0.31"/>
     </enumeratedValueSet>
     <enumeratedValueSet variable="Mortality_Adults">
-      <value value="0.02"/>
-      <value value="0.14"/>
       <value value="0.22"/>
     </enumeratedValueSet>
     <enumeratedValueSet variable="Repro_Rate">
       <value value="0.53"/>
-      <value value="0.58"/>
-      <value value="0.66"/>
-      <value value="1.06"/>
     </enumeratedValueSet>
     <enumeratedValueSet variable="Supplements?">
       <value value="true"/>
@@ -1514,10 +1337,82 @@ count turtles &lt; 1</exitCondition>
       <value value="0.25"/>
     </enumeratedValueSet>
   </experiment>
-  <experiment name="Statquo_All_chicks_2020" repetitions="100" runMetricsEveryStep="true">
-    <setup>setup</setup>
+  <experiment name="CataS_Baseline_SD_2020" repetitions="100" runMetricsEveryStep="true">
+    <setup>prep
+setup</setup>
     <go>go</go>
     <timeLimit steps="50"/>
+    <exitCondition>count turtles &gt; 5000 or 
+count turtles &lt; 1</exitCondition>
+    <metric>(word scenario Supplements? Number_Supplements Supplement_Time Stoch_events? Frequency Severity)</metric>
+    <metric>Mortality_Juveniles</metric>
+    <metric>Mortality_Subadults_Age1</metric>
+    <metric>Mortality_Subadults_Age2</metric>
+    <metric>Mortality_Adults</metric>
+    <metric>Repro_Rate</metric>
+    <metric>count turtles</metric>
+    <metric>count turtles with [colony = "Burghausen"]</metric>
+    <metric>count turtles with [colony = "Kuchl"]</metric>
+    <metric>count turtles with [colony = "Ueberlingen"]</metric>
+    <metric>count turtles with [raising = "FP"]</metric>
+    <metric>count turtles with [raising = "P"]</metric>
+    <metric>count turtles with [colony = "Burghausen" and raising = "FP"]</metric>
+    <metric>count turtles with [colony = "Kuchl" and raising = "FP"]</metric>
+    <metric>count turtles with [colony = "Ueberlingen" and raising = "FP"]</metric>
+    <metric>count turtles with [colony = "Burghausen" and raising = "P"]</metric>
+    <metric>count turtles with [colony = "Kuchl" and raising = "P"]</metric>
+    <metric>count turtles with [colony = "Ueberlingen" and raising = "P"]</metric>
+    <metric>count turtles with [age = 0]</metric>
+    <metric>count turtles with [age = 1]</metric>
+    <metric>count turtles with [age = 2]</metric>
+    <metric>count turtles with [age &gt;= 3]</metric>
+    <enumeratedValueSet variable="scenario">
+      <value value="&quot;Baseline&quot;"/>
+    </enumeratedValueSet>
+    <enumeratedValueSet variable="Number_Juveniles">
+      <value value="37"/>
+    </enumeratedValueSet>
+    <enumeratedValueSet variable="Number_Subadults_Age1">
+      <value value="11"/>
+    </enumeratedValueSet>
+    <enumeratedValueSet variable="Number_Subadults_Age2">
+      <value value="8"/>
+    </enumeratedValueSet>
+    <enumeratedValueSet variable="Number_Adults">
+      <value value="18"/>
+    </enumeratedValueSet>
+    <enumeratedValueSet variable="Supplements?">
+      <value value="true"/>
+    </enumeratedValueSet>
+    <enumeratedValueSet variable="Number_Supplements">
+      <value value="15"/>
+      <value value="30"/>
+    </enumeratedValueSet>
+    <enumeratedValueSet variable="Supplement_Time">
+      <value value="4"/>
+      <value value="7"/>
+    </enumeratedValueSet>
+    <enumeratedValueSet variable="Stoch_events?">
+      <value value="true"/>
+    </enumeratedValueSet>
+    <enumeratedValueSet variable="Frequency">
+      <value value="0.05"/>
+      <value value="0.1"/>
+      <value value="0.15"/>
+      <value value="0.2"/>
+    </enumeratedValueSet>
+    <enumeratedValueSet variable="Severity">
+      <value value="0.05"/>
+      <value value="0.1"/>
+      <value value="0.15"/>
+      <value value="0.2"/>
+      <value value="0.25"/>
+    </enumeratedValueSet>
+  </experiment>
+  <experiment name="Baseline_SD_100years_2020" repetitions="100" runMetricsEveryStep="true">
+    <setup>setup</setup>
+    <go>go</go>
+    <timeLimit steps="100"/>
     <exitCondition>count turtles &gt; 5000  or 
 count turtles &lt; 1</exitCondition>
     <metric>(word Mortality_Juveniles Mortality_Subadults_Age1 Mortality_Subadults_Age2 Mortality_Adults Repro_Rate Supplements? Number_Supplements Supplement_Time Stoch_events? Frequency Severity)</metric>
@@ -1562,8 +1457,7 @@ count turtles &lt; 1</exitCondition>
       <value value="0.22"/>
     </enumeratedValueSet>
     <enumeratedValueSet variable="Repro_Rate">
-      <value value="1.41"/>
-      <value value="3.97"/>
+      <value value="0.53"/>
     </enumeratedValueSet>
     <enumeratedValueSet variable="Supplements?">
       <value value="true"/>
@@ -1581,227 +1475,6 @@ count turtles &lt; 1</exitCondition>
       <value value="0"/>
     </enumeratedValueSet>
     <enumeratedValueSet variable="Severity">
-      <value value="0.25"/>
-    </enumeratedValueSet>
-  </experiment>
-  <experiment name="CataS_Baseline_and_Improvements_2020" repetitions="100" runMetricsEveryStep="true">
-    <setup>prep
-setup</setup>
-    <go>go</go>
-    <timeLimit steps="50"/>
-    <exitCondition>count turtles &gt; 5000 or 
-count turtles &lt; 1</exitCondition>
-    <metric>(word scenario Supplements? Number_Supplements Supplement_Time Stoch_events? Frequency Severity)</metric>
-    <metric>Mortality_Juveniles</metric>
-    <metric>Mortality_Subadults_Age1</metric>
-    <metric>Mortality_Subadults_Age2</metric>
-    <metric>Mortality_Adults</metric>
-    <metric>Repro_Rate</metric>
-    <metric>count turtles</metric>
-    <metric>count turtles with [colony = "Burghausen"]</metric>
-    <metric>count turtles with [colony = "Kuchl"]</metric>
-    <metric>count turtles with [colony = "Ueberlingen"]</metric>
-    <metric>count turtles with [raising = "FP"]</metric>
-    <metric>count turtles with [raising = "P"]</metric>
-    <metric>count turtles with [colony = "Burghausen" and raising = "FP"]</metric>
-    <metric>count turtles with [colony = "Kuchl" and raising = "FP"]</metric>
-    <metric>count turtles with [colony = "Ueberlingen" and raising = "FP"]</metric>
-    <metric>count turtles with [colony = "Burghausen" and raising = "P"]</metric>
-    <metric>count turtles with [colony = "Kuchl" and raising = "P"]</metric>
-    <metric>count turtles with [colony = "Ueberlingen" and raising = "P"]</metric>
-    <metric>count turtles with [age = 0]</metric>
-    <metric>count turtles with [age = 1]</metric>
-    <metric>count turtles with [age = 2]</metric>
-    <metric>count turtles with [age &gt;= 3]</metric>
-    <enumeratedValueSet variable="scenario">
-      <value value="&quot;100RR&quot;"/>
-      <value value="&quot;10adu&quot;"/>
-      <value value="&quot;25adu&quot;"/>
-      <value value="&quot;10all&quot;"/>
-      <value value="&quot;25all&quot;"/>
-      <value value="&quot;10all10RR&quot;"/>
-      <value value="&quot;25all25RR&quot;"/>
-      <value value="&quot;Statusquo&quot;"/>
-    </enumeratedValueSet>
-    <enumeratedValueSet variable="Number_Juveniles">
-      <value value="37"/>
-    </enumeratedValueSet>
-    <enumeratedValueSet variable="Number_Subadults_Age1">
-      <value value="11"/>
-    </enumeratedValueSet>
-    <enumeratedValueSet variable="Number_Subadults_Age2">
-      <value value="8"/>
-    </enumeratedValueSet>
-    <enumeratedValueSet variable="Number_Adults">
-      <value value="18"/>
-    </enumeratedValueSet>
-    <enumeratedValueSet variable="Supplements?">
-      <value value="true"/>
-    </enumeratedValueSet>
-    <enumeratedValueSet variable="Number_Supplements">
-      <value value="15"/>
-      <value value="30"/>
-    </enumeratedValueSet>
-    <enumeratedValueSet variable="Supplement_Time">
-      <value value="4"/>
-      <value value="7"/>
-    </enumeratedValueSet>
-    <enumeratedValueSet variable="Stoch_events?">
-      <value value="true"/>
-    </enumeratedValueSet>
-    <enumeratedValueSet variable="Frequency">
-      <value value="0.05"/>
-      <value value="0.1"/>
-      <value value="0.15"/>
-      <value value="0.2"/>
-    </enumeratedValueSet>
-    <enumeratedValueSet variable="Severity">
-      <value value="0.05"/>
-      <value value="0.1"/>
-      <value value="0.15"/>
-      <value value="0.2"/>
-      <value value="0.25"/>
-    </enumeratedValueSet>
-  </experiment>
-  <experiment name="Cata_all_chicks_without_Supp_2020" repetitions="100" runMetricsEveryStep="true">
-    <setup>prep
-setup</setup>
-    <go>go</go>
-    <timeLimit steps="50"/>
-    <exitCondition>count turtles &gt; 5000 or 
-count turtles &lt; 1</exitCondition>
-    <metric>(word scenario Supplements? Number_Supplements Supplement_Time Stoch_events? Frequency Severity)</metric>
-    <metric>Mortality_Juveniles</metric>
-    <metric>Mortality_Subadults_Age1</metric>
-    <metric>Mortality_Subadults_Age2</metric>
-    <metric>Mortality_Adults</metric>
-    <metric>Repro_Rate</metric>
-    <metric>count turtles</metric>
-    <metric>count turtles with [colony = "Burghausen"]</metric>
-    <metric>count turtles with [colony = "Kuchl"]</metric>
-    <metric>count turtles with [colony = "Ueberlingen"]</metric>
-    <metric>count turtles with [raising = "FP"]</metric>
-    <metric>count turtles with [raising = "P"]</metric>
-    <metric>count turtles with [colony = "Burghausen" and raising = "FP"]</metric>
-    <metric>count turtles with [colony = "Kuchl" and raising = "FP"]</metric>
-    <metric>count turtles with [colony = "Ueberlingen" and raising = "FP"]</metric>
-    <metric>count turtles with [colony = "Burghausen" and raising = "P"]</metric>
-    <metric>count turtles with [colony = "Kuchl" and raising = "P"]</metric>
-    <metric>count turtles with [colony = "Ueberlingen" and raising = "P"]</metric>
-    <metric>count turtles with [age = 0]</metric>
-    <metric>count turtles with [age = 1]</metric>
-    <metric>count turtles with [age = 2]</metric>
-    <metric>count turtles with [age &gt;= 3]</metric>
-    <enumeratedValueSet variable="scenario">
-      <value value="&quot;All_chicks_Cata&quot;"/>
-    </enumeratedValueSet>
-    <enumeratedValueSet variable="Number_Juveniles">
-      <value value="37"/>
-    </enumeratedValueSet>
-    <enumeratedValueSet variable="Number_Subadults_Age1">
-      <value value="11"/>
-    </enumeratedValueSet>
-    <enumeratedValueSet variable="Number_Subadults_Age2">
-      <value value="8"/>
-    </enumeratedValueSet>
-    <enumeratedValueSet variable="Number_Adults">
-      <value value="18"/>
-    </enumeratedValueSet>
-    <enumeratedValueSet variable="Supplements?">
-      <value value="true"/>
-    </enumeratedValueSet>
-    <enumeratedValueSet variable="Number_Supplements">
-      <value value="0"/>
-    </enumeratedValueSet>
-    <enumeratedValueSet variable="Supplement_Time">
-      <value value="4"/>
-    </enumeratedValueSet>
-    <enumeratedValueSet variable="Stoch_events?">
-      <value value="true"/>
-    </enumeratedValueSet>
-    <enumeratedValueSet variable="Frequency">
-      <value value="0.05"/>
-      <value value="0.1"/>
-      <value value="0.15"/>
-      <value value="0.2"/>
-    </enumeratedValueSet>
-    <enumeratedValueSet variable="Severity">
-      <value value="0.05"/>
-      <value value="0.1"/>
-      <value value="0.15"/>
-      <value value="0.2"/>
-      <value value="0.25"/>
-    </enumeratedValueSet>
-  </experiment>
-  <experiment name="CataS_AllChicks_2020" repetitions="100" runMetricsEveryStep="true">
-    <setup>prep
-setup</setup>
-    <go>go</go>
-    <timeLimit steps="50"/>
-    <exitCondition>count turtles &gt; 5000 or 
-count turtles &lt; 1</exitCondition>
-    <metric>(word scenario Supplements? Number_Supplements Supplement_Time Stoch_events? Frequency Severity)</metric>
-    <metric>Mortality_Juveniles</metric>
-    <metric>Mortality_Subadults_Age1</metric>
-    <metric>Mortality_Subadults_Age2</metric>
-    <metric>Mortality_Adults</metric>
-    <metric>Repro_Rate</metric>
-    <metric>count turtles</metric>
-    <metric>count turtles with [colony = "Burghausen"]</metric>
-    <metric>count turtles with [colony = "Kuchl"]</metric>
-    <metric>count turtles with [colony = "Ueberlingen"]</metric>
-    <metric>count turtles with [raising = "FP"]</metric>
-    <metric>count turtles with [raising = "P"]</metric>
-    <metric>count turtles with [colony = "Burghausen" and raising = "FP"]</metric>
-    <metric>count turtles with [colony = "Kuchl" and raising = "FP"]</metric>
-    <metric>count turtles with [colony = "Ueberlingen" and raising = "FP"]</metric>
-    <metric>count turtles with [colony = "Burghausen" and raising = "P"]</metric>
-    <metric>count turtles with [colony = "Kuchl" and raising = "P"]</metric>
-    <metric>count turtles with [colony = "Ueberlingen" and raising = "P"]</metric>
-    <metric>count turtles with [age = 0]</metric>
-    <metric>count turtles with [age = 1]</metric>
-    <metric>count turtles with [age = 2]</metric>
-    <metric>count turtles with [age &gt;= 3]</metric>
-    <enumeratedValueSet variable="scenario">
-      <value value="&quot;All_chicks&quot;"/>
-    </enumeratedValueSet>
-    <enumeratedValueSet variable="Number_Juveniles">
-      <value value="37"/>
-    </enumeratedValueSet>
-    <enumeratedValueSet variable="Number_Subadults_Age1">
-      <value value="11"/>
-    </enumeratedValueSet>
-    <enumeratedValueSet variable="Number_Subadults_Age2">
-      <value value="8"/>
-    </enumeratedValueSet>
-    <enumeratedValueSet variable="Number_Adults">
-      <value value="18"/>
-    </enumeratedValueSet>
-    <enumeratedValueSet variable="Supplements?">
-      <value value="true"/>
-    </enumeratedValueSet>
-    <enumeratedValueSet variable="Number_Supplements">
-      <value value="15"/>
-      <value value="30"/>
-    </enumeratedValueSet>
-    <enumeratedValueSet variable="Supplement_Time">
-      <value value="4"/>
-      <value value="7"/>
-    </enumeratedValueSet>
-    <enumeratedValueSet variable="Stoch_events?">
-      <value value="true"/>
-    </enumeratedValueSet>
-    <enumeratedValueSet variable="Frequency">
-      <value value="0.05"/>
-      <value value="0.1"/>
-      <value value="0.15"/>
-      <value value="0.2"/>
-    </enumeratedValueSet>
-    <enumeratedValueSet variable="Severity">
-      <value value="0.05"/>
-      <value value="0.1"/>
-      <value value="0.15"/>
-      <value value="0.2"/>
       <value value="0.25"/>
     </enumeratedValueSet>
   </experiment>
