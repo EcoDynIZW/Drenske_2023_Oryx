@@ -406,7 +406,7 @@ box()
 Save the Plot
 
 ```{r}
-# png(filename = here("plots", "03_fecundity", "RR_baseline.png"), 
+# png(filename = here("plots", "03_reproduction", "RR_baseline.png"), 
 # width = 900, height = 600)
 # par(mar = c(5,4.5,2,5))
 # 
@@ -636,7 +636,7 @@ par(mar = c(5, 4, 4, 2) + 0.1)
 Save the Plot
 
 ```{r}
-# png(filename = here("plots", "03_fecundity", "RR_statquo.png"), width = 900, height = 600)
+# png(filename = here("plots", "03_reproduction", "RR_statquo.png"), width = 900, height = 600)
 # par(mar = c(5,4.5,2,5))
 # barplot(Statquo_RR_mat, beside = T, border = NA, ylim = c(0,25), ylab = "Number of Individuals", xlab = "Years",
 #         cex.axis = 1.8, cex.lab = 2, col = c("#DE4968FF","#51127CFF", "white" ), 
@@ -761,7 +761,7 @@ par(mar = c(5, 4, 4, 2) + 0.1)
 Save the Plot
 
 ```{r}
-# png(filename = here("plots", "03_fecundity", "RR_allchicks.png"), width = 900, height = 600)
+# png(filename = here("plots", "03_reproduction", "RR_allchicks.png"), width = 900, height = 600)
 # par(mar = c(5,4.5,2,5))
 # barplot(Allchicks_RR_mat, beside = T, border = NA, ylim = c(0,50), ylab = "Number of Individuals", xlab = "Years",
 #         cex.axis = 1.8, cex.lab = 2, col = c("#DE4968FF","#51127CFF", "white" ), 

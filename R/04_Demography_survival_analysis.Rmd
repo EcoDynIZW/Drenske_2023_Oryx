@@ -389,7 +389,7 @@ sum_cox_col
 Survival plot
 ```{r col surv plot}
 # Life status
-ggsurvplot(sfit_2col, data = NBI_3col, conf.int = T, risk.table = F, xlab = "Years", xlim = c(0,8*365.25),
+ggsurvplot(sfit_2col, data = NBI_2col, conf.int = T, risk.table = F, xlab = "Years", xlim = c(0,8*365.25),
            font.x = 23, font.tickslab = 22, font.y = 23,font.legend = 22,
            ggtheme = theme_bw()+ theme(panel.grid.major = element_blank(), panel.grid.minor = element_blank()),
            break.time.by = 365.25, xscale = 365.25, pval = 0.2, pval.coord = c(x = 6.95*365.25, y = 0.85), pval.size = 7,
@@ -401,11 +401,11 @@ Save the Plot
 ```{r col save plot}
 # # Life status
 # png(filename = here("plots","02_survival", "survplot_life_colonies.png"), width = 1200, height = 772)
-# ggsurvplot(sfit_3col, data = NBI_3col, conf.int = T, risk.table = F, xlab = "Years", xlim = c(0,8*365.25),
-#            font.x = 35, font.tickslab = 34, font.y = 35,font.legend = 35,
+# ggsurvplot(sfit_2col, data = NBI_2col, conf.int = T, risk.table = F, xlab = "Years", xlim = c(0,8*365.25),
+#            font.x = 23, font.tickslab = 22, font.y = 23,font.legend = 22,
 #            ggtheme = theme_bw()+ theme(panel.grid.major = element_blank(), panel.grid.minor = element_blank()),
-#            break.time.by = 365.25, xscale = 365.25, pval = 0.2, pval.coord = c(x = 6.55*365.25, y = 0.80), pval.size = 12,
-#            legend = c(0.89,0.90), legend.title = "Colony", legend.labs = c("Burghausen", "Kuchl"),
+#            break.time.by = 365.25, xscale = 365.25, pval = 0.2, pval.coord = c(x = 6.95*365.25, y = 0.85), pval.size = 7,
+#            legend = c(0.9,0.91), legend.title = "Colony", legend.labs = c("Burghausen", "Kuchl"), 
 #            palette = inferno(5,begin =0.65,  end = 0.95, direction = -1))
 # dev.off()
 ```
@@ -431,8 +431,8 @@ NBI_timesplit_colony <- droplevels(NBI_timesplit_colony)
 Survival curve
 ```{r sc surv curve life}
 # life status
-sfit_sc <- survfit(formula = Surv(time = NBI_timesplit_colony$TimeStart2,
-                                      time2 = NBI_timesplit_colony$TimeStop2, 
+sfit_sc <- survfit(formula = Surv(time = NBI_timesplit_colony$TimeStart,
+                                      time2 = NBI_timesplit_colony$TimeStop, 
                                       event = NBI_timesplit_colony$event) ~ NBI_timesplit_colony$STAGE_F + NBI_timesplit_colony$breeding_area, 
                        data = NBI_timesplit_colony)
 sum_sfit_sc <- summary(sfit_sc, times = c(0, 365, 730, 1095, 1460, 1825, 2190, 2555, 2920, 3285))
@@ -442,8 +442,8 @@ sum_sfit_sc
 
 ```{r sc surv curve proj}
 # # project status
-# sfit_sc2 <- survfit(formula = Surv(time = NBI_timesplit_colony2$TimeStart2,
-#                                       time2 = NBI_timesplit_colony2$TimeStop2, 
+# sfit_sc2 <- survfit(formula = Surv(time = NBI_timesplit_colony2$TimeStart,
+#                                       time2 = NBI_timesplit_colony2$TimeStop, 
 #                                       event = NBI_timesplit_colony2$event) ~ NBI_timesplit_colony2$STAGE_F + NBI_timesplit_colony2$breeding_area, 
 #                        data = NBI_timesplit_colony2)
 # sum_sfit_sc2 <- summary(sfit_sc2, times = c(0, 365, 730, 1095, 1460, 1825, 2190, 2555, 2920, 3285))
@@ -569,7 +569,7 @@ sd_s4_K
 Cox proportional hazards model
 ```{r sc cox ph}
 # life status
-cox_sc <- coxph(Surv(NBI_timesplit_colony$TimeStart2, NBI_timesplit_colony$TimeStop2, NBI_timesplit_colony$event) ~ 
+cox_sc <- coxph(Surv(NBI_timesplit_colony$TimeStart, NBI_timesplit_colony$TimeStop, NBI_timesplit_colony$event) ~ 
                 NBI_timesplit_colony$STAGE_F + NBI_timesplit_colony$breeding_area, data = NBI_timesplit_colony)
 sum_cox_sc <- summary(cox_sc)
 sum_cox_sc
@@ -718,8 +718,8 @@ NBI_timesplit_srt <- droplevels(NBI_timesplit_srt)
 Survival curve
 ```{r srt surv curve life}
 # life status
-sfit_srt <- survfit(formula = Surv(time = NBI_timesplit_srt$TimeStart2,
-                                      time2 = NBI_timesplit_srt$TimeStop2, 
+sfit_srt <- survfit(formula = Surv(time = NBI_timesplit_srt$TimeStart,
+                                      time2 = NBI_timesplit_srt$TimeStop, 
                                       event = NBI_timesplit_srt$event) ~ NBI_timesplit_srt$STAGE_F + NBI_timesplit_srt$raising_type, 
                        data = NBI_timesplit_srt)
 sum_sfit_srt <- summary(sfit_srt, times = c(0, 365, 730, 1095, 1460, 1825, 2190, 2555, 2920, 3285))
@@ -817,14 +817,14 @@ sd_s4_BP
 Cox proportional hazards model
 ```{r srt cox ph}
 # life status
-cox_srt <- coxph(Surv(NBI_timesplit_srt$TimeStart2, NBI_timesplit_srt$TimeStop2, NBI_timesplit_srt$event) ~ 
+cox_srt <- coxph(Surv(NBI_timesplit_srt$TimeStart, NBI_timesplit_srt$TimeStop, NBI_timesplit_srt$event) ~ 
                 NBI_timesplit_srt$STAGE_F + NBI_timesplit_srt$raising_type, data = NBI_timesplit_srt)
 sum_cox_srt <- summary(cox_srt)
 sum_cox_srt
 
 
 # # Project status
-# cox_srt2 <- coxph(Surv(NBI_timesplit_srt2$TimeStart2, NBI_timesplit_srt2$TimeStop2, NBI_timesplit_srt2$event) ~ 
+# cox_srt2 <- coxph(Surv(NBI_timesplit_srt2$TimeStart, NBI_timesplit_srt2$TimeStop, NBI_timesplit_srt2$event) ~ 
 #                 NBI_timesplit_srt2$STAGE_F + NBI_timesplit_srt2$raising_type, data = NBI_timesplit_srt2)
 # sum_cox_srt2 <- summary(cox_srt2)
 # sum_cox_srt2

@@ -132,8 +132,8 @@ df_max_sc <- df_max %>% group_by(Scenario) %>% summarize_if(is.numeric, max) # h
 
 ## Save data
 ```{r}
-# saveRDS(object = df_ext, file = here("output", "data-proc", "NetLogo-proc", "df_ext.rds"))
-# saveRDS(object = df_max_sc, file = here("output", "data-proc", "NetLogo-proc", "df_max_sc.rds"))
+# saveRDS(object = df_ext, file = here("output", "data-proc", "model-proc", "df_ext.rds"))
+# saveRDS(object = df_max_sc, file = here("output", "data-proc", "model-proc", "df_max_sc.rds"))
 ```
 
 
@@ -178,7 +178,7 @@ df_Basic <- df_Basic[, -c(25,26)] # remove the first columns (Diff, Quot) for th
 ## Save data
 Save a new version of df_Basic with Lambda
 ```{r}
-#saveRDS(object = df_Basic, file = here("output", "data-proc", "NetLogo-proc", "df_Basic_Lambda.rds"))
+#saveRDS(object = df_Basic, file = here("output", "data-proc", "model-proc", "df_Basic_Lambda.rds"))
 ```
 
 
@@ -229,7 +229,7 @@ table(df_sc_mean$Lambda_sto > 1 & df_sc_mean$Extinct <= 5)
 
 ## Save data 
 ```{r}
-#saveRDS(object = df_sc_mean, file = here("output", "data-proc", "NetLogo-proc", "df_sc_mean.rds"))
+#saveRDS(object = df_sc_mean, file = here("output", "data-proc", "model-proc", "df_sc_mean.rds"))
 ```
 
 
@@ -267,7 +267,7 @@ table(df_lambda_pos$Repro)
 
 ## Save data 
 ```{r}
-#saveRDS(object = df_lambda_pos, file = here("output", "data-proc", "NetLogo-proc", "df_lambda_pos.rds"))
+#saveRDS(object = df_lambda_pos, file = here("output", "data-proc", "model-proc", "df_lambda_pos.rds"))
 ```
 
 # Analysis II: Scenarios of special interest
