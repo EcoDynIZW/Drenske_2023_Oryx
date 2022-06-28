@@ -10,8 +10,6 @@
 
 # Specific file formats
 *.doc
-*.html
-*.png
 *.pptx
 *.xls*
 
@@ -26,9 +24,21 @@
 
 
 # Folder
-plots/
-docs/
+data-raw/model-raw/
+docs/literature
+docs/admin/
+docs/manuscript
+docs/presentations
+model/Old
+output/not_used
+output/data-proc/old
+output/data-proc/model-proc/Old
+output/geo-proc
+plots/01_description/old
+plots/04_PVA/old
+R/Not_used
 
-# large DEM file
+
+# large files
 dem_3035_crop.tif
-*.csv
+df_StevS.rds
