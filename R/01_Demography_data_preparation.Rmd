@@ -227,7 +227,7 @@ NBI$mortality_cause <- droplevels(NBI$mortality_cause)
 ## We store the settings of your computer and the current versions of the
 ## packages used to allow for reproducibility
 Sys.time()
-git2r::repository() ## uncomment if you are using GitHub
+#git2r::repository() ## uncomment if you are using GitHub
 sessionInfo()
 ```
 

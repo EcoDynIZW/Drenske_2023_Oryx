@@ -406,7 +406,7 @@ box()
 Save the Plot
 
 ```{r}
-# png(filename = here("plots", "03_reproduction", "RR_baseline.png"), 
+# png(filename = here("plots", "03_reproduction", "RR_baseline.png"),
 # width = 900, height = 600)
 # par(mar = c(5,4.5,2,5))
 # 
@@ -639,14 +639,14 @@ Save the Plot
 # png(filename = here("plots", "03_reproduction", "RR_statquo.png"), width = 900, height = 600)
 # par(mar = c(5,4.5,2,5))
 # barplot(Statquo_RR_mat, beside = T, border = NA, ylim = c(0,25), ylab = "Number of Individuals", xlab = "Years",
-#         cex.axis = 1.8, cex.lab = 2, col = c("#DE4968FF","#51127CFF", "white" ), 
-#         legend = c("Potential Mothers", "Chicks", "Reproductive rate", "Mean reproductive rate"), 
-#         args.legend = list(x = "topleft", fill = c("#DE4968FF","#51127CFF",magma(1, begin = 0.8),viridis(1,begin = 0.7)), 
+#         cex.axis = 1.8, cex.lab = 2, col = c("#DE4968FF","#51127CFF", "white" ),
+#         legend = c("Potential Mothers", "Chicks", "Reproductive rate", "Mean reproductive rate"),
+#         args.legend = list(x = "topleft", fill = c("#DE4968FF","#51127CFF",magma(1, begin = 0.8),viridis(1,begin = 0.7)),
 #                            ncol = 2, cex = 1.5, border = NA, bty = "n"))
 # axis(side = 1, at = c(2,5,8,11,14,17,20,23), labels = c(2012:2019), cex.axis = 1.8)
 # 
 # par(new = T)
-# plot(time_RR, Statquo_RR_year, type = "l", xaxt = "n", yaxt = "n", xlab = "", ylab = "", ylim = c(0,3.5), 
+# plot(time_RR, Statquo_RR_year, type = "l", xaxt = "n", yaxt = "n", xlab = "", ylab = "", ylim = c(0,3.5),
 #      lwd = 4, col = magma(1, begin = 0.8), xlim = c(1,24))
 # axis(side = 4, cex.axis = 1.8)
 # mtext(text = "Reproductive rate", side = 4, line = 3, cex = 2)
@@ -764,14 +764,14 @@ Save the Plot
 # png(filename = here("plots", "03_reproduction", "RR_allchicks.png"), width = 900, height = 600)
 # par(mar = c(5,4.5,2,5))
 # barplot(Allchicks_RR_mat, beside = T, border = NA, ylim = c(0,50), ylab = "Number of Individuals", xlab = "Years",
-#         cex.axis = 1.8, cex.lab = 2, col = c("#DE4968FF","#51127CFF", "white" ), 
-#         legend = c("Potential Mothers", "Chicks", "Reproductive rate", "Mean reproductive rate"), 
-#         args.legend = list(x = "topleft", fill = c("#DE4968FF","#51127CFF",magma(1, begin = 0.8),viridis(1,begin = 0.7)), 
+#         cex.axis = 1.8, cex.lab = 2, col = c("#DE4968FF","#51127CFF", "white" ),
+#         legend = c("Potential Mothers", "Chicks", "Reproductive rate", "Mean reproductive rate"),
+#         args.legend = list(x = "topleft", fill = c("#DE4968FF","#51127CFF",magma(1, begin = 0.8),viridis(1,begin = 0.7)),
 #                            ncol = 2, cex = 1.5, border = NA, bty = "n"))
 # axis(side = 1, at = c(2,5,8,11,14,17), labels = c(2014:2019), cex.axis = 1.8)
 # 
 # par(new = T)
-# plot(Allchicks_time_RR, Allchicks_RR_year, type = "l", xaxt = "n", yaxt = "n", xlab = "", ylab = "", ylim = c(0,8.5), 
+# plot(Allchicks_time_RR, Allchicks_RR_year, type = "l", xaxt = "n", yaxt = "n", xlab = "", ylab = "", ylim = c(0,8.5),
 #      lwd = 4, col = magma(1, begin = 0.8), xlim = c(1,18))
 # axis(side = 4, cex.axis = 1.8)
 # mtext(text = "Reproductive rate", side = 4, line = 3, cex = 2)

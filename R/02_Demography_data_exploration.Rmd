@@ -213,18 +213,18 @@ Save the Plot
 # png(filename = here("plots", "01_description", "Barplot_all.png"), width = 1300, height = 835)
 # par(mar = c(5,5,2,0))
 # 
-# barplot(NBI_mat, beside = T, ylim = c(0,220), ylab = "Number of Individuals", border = NA, 
+# barplot(NBI_mat, beside = T, ylim = c(0,220), ylab = "Number of Individuals", border = NA,
 #         cex.axis = 3, cex.lab = 3,
 #         col = c(
 #                 magma(4, begin = 0.25, end = 0.6), "white", # Stage
-#                 
+# 
 #                 plasma(1, direction = -1, begin = 0.0, end = 0.6), viridis(1, begin = 0.2, alpha = 0.9), # Sex
 #                   magma(1, begin = 0.1, alpha = 0.6),"white", # Sex
-#                 
-#                 inferno(5,begin =0.65,  end = 0.95, direction = -1), "white", # Colony 
-#                 
+# 
+#                 inferno(5,begin =0.65,  end = 0.95, direction = -1), "white", # Colony
+# 
 #                 viridis(3, begin = 0.65, end = 0.85),"white", # Raising type
-#                 
+# 
 #                 gray(0:7 / 8), viridis(1, begin = 0.5))) # Mortality type
 # 
 # axis(1, at = c(3,7.5,12.5,17.5,24.5), labels = c("", "", "", "", ""), cex.axis = 3)
@@ -263,12 +263,12 @@ Save the Legend
 # par(mar = mar_small)
 # plot(1, type = "n", axes = "F", xlab = "", ylab = "") # empty plot
 # 
-# legend(x = "center", 
+# legend(x = "center",
 #        legend = c("Stage","Juveniles","1 Year Old","2 Year Old","Adults",   "",
-#                   "Sex","Females","Males","Unknown",   "", 
-#                   "Colony","Burghausen","Kuchl","Überlingen", "Rosegg", "unassigned yet",   "", 
-#                   "Raising type","Foster parents","Biological Parents", "Supplementation",   "", 
-#                   "Mortality type","During human care","Electrocution","Injury or illness","Predation","Shot","Other", "Unknown", "Delivered", "Alive"), 
+#                   "Sex","Females","Males","Unknown",   "",
+#                   "Colony","Burghausen","Kuchl","Überlingen", "Rosegg", "unassigned yet",   "",
+#                   "Raising type","Foster parents","Biological Parents", "Supplementation",   "",
+#                   "Mortality type","During human care","Electrocution","Injury or illness","Predation","Shot","Other", "Unknown", "Delivered", "Alive"),
 #        fill = c("white",magma(4, begin = 0.25, end = 0.6),   "white", # Stage
 #                 "white",plasma(1, direction = -1, begin = 0.0, end = 0.6), viridis(1, begin = 0.2, alpha = 0.9), # Sex
 #                         magma(1, begin = 0.1, alpha = 0.6),"white", # Sex
@@ -327,15 +327,15 @@ Save the Plot
 # png(filename = here("plots", "01_description", "Barplot_alive_f.png"), width = 1300, height = 835)
 # par(mar = c(5,5,2,0))
 # 
-# barplot(NBI_mat_f, beside = T, ylim = c(0,50), ylab = "Number of Individuals", border = NA, 
+# barplot(NBI_mat_f, beside = T, ylim = c(0,50), ylab = "Number of Individuals", border = NA,
 #         cex.axis = 3, cex.lab = 3,
 #         col = c(
 #                 magma(4, begin = 0.25, end = 0.6), "white", # Stage
-#                 
-#                 inferno(5,begin =0.65,  end = 0.95, direction = -1), "white", # Colony 
-#                 
+# 
+#                 inferno(5,begin =0.65,  end = 0.95, direction = -1), "white", # Colony
+# 
 #                 viridis(3, begin = 0.65, end = 0.85) # Raising type
-#                 
+# 
 #                 ))
 # axis(1, at = c(3,8.5,13.5), labels = c("", "", ""), cex.axis = 3)
 # axis(1, at = c(3,8.5,13.5), labels = c("Stage", "Colony", "Raising type"), cex.axis = 3, line = 1, lwd = 0)

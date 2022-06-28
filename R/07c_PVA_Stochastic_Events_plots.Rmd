@@ -359,7 +359,7 @@ ggplot(data = df_Supp_summ, aes(x = Supplement_Time,
 
 ## Save plot
 ```{r}
-# ggsave(filename = here("plots", "04_PVA", "Supplements_percent.png"), 
+# ggsave(filename = here("plots", "04_PVA", "Supplements_percent.png"),
 #        width = 13, height = 8, units = "cm")
 ```
 

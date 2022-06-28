@@ -132,21 +132,21 @@ ggsurvplot(sfit_days,
 
 Save the Plot
 ```{r overall save plot}
-# png(filename = here("plots", "02_survival", "survplot_life_overall.png"), 
+# png(filename = here("plots", "02_survival", "survplot_life_overall.png"),
 #     width = 1200, height = 772)
-# ggsurvplot(sfit_days, 
-#            data = NBI, 
-#            palette = "black", 
-#            xlab = "Years", 
-#            font.x = 35, 
-#            font.tickslab = 34, 
-#            font.y = 35, 
+# ggsurvplot(sfit_days,
+#            data = NBI,
+#            palette = "black",
+#            xlab = "Years",
+#            font.x = 35,
+#            font.tickslab = 34,
+#            font.y = 35,
 #            font.legend = 35,
-#            risk.table = F, 
-#            break.time.by = 365.25, 
-#            xscale = 365.25, 
+#            risk.table = F,
+#            break.time.by = 365.25,
+#            xscale = 365.25,
 #            legend = "none",
-#            ggtheme = theme_bw() + theme(panel.grid.major = element_blank(), 
+#            ggtheme = theme_bw() + theme(panel.grid.major = element_blank(),
 #                                         panel.grid.minor = element_blank()))
 # dev.off()
 ```
@@ -232,6 +232,7 @@ s4
 Calculate the standard deviation (SD) for the baseline values 
 Formula: SE * sqrt(n) = SD                  
 SE = Standard error, sqrt = Square root, n = number individuals
+
 ```{r stage sd}
 # life status & project status (numbers are equal)
 sd_s1 <- round(sum_sfit_stage$std.err[2]*sqrt(sum_sfit_stage$n.risk[2]), digits = 2)
@@ -442,8 +443,8 @@ sum_sfit_sc
 
 ```{r sc surv curve proj}
 # # project status
-# sfit_sc2 <- survfit(formula = Surv(time = NBI_timesplit_colony2$TimeStart,
-#                                       time2 = NBI_timesplit_colony2$TimeStop, 
+# sfit_sc2 <- survfit(formula = Surv(time = NBI_timesplit_colony2$TimeStart2,
+#                                       time2 = NBI_timesplit_colony2$TimeStop2, 
 #                                       event = NBI_timesplit_colony2$event) ~ NBI_timesplit_colony2$STAGE_F + NBI_timesplit_colony2$breeding_area, 
 #                        data = NBI_timesplit_colony2)
 # sum_sfit_sc2 <- summary(sfit_sc2, times = c(0, 365, 730, 1095, 1460, 1825, 2190, 2555, 2920, 3285))
@@ -674,18 +675,32 @@ ggsurvplot(sfit_rt, data = NBI_RT, conf.int = T, risk.table = F, xlab = "Years",
 Save the Plot
 ```{r rt save plot}
 # Life status
-# png(filename = here("plots","02_survival", "survplot_life_raising.png"), width = 1200, height = 772)
-# 
-# ggsurvplot(sfit_rt, data = NBI_RT, conf.int = T, risk.table = F, xlab = "Years", xlim = c(0,8*365.25),
-#            font.x = 35, font.tickslab = 34, font.y = 35,font.legend = 35,
+# svg for publication
+# svg(filename = here("plots","02_survival", "survplot_life_raising_20220614.svg"), width = 3.22835, height = 2.07874)
+# ggsurvplot(sfit_rt, data = NBI_RT, conf.int = T, risk.table = F, xlab = "Years", xlim = c(0,8*365.25), size = 0.8,
+#            font.x = 10, font.tickslab = 9, font.y = 10,font.legend = 7,
 #            ggtheme = theme_bw()+ theme(panel.grid.major = element_blank(), panel.grid.minor = element_blank()),
-#            break.time.by = 365.25, xscale = 365.25, pval = 0.004, pval.coord = c(x = 5.85*365.25, y = 0.8), pval.size = 12,
-#            legend = c(0.85,0.90), legend.title = "Raising type",
+#            break.time.by = 365.25, xscale = 365.25, pval = 0.004, pval.coord = c(x = 4.5*365.25, y = 0.45), pval.size = 2.5,
+#            legend = c(0.76,0.75), legend.title = "Raising type",
+#            legend.labs = c("Foster parents", "Biological parents"),
+#            palette = viridis(3, begin = 0.65, end = 0.85))
+# dev.off()
+
+
+# png(filename = here("plots","02_survival", "survplot_life_raising_20220614.png"), width = 82, height = 52.8, units = "mm", res = 2000)
+# 
+# ggsurvplot(sfit_rt, data = NBI_RT, conf.int = T, risk.table = F, xlab = "Years", xlim = c(0,8*365.25), size = 0.8,
+#            font.x = 10, font.tickslab = 9, font.y = 10,font.legend = 7,
+#            ggtheme = theme_bw()+ theme(panel.grid.major = element_blank(), panel.grid.minor = element_blank()),
+#            break.time.by = 365.25, xscale = 365.25, pval = 0.004, pval.coord = c(x = 4.5*365.25, y = 0.45), pval.size = 2.5,
+#            legend = c(0.76,0.75), legend.title = "Raising type",
 #            legend.labs = c("Foster parents", "Biological parents"),
 #            palette = viridis(3, begin = 0.65, end = 0.85))
 # 
 # dev.off()
-#
+```
+
+```{r}
 # # Project status
 # png(filename = here("plots","02_survival", "survplot_project_raising.png"), width = 1200, height = 772)
 # 
@@ -729,8 +744,8 @@ sum_sfit_srt
 
 ```{r srt surv curve proj}
 # # project status
-# sfit_srt2 <- survfit(formula = Surv(time = NBI_timesplit_srt2$TimeStart2,
-#                                       time2 = NBI_timesplit_srt2$TimeStop2, 
+# sfit_srt2 <- survfit(formula = Surv(time = NBI_timesplit_srt2$TimeStart,
+#                                       time2 = NBI_timesplit_srt2$TimeStop, 
 #                                       event = NBI_timesplit_srt2$event) ~ NBI_timesplit_srt2$STAGE_F + NBI_timesplit_srt2$raising_type, 
 #                        data = NBI_timesplit_srt2)
 # sum_sfit_srt2 <- summary(sfit_srt2, times = c(0, 365, 730, 1095, 1460, 1825, 2190, 2555, 2920, 3285))
@@ -922,18 +937,18 @@ ggsurvplot(sfit_sex, data = NBI_sex, conf.int = T, risk.table = F, xlab = "Years
 
 Save the Plot
 ```{r sex save plot}
-# Life status
-png(filename = here("plots","02_survival", "survplot_life_sex.png"), width = 1200, height = 772)
-
-ggsurvplot(sfit_sex, data = NBI_sex, conf.int = T, risk.table = F, xlab = "Years", xlim = c(0,8*365.25),
-           font.x = 35, font.tickslab = 34, font.y = 35,font.legend = 35,
-           ggtheme = theme_bw()+ theme(panel.grid.major = element_blank(), panel.grid.minor = element_blank()),
-           break.time.by = 365.25, xscale = 365.25, pval = 0.4, pval.coord = c(x = 7.05*365.25, y = 0.80), pval.size = 12,
-           legend = c(0.92,0.90), legend.title = "Sex",
-           legend.labs = c("females", "males"),
-           palette = c(plasma(1, direction = -1, begin = 0.0, end = 0.6), viridis(1, begin = 0.2, alpha = 0.9)))
-
-dev.off()
+# # Life status
+# png(filename = here("plots","02_survival", "survplot_life_sex.png"), width = 1200, height = 772)
+# 
+# ggsurvplot(sfit_sex, data = NBI_sex, conf.int = T, risk.table = F, xlab = "Years", xlim = c(0,8*365.25),
+#            font.x = 35, font.tickslab = 34, font.y = 35,font.legend = 35,
+#            ggtheme = theme_bw()+ theme(panel.grid.major = element_blank(), panel.grid.minor = element_blank()),
+#            break.time.by = 365.25, xscale = 365.25, pval = 0.4, pval.coord = c(x = 7.05*365.25, y = 0.80), pval.size = 12,
+#            legend = c(0.92,0.90), legend.title = "Sex",
+#            legend.labs = c("females", "males"),
+#            palette = c(plasma(1, direction = -1, begin = 0.0, end = 0.6), viridis(1, begin = 0.2, alpha = 0.9)))
+# 
+# dev.off()
 #
 # # Project status
 # png(filename = here("plots","02_survival", "survplot_project_sex.png"), width = 1200, height = 772)
@@ -1128,20 +1143,20 @@ timeline_NBI(df = NBI_timesplit, start = "Year", end = "end_stage", names = "nam
 Save the Plot
 ```{r TL save plot}
 # png(filename = here("plots", "02_survival", "timelines_all.png"), width = 700, height = 763)
-# timeline_NBI(df = NBI_timesplit, start = "Year", end = "end_stage", names = "name", phase = "STAGE", group1 = "hatch_year", 
-#              theme = theme_bw() + theme(panel.border = element_blank(), 
-#                                         panel.spacing.y = unit(0.0, "lines"), 
-#                                         panel.grid.major.y = element_blank(), 
-#                                         panel.grid.major.x = element_line(), 
-#                                         panel.grid.minor = element_line(), 
-#                                         strip.background = element_blank(), 
-#                                         strip.text = element_blank(), 
-#                                         axis.text.y = element_blank(), 
-#                                         axis.ticks.y = element_blank(), 
-#                                         axis.title = element_text(size = 18), 
-#                                         axis.text = element_text(size = 16), 
-#                                         legend.text = element_text(size = 16), 
-#                                         legend.title = element_text(size = 18)), 
+# timeline_NBI(df = NBI_timesplit, start = "Year", end = "end_stage", names = "name", phase = "STAGE", group1 = "hatch_year",
+#              theme = theme_bw() + theme(panel.border = element_blank(),
+#                                         panel.spacing.y = unit(0.0, "lines"),
+#                                         panel.grid.major.y = element_blank(),
+#                                         panel.grid.major.x = element_line(),
+#                                         panel.grid.minor = element_line(),
+#                                         strip.background = element_blank(),
+#                                         strip.text = element_blank(),
+#                                         axis.text.y = element_blank(),
+#                                         axis.ticks.y = element_blank(),
+#                                         axis.title = element_text(size = 18),
+#                                         axis.text = element_text(size = 16),
+#                                         legend.text = element_text(size = 16),
+#                                         legend.title = element_text(size = 18)),
 #              other = labs(colour = "Stage", y = "Individuals"))
 # dev.off()
 ```

@@ -262,7 +262,7 @@ ggplot(df_Basic_scen, aes(x = Year, y = IndAll)) +
   theme(legend.position = "none", panel.grid = element_blank(), 
         strip.background =element_rect(fill="grey50")) + 
   labs(x = "Years after simulation start", y = "Female individuals") + 
-  geom_text(data = df_scen, mapping = aes(x = 43, y = 170),  
+  geom_text(data = df_scen, mapping = aes(x = 42, y = 170),  
             label = paste(sprintf("%.2f", round(df_scen$Lambda_sto, digits = 2)), # sprintf ensures that two (or three) decimal places are actually displayed.
                           "\u00b1", # +- sign
                           sprintf("%.3f", round(df_scen$SD_Lambda, digits = 3)), sep = " "), 
@@ -270,7 +270,7 @@ ggplot(df_Basic_scen, aes(x = Year, y = IndAll)) +
   scale_colour_viridis_d(option = "plasma", begin = 0.4)
 
 
-# Version 1 y-lim 0-500
+# Version 2 y-lim 0-500
 # ggplot(df_Basic_scen, aes(x = Year, y = IndAll)) + 
 #   geom_line(aes(group = Run, colour = Scenario)) + 
 #   facet_wrap( ~Scenario, 
@@ -292,8 +292,10 @@ ggplot(df_Basic_scen, aes(x = Year, y = IndAll)) +
 
 Save the plot
 ```{r}
- ggsave(filename = here("plots", "04_PVA", "20211123_pop_trajectories_200.png"),
-        width = 15, height = 20, units = "cm")
+ ggsave(filename = here("plots", "04_PVA", "20220614_pop_trajectories_200.png"),
+        width = 11.5, height = 17.17, units = "cm", dpi = 2800)
+ ggsave(filename = here("plots", "04_PVA", "20220614_pop_trajectories_200.svg"),
+        width = 11.5, height = 17.17, units = "cm", dpi = 2800)
 ```
 
 ***

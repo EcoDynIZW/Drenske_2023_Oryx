@@ -58,7 +58,7 @@ unique(df_sc_mean$Repro)
 
 Change the column names
 ```{r}
-colnames(df_sc_mean)[20:24] <- c("m1", "m2", "m3", "m4", "RR") 
+colnames(df_sc_mean)[10:14] <- c("m1", "m2", "m3", "m4", "RR") 
 ```
 
 Add columns for survival
@@ -205,13 +205,13 @@ vis.gam(gammod_2_2, view = c("m4", "RR"), plot.type = "persp", type = "response"
 
 Save the plot
 ```{r}
-# # s4 and RR
-# png(filename = here("plots", "04_PVA", "persp_s4_RR_lambda_20211124.png"), width = 1200, height = 772)
-# vis.gam(gammod_2_1, view = c("s4", "RR"), plot.type = "persp", type = "response", zlim = c(0.5,1.8), 
-#         ticktype = "detailed", border = NA, n.grid = 1000, nticks = 3, 
-#         xlab = "s4", ylab = "RR", zlab = "Lambda", 
-#         color = "heat", theta= -140, cex.lab = 3, cex.axis = 2.5)
-# dev.off()
+# s4 and RR
+png(filename = here("plots", "04_PVA", "persp_s4_RR_lambda_20211124.png"), width = 1200, height = 772)
+vis.gam(gammod_2_1, view = c("s4", "RR"), plot.type = "persp", type = "response", zlim = c(0.5,1.8),
+        ticktype = "detailed", border = NA, n.grid = 1000, nticks = 3,
+        xlab = "s4", ylab = "RR", zlab = "Lambda",
+        color = "heat", theta= -140, cex.lab = 3, cex.axis = 2.5)
+dev.off()
 ```
 
 ## Effect size
@@ -243,6 +243,7 @@ anova(mod1_3_1, test='LRT')
 #dredge(mod1_3_1)
 plot(allEffects(mod1_3_1),type='response', ylim = c(1,2))
 ```
+
 Save the plot
 ```{r}
 png(filename = here("plots", "04_PVA", "lambda_effects_plot20211216.png"), width = 1200, height = 772)

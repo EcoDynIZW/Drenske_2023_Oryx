@@ -7,7 +7,7 @@ d6::fill_desc(
   author_first_name = "Sinah", ## Your First Name
   author_last_name = "Drenske",  ## Your Last Name
   author_email = "drenske@izw-berlin.de",      ## Your Email
-  repo_url = "https://github.com/SinahDre/Drenske_2020_PVA_NBI"         ## The URL of the GitHub Repo (optional)
+  repo_url = "ADD"         ## The URL of the GitHub Repo (optional)
 )
 
 ## Add and fill the readme
