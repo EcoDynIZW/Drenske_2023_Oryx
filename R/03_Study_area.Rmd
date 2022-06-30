@@ -1,18 +1,15 @@
 ---
-title: "PVA of the NBI: Study area" ## name of your project
-author: "Cédric Scherer"                     ## your name(s)
-date: "`r Sys.Date()`"                  ## current date
+title: "PVA of the NBI: Study area"
+author: "Cédric Scherer"           
+date: "`r Sys.Date()`"     
 output:
   rmdformats::readthedown:
-    code_folding: hide                  ## hide or show code by default?
-    toc_depth: 3                        ## 3-level TOC
+    code_folding: hide     
+    toc_depth: 3           
 ---
 
 ```{r setup, include=FALSE}
-## You can ignore this chunk in most cases
-## If you want to modify chunk options, you can do it here for all chunks or
-## add the options in the repsective chunk header, e.g. `{r, message = FALSE}`
-knitr::opts_chunk$set(echo = TRUE, warning = TRUE, message = TRUE,
+knitr::opts_chunk$set(echo = TRUE, warning = FALSE, message = FALSE,
                       fig.width = 9, fig.height = 6, dpi = 500, 
                       retina = 1, fig.showtext = TRUE)
 ```
@@ -24,12 +21,14 @@ knitr::opts_chunk$set(echo = TRUE, warning = TRUE, message = TRUE,
 In this script we create the map for the study area.
 
 # Setup
+
 ```{r prep}
 ## packages
 library("tidyverse")
 library("raster")
 library("sf")
 library("RStoolbox")
+library("ggsn")
 library("lwgeom")
 library("rnaturalearth")
 library("rworldmap")
@@ -40,22 +39,20 @@ library("pdftools")
 library("systemfonts")
 
 ## set the theme
-theme_set(theme_minimal(base_family = "Roboto"))
+theme_set(theme_minimal(base_family = "Open Sans"))
 theme_update(
   axis.ticks = element_line(color = "grey10"),
-  axis.text.x = element_text(family = "Roboto Mono",
-                             size = 16, 
+  axis.ticks.length = unit(-.5, "lines"),
+  axis.text.x = element_text(size = 16, 
                              margin = margin(t = 3)),
-  axis.text.y = element_text(family = "Roboto Mono",
-                             size = 16, 
+  axis.text.y = element_text(size = 16, 
                              margin = margin(r = 3)),
   panel.border = element_rect(color = "grey10", fill = NA, size = 1), 
   panel.background = element_rect(color = "white", fill = "white"),
-  plot.margin = margin(20, 20, 20, 20),
-  plot.tag = element_text(size = 20, face = "bold"),
+  plot.margin = margin(5, 10, 10, 10),
+  plot.tag = element_text(size = 24, face = "bold"),
   legend.position = "top",
-  legend.text = element_text(family = "Roboto",
-                             face = "bold",
+  legend.text = element_text(face = "bold",
                              size = 18,
                              margin = margin(r = 15, b = 0))
 )
@@ -132,12 +129,15 @@ overview <-
                fill = "white",
                size = 3,
                stroke = .8) +
+    ggspatial::annotation_scale(location = 'tl',
+                                text_family = "Open Sans",
+                                text_cex = 1.2) +
     coord_sf(xlim = c(2000000, 6600000), 
              ylim = c(1000000, 5600000)) +
     scale_x_continuous(expand = c(0, 0), breaks = seq(-10, 30, by = 10)) +
     theme(panel.ontop = F,
           panel.grid.major = element_line(color = "grey85", linetype = "dashed", size = .4)) +
-    labs(x = NULL, y = NULL, tag = "A.")
+    labs(x = NULL, y = NULL)
 
 overview
 ```
@@ -145,10 +145,10 @@ overview
 
 ```{r save overview-map, fig.width = 8.5, fig.height = 10}
 ## save map
-# ggsave(here::here("plots", "NBIPVA_A_europe_countries.pdf"),
+# ggsave(here::here("plots", "01_description", "NBIPVA_A_europe_countries.pdf"),
 #        width = 8.95, height = 10, device = cairo_pdf)
 # 
-# pdf_convert(pdf = here::here("plots", "NBIPVA_A_europe_countries.pdf"), 
+# pdf_convert(pdf = here::here("plots", "01_description", "NBIPVA_A_europe_countries.pdf"), 
 #             format = "png", dpi = 750)
 ```
 
@@ -263,7 +263,7 @@ alps <-
                     nudge_x = 20000,
                     size = 4.4,
                     color = "#fefefe",
-                    family = "Roboto",
+                    family = "Open Sans",
                     fontface = "bold",
                     lineheight = .8,
                     hjust = 0,
@@ -273,11 +273,14 @@ alps <-
                     nudge_x = -20000,
                     size = 4.4,
                     color = "#fefefe",
-                    family = "Roboto",
+                    family = "Open Sans",
                     fontface = "bold",
                     lineheight = .8,
                     hjust = 1,
                     bg.color = "#212121") +
+    ggspatial::annotation_scale(location = 'tl',
+                                text_family = "Open Sans",
+                                text_cex = 1.2) +
     scale_color_manual(values = c("#d10173", "#21bffe"),
                        name = "") +
     rcartocolor::scale_fill_carto_c(palette = "ag_GrnYl", direction = -1, guide = "none") +
@@ -288,7 +291,8 @@ alps <-
                                 title.hjust = 0.5, 
                                 nrow = 1,
                                 label.position = "right")) +
-    labs(x = NULL, y = NULL, tag = "B.")
+    theme(legend.position = "top") +
+    labs(x = NULL, y = NULL)
 
 alps
 ```
@@ -296,26 +300,28 @@ alps
 
 ```{r save hillshade-map, fig.width = 8.5, fig.height = 10}
 ## save map
-# ggsave(here::here("plots", "NBIPVA_B_alps_GrnYl.pdf"),
+# ggsave(here::here("plots", "01_description", "NBIPVA_B_alps_GrnYl.pdf"),
 #        width = 8.5, height = 10, device = cairo_pdf)
 # 
-# pdf_convert(pdf = here::here("plots", "NBIPVA_B_alps_GrnYl.pdf"), 
+# pdf_convert(pdf = here::here("plots", "01_description", "NBIPVA_B_alps_GrnYl.pdf"), 
 #             format = "png", dpi = 750)
 ```
 
 ```{r panel, fig.width = 17, fig.height = 10}
-p <- overview + alps
+p <- overview + alps + plot_annotation(tag_level = "A", tag_suffix = ".")
 
 p
 ```
 
 ```{r save panel, fig.width = 17, fig.height = 10}
 ## save panel
-# ggsave(here::here("plots", "NBIPVA_panel_GrnYl.pdf"),
-#        width = 17, height = 10, device = cairo_pdf)
-# 
-# pdf_convert(pdf = here::here("plots", "NBIPVA_panel_GrnYl.pdf"), 
-#             format = "png", dpi = 750)
+file <- here::here("plots", "01_description", "NBIPVA_panel_GrnYl")
+
+ggsave(paste0(file, ".pdf"), width = 17, height = 10, device = cairo_pdf)
+
+ggsave(paste0(file, ".svg"), width = 17, height = 10)
+
+pdf_convert(pdf = paste0(file, ".pdf"), filename = paste0(file, ".png"), format = "png", dpi = 750)
 ```
 
 ***
@@ -323,11 +329,8 @@ p
 <details><summary>Session Info</summary>
 
 ```{r sessionInfo}
-## DO NOT REMOVE!
-## We store the settings of your computer and the current versions of the
-## packages used to allow for reproducibility
 Sys.time()
-#git2r::repository() ## uncomment if you are using GitHub
+git2r::repository()
 sessionInfo()
 ```
 
