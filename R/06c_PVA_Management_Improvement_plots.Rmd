@@ -34,6 +34,7 @@ In this script we create barplots to show the distribution of survival and repro
 ## please add ALL LIBRARIES NEEDED HERE
 ## please remove libraries from the list that are not needed anymore 
 ## at a later stage
+library("extrafont")
 library("here")
 library("ggplot2")
 library("viridisLite")
@@ -250,6 +251,11 @@ length(unique(df_Basic_scen$Scenario))
 
 
 ```{r}
+# Loading fonts (with package extrafont)
+font_import()
+loadfonts(device = "win")
+fonts()
+
 # Version 1 y-lim 0-200
 ggplot(df_Basic_scen, aes(x = Year, y = IndAll)) + 
   geom_line(aes(group = Run, colour = Scenario)) + 
@@ -259,8 +265,10 @@ ggplot(df_Basic_scen, aes(x = Year, y = IndAll)) +
   geom_line(data = df_mean, aes(x = Year, y = IndAll, group = Scenario), size = 1) +
   scale_y_continuous(limits = c(0, 200)) +
   theme_light() +
-  theme(legend.position = "none", panel.grid = element_blank(), 
-        strip.background =element_rect(fill="grey50")) + 
+  theme(legend.position = "none", 
+        panel.grid = element_blank(), 
+        strip.background =element_rect(fill="grey50"), 
+        text = element_text(family = "Open Sans")) + 
   labs(x = "Years after simulation start", y = "Female individuals") + 
   geom_text(data = df_scen, mapping = aes(x = 42, y = 170),  
             label = paste(sprintf("%.2f", round(df_scen$Lambda_sto, digits = 2)), # sprintf ensures that two (or three) decimal places are actually displayed.
@@ -292,10 +300,10 @@ ggplot(df_Basic_scen, aes(x = Year, y = IndAll)) +
 
 Save the plot
 ```{r}
- ggsave(filename = here("plots", "04_PVA", "20220614_pop_trajectories_200.png"),
-        width = 11.5, height = 17.17, units = "cm", dpi = 2800)
- ggsave(filename = here("plots", "04_PVA", "20220614_pop_trajectories_200.svg"),
-        width = 11.5, height = 17.17, units = "cm", dpi = 2800)
+ # ggsave(filename = here("plots", "04_PVA", "20220801_pop_trajectories_200.png"),
+ #        width = 11.5, height = 17.17, units = "cm", dpi = 2800)
+ # ggsave(filename = here("plots", "04_PVA", "20220801_pop_trajectories_200.svg"),
+ #        width = 11.5, height = 17.17, units = "cm", dpi = 2800)
 ```
 
 ***

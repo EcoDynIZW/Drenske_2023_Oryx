@@ -34,6 +34,7 @@ In this script we do the survival analysis. We calculate the survival probabilit
 ## please add ALL LIBRARIES NEEDED HERE
 ## please remove libraries from the list that are not needed anymore 
 ## at a later stage
+library("extrafont")
 library("here")
 library("survival")
 library("survminer")
@@ -653,11 +654,21 @@ sum_cox_rt
 
 Survival plot
 ```{r rt surv plot}
+# Loading fonts (with package extrafont)
+font_import()
+loadfonts(device = "win")
+fonts()
+
 # Life status
-ggsurvplot(sfit_rt, data = NBI_RT, conf.int = T, risk.table = F, xlab = "Years", xlim = c(0,8*365.25),
+ggsurvplot(sfit_rt, data = NBI_RT, conf.int = T, risk.table = F, 
+           xlab = "Years", xlim = c(0,8*365.25),
            font.x = 23, font.tickslab = 22, font.y = 23,font.legend = 22,
-           ggtheme = theme_bw()+ theme(panel.grid.major = element_blank(), panel.grid.minor = element_blank()),
-           break.time.by = 365.25, xscale = 365.25, pval = 0.004, pval.coord = c(x = 6.75*365.25, y = 0.85), pval.size = 7,
+           ggtheme = theme_bw() + 
+                     theme(panel.grid.major = element_blank(), 
+                           panel.grid.minor = element_blank(), 
+                           text = element_text(family = "Open Sans")),
+           break.time.by = 365.25, xscale = 365.25, 
+           pval = 0.004, pval.coord = c(x = 6.75*365.25, y = 0.85), pval.size = 7,
            legend = c(0.9,0.91), legend.title = "Raising type", 
            legend.labs = c("Foster parents", "Biological parents"), 
            palette = viridis(3, begin = 0.65, end = 0.85))
@@ -676,27 +687,37 @@ Save the Plot
 ```{r rt save plot}
 # Life status
 # svg for publication
-# svg(filename = here("plots","02_survival", "survplot_life_raising_20220614.svg"), width = 3.22835, height = 2.07874)
-# ggsurvplot(sfit_rt, data = NBI_RT, conf.int = T, risk.table = F, xlab = "Years", xlim = c(0,8*365.25), size = 0.8,
+# svg(filename = here("plots","02_survival", "survplot_life_raising_20220801.svg"), width = 3.22835, height = 2.07874)
+# ggsurvplot(sfit_rt, data = NBI_RT, conf.int = T, risk.table = F, 
+#            xlab = "Years", xlim = c(0,8*365.25), size = 0.8,
 #            font.x = 10, font.tickslab = 9, font.y = 10,font.legend = 7,
-#            ggtheme = theme_bw()+ theme(panel.grid.major = element_blank(), panel.grid.minor = element_blank()),
-#            break.time.by = 365.25, xscale = 365.25, pval = 0.004, pval.coord = c(x = 4.5*365.25, y = 0.45), pval.size = 2.5,
-#            legend = c(0.76,0.75), legend.title = "Raising type",
+#            ggtheme = theme_bw() + 
+#                      theme(panel.grid.major = element_blank(), 
+#                            panel.grid.minor = element_blank(), 
+#                            text = element_text(family = "Open Sans")),
+#            break.time.by = 365.25, xscale = 365.25, 
+#            pval = 0.004, pval.coord = c(x = 4.5*365.25, y = 0.45), pval.size = 2.5,
+#            legend = c(0.75,0.75), legend.title = "Raising type",
 #            legend.labs = c("Foster parents", "Biological parents"),
 #            palette = viridis(3, begin = 0.65, end = 0.85))
 # dev.off()
 
 
-# png(filename = here("plots","02_survival", "survplot_life_raising_20220614.png"), width = 82, height = 52.8, units = "mm", res = 2000)
-# 
-# ggsurvplot(sfit_rt, data = NBI_RT, conf.int = T, risk.table = F, xlab = "Years", xlim = c(0,8*365.25), size = 0.8,
+# png(filename = here("plots","02_survival", "survplot_life_raising_20220801_2.png"), width = 82, height = 52.8, units = "mm", res = 2000)
+#  
+# ggsurvplot(sfit_rt, data = NBI_RT, conf.int = T, risk.table = F, 
+#            xlab = "Years", xlim = c(0,8*365.25), size = 0.8,
 #            font.x = 10, font.tickslab = 9, font.y = 10,font.legend = 7,
-#            ggtheme = theme_bw()+ theme(panel.grid.major = element_blank(), panel.grid.minor = element_blank()),
-#            break.time.by = 365.25, xscale = 365.25, pval = 0.004, pval.coord = c(x = 4.5*365.25, y = 0.45), pval.size = 2.5,
+#            ggtheme = theme_bw() + 
+#                      theme(panel.grid.major = element_blank(), 
+#                            panel.grid.minor = element_blank(), 
+#                            text = element_text(family = "Open Sans")),
+#            break.time.by = 365.25, xscale = 365.25, 
+#            pval = 0.004, pval.coord = c(x = 4.5*365.25, y = 0.45), pval.size = 2.5,
 #            legend = c(0.76,0.75), legend.title = "Raising type",
 #            legend.labs = c("Foster parents", "Biological parents"),
 #            palette = viridis(3, begin = 0.65, end = 0.85))
-# 
+#  
 # dev.off()
 ```
 
