@@ -1,10 +1,10 @@
 
-# Drenske et al. 2022 *submitted to Oryx*
+# Drenske et al. (accepted) *Oryx*
 
 <!-- badges: start -->
 <!-- badges: end -->
 
-> **Sinah Drenske, Viktoriia Radchuk, Cédric Scherer**, Corinna Esterer, Ingo Kowarik, Johannes Fritz, **Stephanie Kramer-Schadt** (2022): On the road to self-sustainability: Reintroduced migratory European Northern Bald Ibises (*Geronticus eremita*) still need management interventions for population viability. *Oryx* XXX. DOI: XXX
+> **Sinah Drenske, Viktoriia Radchuk, Cédric Scherer**, Corinna Esterer, Ingo Kowarik, Johannes Fritz, **Stephanie Kramer-Schadt** (accepted): On the road to self-sustainability: Reintroduced migratory European Northern Bald Ibises (*Geronticus eremita*) still need management interventions for population viability. *Oryx* XXX. DOI: XXX
 
 The northern bald ibis disappeared from Europe in the Middle Ages. Since 2003 a migratory population has been reintroduced in Central Europe. We conducted demographic analyses of the survival and reproduction of 384 northern bald ibises over a period of 12 years (2008-2019). These data also formed the basis for a population viability analysis simulating the possible future development of the northern bald ibis population under different scenarios. We analysed life-stage specific survival rates for differences between these stages, rearing protocols, and colonies as well as the influence of stochastic catastrophic events and northern bald ibis reinforcement translocations on the population growth. Stage-specific survival probabilities ranged from 0.64 to 0.78. 45% of the mature females reproduced, with a mean fecundity of 2.15 fledglings per nest. The complementary population viability analysis indicated that the release population is close to self-sustainability with an estimated population growth rate of 0.95 and 24% extinction probability within 50 years. Out of the 326 future scenarios tested, 94 % reached the criteria of <5% extinction probability and population growth rates >1. Stochastic catastrophic events had only a limited effect. Despite comparatively high survival and fecundity rates, the population viability analysis indicated that to achieve self-sustainability the release population needs further translocations to support population growth and effective measures against the major mortality threats: illegal hunting in Italy and electrocution on unsecured power poles. The findings of this study are to be implemented as part of a second European LIFE project.
 
