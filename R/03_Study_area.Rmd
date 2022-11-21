@@ -9,9 +9,10 @@ output:
 ---
 
 ```{r setup, include=FALSE}
-knitr::opts_chunk$set(echo = TRUE, warning = FALSE, message = FALSE,
-                      fig.width = 9, fig.height = 6, dpi = 500, 
-                      retina = 1, fig.showtext = TRUE)
+knitr::opts_chunk$set(
+  echo = TRUE, warning = FALSE, message = FALSE,
+  fig.width = 9, fig.height = 6, dev = "ragg_png", dpi = 180, retina = 1
+)
 ```
 
 * **Hypothesis:** We hypothesize that at the present time the northern bald ibis population can survive without further management and release. We predict that the observed demographic rates will ensure population growth and do not differ between the breeding colonies. 
@@ -31,11 +32,9 @@ library("RStoolbox")
 library("ggsn")
 library("lwgeom")
 library("rnaturalearth")
-library("rworldmap")
 library("rmapshaper")
 library("shadowtext")
 library("patchwork")
-library("pdftools")
 library("systemfonts")
 
 ## set the theme
@@ -83,6 +82,8 @@ locations <-
     type = c("Breeding ground", "Breeding ground", "Breeding ground", "Breeding ground", "Wintering ground"),
     label = c("Burghausen\n(Germany)", "Überlingen\n(Germany)", 
               "Kuchl\n(Austria)", "Rosegg\n(Austria)", "Laguna di\nOrbetello\n(Italy)"),
+    label_alt = c("Burghausen", "Überlingen", 
+              "Kuchl", "Rosegg", "Laguna di\nOrbetello"),
     side = c("r", "l", "r", "r", "r"),
     x = c(4531605, 4258768, 4557635, 4629096, 4419572),
     y = c(2788488, 2739526, 2728565, 2616771, 2148807),
@@ -98,25 +99,30 @@ locations <-
 
 ```{r overview-map, fig.width = 8.5, fig.height = 10}
 sf_world <- 
-  st_as_sf(rworldmap::getMap(resolution = "low")) %>% 
+  rnaturalearth::ne_countries(returnclass = "sf", scale = 10) %>% 
   st_transform(crs = st_crs(dem_alps)) %>% 
   st_buffer(dist = 0) %>% 
-  dplyr::select(ISO_A2, SOVEREIGNT, LON, continent) %>% 
+  dplyr::select(iso_a2, sovereignt, continent) %>% 
   mutate(area = st_area(.))
 
+sf_inner <- rmapshaper::ms_innerlines(sf_world)
+
 overview <- 
-  ggplot(sf_world) +
-    geom_sf(fill = "grey60",
-            color = "grey80",
-            lwd = 0.3) +
+  ggplot() +
+    geom_sf(data = sf_world,
+            fill = "grey60",
+            color = "transparent") +
+    geom_sf(data = sf_inner, 
+            color = "grey80", 
+            size = .3) +
     geom_rect(xmin = 4000600, xmax = 4840000,
               ymin = 2000600, ymax = 2990000,
               color = "#212121",
               fill = NA) +
     geom_sf_text(data = sf_world %>% 
-                   filter(ISO_A2 %in% c("DE", "IT", "AT")) %>% 
-                   group_by(ISO_A2) %>% slice(1),
-                 aes(label = ISO_A2),
+                   filter(iso_a2 %in% c("DE", "IT", "AT")) %>% 
+                   group_by(iso_a2) %>% slice(1),
+                 aes(label = iso_a2),
                  family = "Open Sans",
                  color = "white",
                  fontface = "bold",
@@ -132,10 +138,12 @@ overview <-
     ggspatial::annotation_scale(location = 'tl',
                                 text_family = "Open Sans",
                                 text_cex = 1.2) +
+    ggspatial::annotation_north_arrow(location = 'bl',
+                                      text_family = "Open Sans") +
     coord_sf(xlim = c(2000000, 6600000), 
              ylim = c(1000000, 5600000)) +
     scale_x_continuous(expand = c(0, 0), breaks = seq(-10, 30, by = 10)) +
-    theme(panel.ontop = F,
+    theme(panel.ontop = FALSE,
           panel.grid.major = element_line(color = "grey85", linetype = "dashed", size = .4)) +
     labs(x = NULL, y = NULL)
 
@@ -143,13 +151,10 @@ overview
 ```
 
 
-```{r save overview-map, fig.width = 8.5, fig.height = 10}
+```{r save-overview-map, fig.width = 8.5, fig.height = 10}
 ## save map
-# ggsave(here::here("plots", "01_description", "NBIPVA_A_europe_countries.pdf"),
+# ggsave(here::here("plots", "01_description", "map_A_europe_countries.pdf"),
 #        width = 8.95, height = 10, device = cairo_pdf)
-# 
-# pdf_convert(pdf = here::here("plots", "01_description", "NBIPVA_A_europe_countries.pdf"), 
-#             format = "png", dpi = 750)
 ```
 
 
@@ -197,7 +202,7 @@ oceans <-
   st_transform(crs = st_crs(bbox)) %>% 
   st_make_valid() %>% 
   st_crop(., bbox) %>% 
-  ## transformation leads to inveresed oceans - fix it with ms_erase
+  ## transformation leads to inversed oceans - fix it with ms_erase
   rmapshaper::ms_erase(st_as_sf(bbox), .) %>%
   st_transform(crs = st_crs(dem_alps))
 
@@ -210,28 +215,15 @@ lakes <-
 
 ## map
 alps <- 
-  ggplot(df_hills) +
+  ggplot() +
     geom_raster(data = df_hills, aes(lon, lat, fill = hills, group = 1)) +
     geom_raster(data = df_slope, aes(lon, lat, fill = slope, group = 2), alpha = .6) +
     geom_sf(data = oceans,
             fill = "#627696",
             color = "#627696") +
     geom_sf(data = lakes,
-            linetype = "dashed",
             fill = "#627696",
             color = "#627696") +
-    # geom_curve(data = filter(locations, location %in% c("B", "K", "R")),
-    #            aes(x = from_x, xend = to_x,
-    #                y = from_y, yend = to_y),
-    #            curvature = .12,
-    #            size = 1.8,
-    #            color = "#fefefe") +
-    # geom_curve(data = filter(locations, location == "U"),
-    #            aes(x = from_x, xend = to_x,
-    #                y = from_y, yend = to_y),
-    #            curvature = -.12,
-    #            size = 1.8,
-    #            color = "#fefefe") +
     geom_curve(data = filter(locations, location %in% c("B", "K", "R")),
                aes(x = from_x, xend = to_x,
                    y = from_y, yend = to_y),
@@ -261,51 +253,51 @@ alps <-
     geom_shadowtext(data = filter(locations, side == "r"),
                     aes(x, y, label = label),
                     nudge_x = 20000,
-                    size = 4.4,
+                    size = 4.7,
                     color = "#fefefe",
                     family = "Open Sans",
                     fontface = "bold",
-                    lineheight = .8,
+                    lineheight = .9,
                     hjust = 0,
                     bg.color = "#212121") +
     geom_shadowtext(data = filter(locations, side == "l"),
                     aes(x, y, label = label),
                     nudge_x = -20000,
-                    size = 4.4,
+                    size = 4.7,
                     color = "#fefefe",
                     family = "Open Sans",
                     fontface = "bold",
-                    lineheight = .8,
+                    lineheight = .9,
                     hjust = 1,
                     bg.color = "#212121") +
     ggspatial::annotation_scale(location = 'tl',
                                 text_family = "Open Sans",
                                 text_cex = 1.2) +
-    scale_color_manual(values = c("#d10173", "#21bffe"),
-                       name = "") +
+    ggspatial::annotation_north_arrow(location = 'bl',
+                                      text_family = "Open Sans") +
+    scale_color_manual(values = c("#d10173", "#21bffe"), name = NULL) +
     rcartocolor::scale_fill_carto_c(palette = "ag_GrnYl", direction = -1, guide = "none") +
     #rcartocolor::scale_fill_carto_c(palette = "Fall", direction = -1, guide = "none") +
     scale_x_continuous(expand = c(0, 0), limits = c(4000600, 4840000)) +
     scale_y_continuous(expand = c(0, 0), limits = c(2000600, 2990000)) +
-    guides(color = guide_legend(title.position = "left", 
-                                title.hjust = 0.5, 
-                                nrow = 1,
-                                label.position = "right")) +
+    guides(color = guide_legend(nrow = 1, label.position = "right")) +
     theme(legend.position = "top") +
     labs(x = NULL, y = NULL)
 
 alps
-```
 
 
-```{r save hillshade-map, fig.width = 8.5, fig.height = 10}
-## save map
-# ggsave(here::here("plots", "01_description", "NBIPVA_B_alps_GrnYl.pdf"),
-#        width = 8.5, height = 10, device = cairo_pdf)
-# 
-# pdf_convert(pdf = here::here("plots", "01_description", "NBIPVA_B_alps_GrnYl.pdf"), 
-#             format = "png", dpi = 750)
+alps_alt <- 
+  alps +
+  guides(color = guide_legend(ncol = 1, label.position = "right")) +
+  theme(legend.position = c(1, 1), legend.justification = c(1.0001, 1.01),
+        legend.background = element_rect(fill = "white", color = "grey10",  size = .5),
+        legend.margin = margin(7, 5, 10, 10))
+
+alps_alt
 ```
+
+# Combined Maps
 
 ```{r panel, fig.width = 17, fig.height = 10}
 p <- overview + alps + plot_annotation(tag_level = "A", tag_suffix = ".")
@@ -313,16 +305,139 @@ p <- overview + alps + plot_annotation(tag_level = "A", tag_suffix = ".")
 p
 ```
 
-```{r save panel, fig.width = 17, fig.height = 10}
-## save panel
-file <- here::here("plots", "01_description", "NBIPVA_panel_GrnYl")
 
-ggsave(paste0(file, ".pdf"), width = 17, height = 10, device = cairo_pdf)
+### Alternative Variant with Inside Legend
 
-ggsave(paste0(file, ".svg"), width = 17, height = 10)
+```{r panel-alt, fig.width = 17, fig.height = 10}
+p_alt <- overview + alps_alt + plot_annotation(tag_level = "A", tag_suffix = ".") 
 
-pdf_convert(pdf = paste0(file, ".pdf"), filename = paste0(file, ".png"), format = "png", dpi = 750)
+p_alt
 ```
+
+```{r save-panel}
+## save panel
+file <- here::here("plots", "01_description", "map_panel_GrnYl")
+
+#ggsave(plot = p, paste0(file, ".pdf"), width = 17, height = 10, device = cairo_pdf)
+ggsave(plot = p, paste0(file, ".png"), width = 17, height = 10, dpi = 750, bg = "white")
+ggsave(plot = p, paste0(file, ".svg"), width = 17, height = 10)
+
+
+file <- here::here("plots", "01_description", "map_panel_GrnYl_alt")
+
+#ggsave(plot = p_alt, paste0(file, ".pdf"), width = 17, height = 10, device = cairo_pdf)
+ggsave(plot = p_alt, paste0(file, ".png"), width = 17, height = 10, dpi = 750, bg = "white")
+ggsave(plot = p_alt, paste0(file, ".svg"), width = 17, height = 10)
+```
+
+# Alternative Single Map Variant
+
+```{r single map, fig.width = 9, fig.height = 10}
+country_labs <- 
+  tibble(
+    country = c("DE", "IT", "AT"),
+    long = c(10.5, 12.2, 14.9),
+    lat = c(48.2, 43.3, 47.2)
+  ) %>% 
+  st_as_sf(coords = c("long", "lat"), crs = crs(oceans_raw))
+
+p_single <-
+  ggplot() +
+    geom_raster(data = df_hills, aes(lon, lat, fill = hills, group = 1)) +
+    geom_raster(data = df_slope, aes(lon, lat, fill = slope, group = 2), alpha = .6) +
+    geom_sf(data = oceans,
+            fill = "#627696",
+            color = "#627696") +
+    geom_sf(data = lakes,
+            fill = "#627696",
+            color = "#627696") +
+    geom_sf(data = sf_inner, 
+            color = "white",
+            size = .9) +
+    geom_sf_text(data = country_labs,
+                 aes(label = country),
+                 family = "Open Sans",
+                 color = "white",
+                 fontface = "bold",
+                 size = 9) +
+    geom_curve(data = filter(locations, location %in% c("B", "K", "R")),
+               aes(x = from_x, xend = to_x,
+                   y = from_y, yend = to_y),
+               curvature = .12,
+               size = 1.3,
+               color = "#212121") +
+    geom_curve(data = filter(locations, location == "U"),
+               aes(x = from_x, xend = to_x,
+                   y = from_y, yend = to_y),
+               curvature = -.12,
+               size = 1.3,
+               color = "#212121") +
+    ## outer ring
+    geom_point(data = locations,
+               aes(x, y,
+                   color = type),
+               shape = 21,
+               fill = "#fefefe",
+               size = 9,
+               stroke = .8) +
+    ## inner point
+    geom_point(data = locations,
+               aes(x, y,
+                   color = type),
+               size = 3) +
+    ## location labels
+    geom_shadowtext(data = filter(locations, side == "r"),
+                    aes(x, y, label = label_alt),
+                    nudge_x = 20000,
+                    size = 6.2,
+                    color = "#fefefe",
+                    family = "Open Sans",
+                    fontface = "bold",
+                    lineheight = .9,
+                    hjust = 0,
+                    bg.color = "#212121") +
+    geom_shadowtext(data = filter(locations, side == "l"),
+                    aes(x, y, label = label_alt),
+                    nudge_x = -20000,
+                    size = 6.2,
+                    color = "#fefefe",
+                    family = "Open Sans",
+                    fontface = "bold",
+                    lineheight = .9,
+                    hjust = 1,
+                    bg.color = "#212121") +
+    ggspatial::annotation_scale(location = 'tl',
+                                text_family = "Open Sans",
+                                text_cex = 1.6) +
+    ggspatial::annotation_north_arrow(location = 'bl',
+                                      text_family = "Open Sans") +
+    scale_color_manual(values = c("#d10173", "#21bffe"), name = NULL) +
+    rcartocolor::scale_fill_carto_c(palette = "ag_GrnYl", direction = -1, guide = "none") +
+    scale_x_continuous(expand = c(0, 0), limits = c(4000000, 4840000)) +
+    scale_y_continuous(expand = c(0, 0), limits = c(2050000, 3000000)) +
+    #guides(color = guide_legend(nrow = 1, label.position = "right")) +
+    guides(color = guide_legend(ncol = 1, label.position = "right")) +
+    labs(x = NULL, y = NULL) +
+    theme(legend.position = c(1, 1), legend.justification = c(1.0001, 1.01),
+          legend.background = element_rect(fill = "white", color = "grey10", size = .5),
+          legend.margin = margin(7, 5, 10, 10))
+
+p_single
+```
+
+```{r save-single-map}
+## save panel
+file <- here::here("plots", "01_description", "map_single_GrnYl")
+
+#ggsave(plot = p_single, paste0(file, ".pdf"), width = 9, height = 10, device = cairo_pdf)
+ggsave(plot = p_single, paste0(file, ".png"), width = 9, height = 10, dpi = 750, bg = "white")
+ggsave(plot = p_single, paste0(file, ".svg"), width = 9, height = 10)
+```
+
+```{r cvd-check, fig.width = 18, fig.height = 20}
+colorBlindness::cvdPlot(p_single)
+```
+
 
 ***
 
