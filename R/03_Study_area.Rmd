@@ -38,7 +38,7 @@ library("patchwork")
 library("systemfonts")
 
 ## set the theme
-theme_set(theme_minimal(base_family = "Open Sans"))
+theme_set(theme_minimal(base_size = 14, base_family = "Open Sans"))
 theme_update(
   axis.ticks = element_line(color = "grey10"),
   axis.ticks.length = unit(-.5, "lines"),
@@ -138,8 +138,6 @@ overview <-
     ggspatial::annotation_scale(location = 'tl',
                                 text_family = "Open Sans",
                                 text_cex = 1.2) +
-    ggspatial::annotation_north_arrow(location = 'bl',
-                                      text_family = "Open Sans") +
     coord_sf(xlim = c(2000000, 6600000), 
              ylim = c(1000000, 5600000)) +
     scale_x_continuous(expand = c(0, 0), breaks = seq(-10, 30, by = 10)) +
@@ -273,8 +271,7 @@ alps <-
     ggspatial::annotation_scale(location = 'tl',
                                 text_family = "Open Sans",
                                 text_cex = 1.2) +
-    ggspatial::annotation_north_arrow(location = 'bl',
-                                      text_family = "Open Sans") +
+    ggspatial::annotation_north_arrow(location = 'bl') +
     scale_color_manual(values = c("#d10173", "#21bffe"), name = NULL) +
     rcartocolor::scale_fill_carto_c(palette = "ag_GrnYl", direction = -1, guide = "none") +
     #rcartocolor::scale_fill_carto_c(palette = "Fall", direction = -1, guide = "none") +
@@ -335,9 +332,9 @@ ggsave(plot = p_alt, paste0(file, ".svg"), width = 17, height = 10)
 ```{r single map, fig.width = 9, fig.height = 10}
 country_labs <- 
   tibble(
-    country = c("DE", "IT", "AT"),
+    country = c("Germany", "Italy", "Austria"),
     long = c(10.5, 12.2, 14.9),
-    lat = c(48.2, 43.3, 47.2)
+    lat = c(48.6, 43.3, 47.2)
   ) %>% 
   st_as_sf(coords = c("long", "lat"), crs = crs(oceans_raw))
 
@@ -389,7 +386,7 @@ p_single <-
     geom_shadowtext(data = filter(locations, side == "r"),
                     aes(x, y, label = label_alt),
                     nudge_x = 20000,
-                    size = 6.2,
+                    size = 7,
                     color = "#fefefe",
                     family = "Open Sans",
                     fontface = "bold",
@@ -399,7 +396,7 @@ p_single <-
     geom_shadowtext(data = filter(locations, side == "l"),
                     aes(x, y, label = label_alt),
                     nudge_x = -20000,
-                    size = 6.2,
+                    size = 7,
                     color = "#fefefe",
                     family = "Open Sans",
                     fontface = "bold",
@@ -409,8 +406,7 @@ p_single <-
     ggspatial::annotation_scale(location = 'tl',
                                 text_family = "Open Sans",
                                 text_cex = 1.6) +
-    ggspatial::annotation_north_arrow(location = 'bl',
-                                      text_family = "Open Sans") +
+    ggspatial::annotation_north_arrow(location = 'bl') +
     scale_color_manual(values = c("#d10173", "#21bffe"), name = NULL) +
     rcartocolor::scale_fill_carto_c(palette = "ag_GrnYl", direction = -1, guide = "none") +
     scale_x_continuous(expand = c(0, 0), limits = c(4000000, 4840000)) +
