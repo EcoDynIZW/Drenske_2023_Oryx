@@ -52,8 +52,8 @@ theme_update(
   plot.tag = element_text(size = 24, face = "bold"),
   legend.position = "top",
   legend.text = element_text(face = "bold",
-                             size = 18,
-                             margin = margin(r = 15, b = 0))
+                             size = 20,
+                             margin = margin(2, 6, 2, 6))
 )
 ```
 
@@ -386,7 +386,7 @@ p_single <-
     geom_shadowtext(data = filter(locations, side == "r"),
                     aes(x, y, label = label_alt),
                     nudge_x = 20000,
-                    size = 7,
+                    size = 7.7,
                     color = "#fefefe",
                     family = "Open Sans",
                     fontface = "bold",
@@ -396,7 +396,7 @@ p_single <-
     geom_shadowtext(data = filter(locations, side == "l"),
                     aes(x, y, label = label_alt),
                     nudge_x = -20000,
-                    size = 7,
+                    size = 7.7,
                     color = "#fefefe",
                     family = "Open Sans",
                     fontface = "bold",
