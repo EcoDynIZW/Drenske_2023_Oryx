@@ -11,3 +11,6 @@ The northern bald ibis disappeared from Europe in the Middle Ages. Since 2003 a 
 ## Scripts
 The project contains R scripts (folder *R*) to analyse the life history data of 384 Northern Bald Ibises. The calculated survival and reproduction probabilities are used as input for an individual-based model in NetLogo (folder *model*). The results of the IBM were then analysed again using R. 
 **Please note**: Some raw data like the results of the NetLogo models are not included in the github project due to size limitations.  
+
+## Blogpost
+https://www.oryxthejournal.org/blog/with-a-little-help-the-european-northern-bald-ibis-population-well-on-the-way-to-self-sustainability/
